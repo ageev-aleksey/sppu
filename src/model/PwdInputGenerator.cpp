@@ -38,7 +38,7 @@ SddModel::Input PwdInputGenerator::generate(const SddModel::State &state) {
     if(step(state.time, mOzDutyCycle, mFrequency)) {
         res.pwmOz = mMaxValue;
     } else {
-        res.pwmOx = mMinValue;
+        res.pwmOz = mMinValue;
     }
     return res;
 }

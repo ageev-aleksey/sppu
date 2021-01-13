@@ -226,6 +226,10 @@ void QSddModelView::stateInGui() {
         mPlots->addPlotData(1, 0, 0, centerState.time, centerState.positionOz);
         mPlots->addPlotData(1, 0, 0, endState.time, endState.positionOz);
 
+        mPlots->addPlotData(1, 1, 0, beginState.time, beginState.speedOz);
+        mPlots->addPlotData(1, 1, 0, centerState.time, centerState.speedOz);
+        mPlots->addPlotData(1, 1, 0, endState.time, endState.speedOz);
+
         mPlots->addPlotData(0, 2, 0, beginState.time, beginState.IOx);
         mPlots->addPlotData(0, 2, 0, centerState.time, centerState.IOx);
         mPlots->addPlotData(0, 2, 0, endState.time, endState.IOx);
@@ -233,6 +237,7 @@ void QSddModelView::stateInGui() {
         mPlots->addPlotData(1, 2, 0, beginState.time, beginState.IOz);
         mPlots->addPlotData(1, 2, 0, centerState.time, centerState.IOz);
         mPlots->addPlotData(1, 2, 0, endState.time, endState.IOz);
+
 
 
         mPlots->allReplot();
@@ -312,6 +317,7 @@ void QSddModelView::takeModelState(SddModel::State state) {
         std::lock_guard<std::mutex> lock(mMutexState);
         mState.push_back(state);
     }
+    // TODO убрать. Задержка ьормозит GUI а не поток исполнения модели
     int valueDelay = delayModelingField->text().toInt();
     if (valueDelay != 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(valueDelay));

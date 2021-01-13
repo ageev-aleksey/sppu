@@ -32,7 +32,7 @@ QT5_ADD_RESOURCES(${QRC}, QT_RESOURCES)
 add_library(qt_model_components STATIC ${SRC_MODEL_COMPONENTS})
 target_include_directories(qt_model_components PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS})
 target_compile_options(qt_model_components PRIVATE -fPIC)
-target_link_libraries(qt_model_components)
+target_link_libraries(qt_model_components sdd_protocol)
 add_library(SDD::QT_MODEL_COMPONENTS ALIAS qt_model_components)
 
 add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
