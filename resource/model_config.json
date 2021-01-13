@@ -1,0 +1,18 @@
+{
+  "sddModel": {
+    "speedOx0": 0,
+    "speedOz0": 0,
+    "positionOx0": 0,
+    "positionOz0": 0,
+    "frictionCoeff": 0,
+    "frictionLinearCoeff": 0,
+    "frictionQuadraticCoeff": 0,
+    "structCoeff": 0
+  },
+
+  "device": {
+    "type": "comport",
+    "path": "/dev/pts/0"
+  }
+
+}

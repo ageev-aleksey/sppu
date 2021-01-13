@@ -16,6 +16,7 @@ include(${CMAKE_CURRENT_LIST_DIR}/find_headers.cmake)
 set(LIB_DIR ${CMAKE_CURRENT_LIST_DIR}/lib)
 set(INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 set(SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
+set(RESOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/resource)
 
 include(./cmake/Cpplint.cmake)
 
