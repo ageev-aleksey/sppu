@@ -1,4 +1,5 @@
 #include "sdd_protocol/Light.h"
+using namespace sdd;
 
 Light::Light() : Package("light", 29, Message::Endianness::MSG_LITTLE_ENDIAN)
 {

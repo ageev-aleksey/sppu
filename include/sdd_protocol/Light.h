@@ -6,15 +6,23 @@
 #define SPPU_SERIAL_LIGHT_H
 
 #include "Package.h"
+namespace sdd {
+    /**
+     * Пакеь управления светодиодом
+     */
+    class Light : public Package {
+    public:
+        Light();
+        Light(std::vector<Package::byte_t> &buff);
 
-class Light : public Package {
-public:
-    Light();
-    Light(std::vector<Package::byte_t> &buff);
+        /// Включить светодиод
+        void lightOn();
+        /// Выключить светодиод
+        void lightOff();
+        /// Мерцание светодиода
+        void blinking(short n);
+    };
 
-    void lightOn();
-    void lightOff();
-    void blinking(short n);
-};
+}
 
 #endif //SPPU_SERIAL_LIGHT_H

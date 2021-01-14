@@ -2,6 +2,7 @@
 #include "sdd_protocol/PackageError.h"
 #include <exception>
 #include <string>
+using namespace sdd;
 
 Package::Package(std::string pname, char id, Message::Endianness end) : bworker(end) {
 	bworker.addField("CC", 1);

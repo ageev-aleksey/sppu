@@ -5,24 +5,27 @@
 #ifndef SPPU_SERIAL_PACKAGEBUFFER_H
 #define SPPU_SERIAL_PACKAGEBUFFER_H
 
-#include "State.h"
+#include "StatePackage.h"
 #include <boost/circular_buffer.hpp>
 #include <ostream>
 
-//TODO Класс реализован строкго для одного типа пакетов - State. /
-// необходимо переделать, чтобы класс работал для любых пакетов. /
-// для этого необходимо реализовать патер фабрики
-class PackageBuffer {
-public:
-    PackageBuffer(size_t size);
-    void addBytes(const std::vector<unsigned char> &bytes);
-    State formPackage();
-    void flush();
-	friend std::ostream &operator<<(std::ostream &stream, const PackageBuffer &buff);
+namespace sdd {
+    class PackageBuffer {
+    public:
+        explicit PackageBuffer(size_t size);
+        void addBytes(const std::vector<unsigned char> &bytes);
+        StatePackage formPackage();
+        void flush();
+        friend std::ostream &operator<<(std::ostream &stream, const PackageBuffer &buff);
 //private:
-    boost::circular_buffer<unsigned char> buffer;
-   };
+        boost::circular_buffer<unsigned char> buffer;
+    };
+}
+//TODO пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ - StatePackage. /
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ. /
+// пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-std::ostream &operator<<(std::ostream &stream, const PackageBuffer &buff);
+
+std::ostream &operator<<(std::ostream &stream, const sdd::PackageBuffer &buff);
 
 #endif //SPPU_SERIAL_PACKAGEBUFFER_H

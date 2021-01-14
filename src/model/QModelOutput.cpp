@@ -1,5 +1,5 @@
 #include "model/QModelOutput.h"
-#include "sdd_protocol/State.h"
+#include "sdd_protocol/StatePackage.h"
 #include <math.h>
 
 static const double PI =  3.14;
@@ -26,7 +26,7 @@ static short convertPwm(double value) {
 }
 
 void QModelOutput::writeModelState(SddModel::State state) {
-    State statePackage;
+    sdd::StatePackage statePackage;
     // TODO (?)
     statePackage.setOX(convertCorner(state.positionOx));
     statePackage.setOY(convertCorner(state.positionOz));

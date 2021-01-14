@@ -317,7 +317,7 @@ void QSddModelView::takeModelState(SddModel::State state) {
         std::lock_guard<std::mutex> lock(mMutexState);
         mState.push_back(state);
     }
-    // TODO убрать. Задержка ьормозит GUI а не поток исполнения модели
+    // TODO(ageev) убрать. Задержка ьормозит GUI а не поток исполнения модели
     int valueDelay = delayModelingField->text().toInt();
     if (valueDelay != 0) {
         std::this_thread::sleep_for(std::chrono::milliseconds(valueDelay));

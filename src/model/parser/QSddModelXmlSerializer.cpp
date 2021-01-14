@@ -19,7 +19,7 @@ static void throw_if_dont_contain_required_keys(const QStringList &cKeys, const 
     for(const auto &el : rKeys) {
         if(!cKeys.contains(el)) {
             std::stringstream msg;
-            msg << "Json error parsing SddModel::State; Json dont contain required field -> "
+            msg << "Json error parsing SddModel::StatePackage; Json dont contain required field -> "
                 << el.toStdString();
             throw std::runtime_error(msg.str());
         }
@@ -31,7 +31,7 @@ SddModel::State QSddModelXmlSerializer::stateDeserialize(const QString &str) {
     bytes.append(str);
     QJsonDocument doc = QJsonDocument::fromJson(bytes);
     if(!doc.isObject()) {
-        throw std::runtime_error("Json error parsing SddModel::State; Json object expected");
+        throw std::runtime_error("Json error parsing SddModel::StatePackage; Json object expected");
     }
     auto jsonObject = doc.object();
 
@@ -64,7 +64,7 @@ SddModel::Input QSddModelXmlSerializer::inputDeserialize(const QString &str) {
     bytes.append(str);
     QJsonDocument doc = QJsonDocument::fromJson(bytes);
     if(!doc.isObject()) {
-        throw std::runtime_error("Json error parsing SddModel::State; Json object expected");
+        throw std::runtime_error("Json error parsing SddModel::StatePackage; Json object expected");
     }
     auto jsonObject = doc.object();
 

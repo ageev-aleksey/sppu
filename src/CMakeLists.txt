@@ -14,6 +14,7 @@ file(GLOB_RECURSE QT_MOC_HEADERS ${INCLUDE_DIR}/Q*.h)
 
 file(GLOB_RECURSE SRC_SERIALIZATION ${CMAKE_CURRENT_LIST_DIR}/serialization/*.cpp)
 file(GLOB_RECURSE SRC_SDD_PROTOCOL ${CMAKE_CURRENT_LIST_DIR}/sdd_protocol/*.cpp)
+file(GLOB_RECURSE QT_MOC_SDD_PROTOCOL_HEADERS ${INCLUDE_DIR}/sdd_protocol/Q*.h)
 
 add_library(sdd_model STATIC ${SRC_MODEL} ${MATLAB_SIMULINK_SRC})
 target_include_directories(sdd_model PRIVATE ${INCLUDE_DIR} ${MATLAB_SIMULINK_INCLUDE_DIRS})
@@ -49,8 +50,9 @@ target_enable_cpplint(app_gui
 
 
 
-add_library(sdd_protocol ${SRC_SDD_PROTOCOL} ${SRC_SERIALIZATION})
-target_include_directories(sdd_protocol PUBLIC ${INCLUDE_DIR})
+add_library(sdd_protocol ${SRC_SDD_PROTOCOL} ${SRC_SERIALIZATION} ${QT_MOC_SDD_PROTOCOL_HEADERS})
+target_include_directories(sdd_protocol PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS} ${Qt5SerialPort_INCLUDE_DIRS})
+target_link_libraries(sdd_protocol  ${Qt5Core_LIBRARIES} ${Qt5SerialPort_LIBRARIES})
 
 add_executable(model_to_com_port ${QT_MOC_SDD_MODEL_HEADERS} ${CMAKE_CURRENT_LIST_DIR}/main_ModelToComPort.cpp)
 target_include_directories(model_to_com_port PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}

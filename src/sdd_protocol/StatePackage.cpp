@@ -1,92 +1,92 @@
-#include "sdd_protocol/State.h"
+#include "sdd_protocol/StatePackage.h"
+using namespace sdd;
 
-
-State::State() : Package("state", 20, Message::Endianness::MSG_LITTLE_ENDIAN) {
+StatePackage::StatePackage() : Package("state", 20, Message::Endianness::MSG_LITTLE_ENDIAN) {
     create_all_fields();
 }
 
 
 
-State::State(const std::vector<Package::byte_t> &bin_buff) : Package("state", 20, Message::Endianness::MSG_LITTLE_ENDIAN) {
+StatePackage::StatePackage(const std::vector<Package::byte_t> &bin_buff) : Package("state", 20, Message::Endianness::MSG_LITTLE_ENDIAN) {
     create_all_fields();
     fromBinary(bin_buff);
 }
 
-State::~State() {
+StatePackage::~StatePackage() {
 
 }
 
 /*
-void State::fromBinary(std::vector<Package::byte_t> bin_buff) {//TODO копирование
+void StatePackage::fromBinary(std::vector<Package::byte_t> bin_buff) {//TODO копирование
    if((bin_buff.size() == 36) && (bin_buff[0] == id())) {
         bworker.fromBinary(bin_buff, 1); //TODO копирование
    }
 
 }*/
 
-Package::byte_t State::state() {
+Package::byte_t StatePackage::state() {
     return findField("TW")->to<Package::byte_t>()[0];
 }
 
-void State::setState(Package::byte_t s) {
+void StatePackage::setState(Package::byte_t s) {
     findField("TW")->fill(&s, 1);
 }
 
-short State::OX() {
+short StatePackage::OX() {
     return findField("OX")->to<short>()[0];
 }
 
-void State::setOX(short x) {
+void StatePackage::setOX(short x) {
     findField("OX")->fill(reinterpret_cast<const char*>(&x), 2);
 }
 
-short State::OY() {
+short StatePackage::OY() {
     return  findField("OY")->to<short>()[0];
 }
 
-void State::setOY(short y) {
+void StatePackage::setOY(short y) {
     findField("OY")->fill(reinterpret_cast<const char*>(&y), 2);
 }
 
-short State::PWMX() {
+short StatePackage::PWMX() {
     return findField("PWMX")->to<short>()[0];
 }
 
-void State::setPWMX(short pwmx){
+void StatePackage::setPWMX(short pwmx){
     findField("PWMX")->fill(reinterpret_cast<const char*>(&pwmx), 2);
 }
 
-short State::PWMY() {
+short StatePackage::PWMY() {
     return findField("PWMY")->to<short>()[0];
 }
 
-void State::setPWMY(short pwmy){
+void StatePackage::setPWMY(short pwmy){
     findField("PWMY")->fill(reinterpret_cast<const char*>(&pwmy), 2);
 }
 
-short State::positionX() {
+short StatePackage::positionX() {
     return findField("POSX")->to<short>()[0];
 }
 
-void  State::setPositionX(short pos) {
+void  StatePackage::setPositionX(short pos) {
     findField("POSX")->fill(reinterpret_cast<const char*>(&pos), 2);
 }
 
-short State::positionY() {
+short StatePackage::positionY() {
     return findField("POSY")->to<short>()[0];
 }
 
-void  State::setPositionY(short pos) {
+void  StatePackage::setPositionY(short pos) {
     findField("POSY")->fill(reinterpret_cast<const char*>(&pos), 2);
 }
 
-Package::byte_t State::randomValue() {
+Package::byte_t StatePackage::randomValue() {
     return findField("R")->to<Package::byte_t>()[0];
 }
 
 
 
-void State::create_all_fields() {
+void StatePackage::create_all_fields() {
 	bworker.addField("TW", 1);
 	bworker.addField("OX", 2);
 	bworker.addField("OY", 2);

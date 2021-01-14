@@ -1,5 +1,5 @@
 #include "sdd_protocol/PackageError.h"
-
+using namespace sdd;
 
 PackageError::PackageError(const std::string &what) : std::runtime_error(what) {
 

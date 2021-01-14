@@ -6,7 +6,7 @@
 QSddModelExecutor::QSddModelExecutor(std::unique_ptr<SddModel> model) : mModel(std::move(model)) {
     qRegisterMetaType<SddModel::Input>("Input");
     qRegisterMetaType<SddModel::Parameters>("Parameters");
-    qRegisterMetaType<SddModel::State>("State");
+    qRegisterMetaType<SddModel::State>("StatePackage");
 }
 
 void QSddModelExecutor::setParameters(const SddModel::Parameters &parameters) {
