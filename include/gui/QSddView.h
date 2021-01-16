@@ -12,17 +12,17 @@
 #include <QHBoxLayout>
 #include "model/QSddModelExecutor.h"
 #include "model/PwdInputGenerator.h"
-#include "gui/QGridDimanicPlots.h"
+#include "gui/QGridDynamicPlots.h"
 #include "gui/QConditionalControl.h"
 
 //TODO не проинициализированны внутренние виджеты
-class QSddModelView : public QWidget
+class QSddView : public QWidget
 {
     Q_OBJECT
 public:
 
-    explicit QSddModelView(std::shared_ptr<QSddModelExecutor> modelConnector, QWidget *parent = nullptr);
-    ~QSddModelView() noexcept override;
+    explicit QSddView(std::shared_ptr<sdd::conn::IConnection> sddConnector, QWidget *parent = nullptr);
+    ~QSddView() noexcept override;
 
     std::vector<SddModel::State> getLastData();
 
@@ -45,10 +45,10 @@ private:
     void guiInit();
     void  setDefaultGuiState();
     void updateGuiParametersValue();
-    void takeModelState(SddModel::State state);
+    void takeModelState(sdd::conn::State &state);
     QWidget* pwmControlInit();
 
-    std::shared_ptr<QSddModelExecutor> mModel;
+    std::shared_ptr<sdd::conn::IConnection> mSddConnect;
 
     // Вывод текущего состояние модели
     QVBoxLayout *mLayout = new QVBoxLayout;
@@ -87,9 +87,9 @@ private:
     int delayModeling = 0;
 
 
-    QGridDimanicPlots *mPlots = new QGridDimanicPlots;
+    QGridDynamicPlots *mPlots = new QGridDynamicPlots;
     std::mutex mMutexState;
-    std::vector<SddModel::State> mState;
+    std::vector<sdd::conn::State> mState;
     QTimer mTimerGraphUpdate;
 
 };

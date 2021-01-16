@@ -7,6 +7,7 @@
 #include <QtCore>
 #include "model/SddModel.h"
 #include "model/InputGenerator.h"
+#include "sdd_protocol/connect/IConnection.h"
 #include <atomic>
 #include <thread>
 
@@ -14,7 +15,7 @@
  * Класс выполняющий организацию связи модели sdd с системой сообщений QT,
  * а так же запуск моделирования в отдельном пототке.
  */
-class QSddModelExecutor : public QObject {
+class QSddModelExecutor : public QObject, public sdd::conn::IConnection {
     Q_OBJECT
 public:
     explicit QSddModelExecutor(std::unique_ptr<SddModel> model);
@@ -23,6 +24,9 @@ public:
     bool isRun();
     std::shared_ptr<InputGenerator> setInputGenerator(std::shared_ptr<InputGenerator> generator);
     std::shared_ptr<InputGenerator> resetInputGenerator();
+    sdd::conn::State recvState() override;
+    void sendPackage(sdd::Package *package) override;
+    void regCallbackDataReady(std::function<Handle> handler) override;
 public slots:
     void setParameters(const SddModel::Parameters &parameters);
     void setParametersDefault();
@@ -31,6 +35,7 @@ public slots:
     void stop();
     void reset();
 signals:
+    void receiveStatePackage(sdd::conn::State state);
     void parametersUpdate(SddModel::Parameters parameters);
     void inputUpdate(SddModel::Input input);
     void modelTakeStep(SddModel::State state);
@@ -48,6 +53,7 @@ private:
     SddModel::State mCurrentState{};
     bool mIsNewInput = false;
     SddModel::Input mNewInput{};
+    std::function<Handle> m_dataReceived;
 
     std::thread mThread;
 

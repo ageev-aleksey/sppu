@@ -37,7 +37,7 @@
 
 #include "sl_types_def.h"
 
-/* Additional types required for Simulink External Mode */
+/* Additional types required for Simulink External ModePackage */
 #ifndef fcn_call_T
 # define fcn_call_T real_T
 #endif
@@ -347,7 +347,7 @@ typedef enum
 } SSLoggingSaveFormat;
 
 /*======================================================*
- * Types for Simulink Functions access from S-functions *
+ * Types for Simulink Functions connect from S-functions *
  *======================================================*/
 
 #ifndef SIMULINK_FUNCTION_TYPES

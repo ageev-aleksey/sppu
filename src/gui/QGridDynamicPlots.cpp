@@ -1,13 +1,13 @@
-#include "gui/QGridDimanicPlots.h"
+#include "gui/QGridDynamicPlots.h"
 
 
-QGridDimanicPlots::QGridDimanicPlots(QWidget *parent) : QWidget(parent) {
+QGridDynamicPlots::QGridDynamicPlots(QWidget *parent) : QWidget(parent) {
     setLayout(new QGridLayout);
 }
 
-QGridDimanicPlots::~QGridDimanicPlots() noexcept = default;
+QGridDynamicPlots::~QGridDynamicPlots() noexcept = default;
 
-QCustomPlot* QGridDimanicPlots::addPlot(size_t row, size_t col, const Property *property) {
+QCustomPlot* QGridDynamicPlots::addPlot(size_t row, size_t col, const Property *property) {
     const Property *p = property;
     if (p == nullptr) {
         p = &mProp;
@@ -42,7 +42,7 @@ QCustomPlot* QGridDimanicPlots::addPlot(size_t row, size_t col, const Property *
     }
 }
 
-QCustomPlot* QGridDimanicPlots::plot(size_t row, size_t col) {
+QCustomPlot* QGridDynamicPlots::plot(size_t row, size_t col) {
     if (mPlots.size() > row && mPlots[row].size() > col) {
         return mPlots[row][col].plot;
     } else {
@@ -50,7 +50,7 @@ QCustomPlot* QGridDimanicPlots::plot(size_t row, size_t col) {
     }
 }
 
-void QGridDimanicPlots::addPlotData(size_t row, size_t col, size_t numberGraph, double key, double value) {
+void QGridDynamicPlots::addPlotData(size_t row, size_t col, size_t numberGraph, double key, double value) {
     if ( !(mPlots.size() > row && mPlots[row].size() > col && mPlots[row][col].plot != nullptr) ) {
         throw std::runtime_error("plot not exist");
     }
@@ -79,7 +79,7 @@ void QGridDimanicPlots::addPlotData(size_t row, size_t col, size_t numberGraph, 
     // mPlots[row][col].plot->replot(QCustomPlot::RefreshPriority::rpQueuedReplot);
 }
 
-void QGridDimanicPlots::allDataClear() {
+void QGridDynamicPlots::allDataClear() {
     for (auto &el : mPlots) {
         for (auto p : el) {
             if (p.plot != nullptr) {
@@ -91,7 +91,7 @@ void QGridDimanicPlots::allDataClear() {
     }
 }
 
-void QGridDimanicPlots::allReplot() {
+void QGridDynamicPlots::allReplot() {
     for (auto &el : mPlots) {
         for (auto p : el) {
             if (p.plot != nullptr) {

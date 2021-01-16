@@ -8,7 +8,7 @@
 #include <qcustomplot.h>
 #include <utility>
 
-class QGridDimanicPlots : public QWidget {
+class QGridDynamicPlots : public QWidget {
     Q_OBJECT
 public:
 
@@ -29,9 +29,9 @@ public:
         std::vector<Limits> limits = {{}};
     };
 
-    QGridDimanicPlots(QWidget *parnet = nullptr);
-    QGridDimanicPlots(const Property &prop, QWidget *parnet = nullptr);
-    ~QGridDimanicPlots() override;
+    explicit QGridDynamicPlots(QWidget *parnet = nullptr);
+    // explicit QGridDynamicPlots(const Property &prop, QWidget *parnet = nullptr);
+    ~QGridDynamicPlots() override;
     QCustomPlot* addPlot(size_t row, size_t col, const Property *p = nullptr);
     QCustomPlot* plot(size_t row, size_t col);
     void addPlotData(size_t row, size_t col, size_t numberGraph, double key, double value);

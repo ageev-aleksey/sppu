@@ -83,7 +83,7 @@
 
 typedef struct LogInfo_Tag {
     LogVar       *t;                   /* Time log variable                   */
-    void         *x;                   /* State log variable                  */
+    void         *x;                   /* StatePackage log variable                  */
     int_T        ny;                   /* Length of "y" log variables         */
     void         **y;                  /* Output log vars                     */
     void         *xFinal;              /* Final state log variable            */

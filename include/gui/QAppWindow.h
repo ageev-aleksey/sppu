@@ -6,10 +6,10 @@
 #define TESTSIMULINKMODEL_MYAPP_H
 #include <QtCore>
 #include <QWidget>
-#include "gui/QGridDimanicPlots.h"
+#include "gui/QGridDynamicPlots.h"
 #include <thread>
 #include <atomic>
-#include "gui/QSddModelView.h"
+#include "gui/QSddView.h"
 #include "gui/QSddModelSaver.h"
 
 class QAppWindow : public QWidget
@@ -27,7 +27,7 @@ private:
     void sddModelInit();
 
     //QModelPlots *plots;
-    QSddModelView *mModel;
+    QSddView *mModel;
     QSddModelSaver *mSaver;
     QVBoxLayout *mLayout;
     QSettings mSettings;

@@ -138,7 +138,7 @@ struct ssc_sli_kesYKdRukKtCYLfoQ0YRJ5 ssc_sli_VqKh4Kz_QZS0XmkDAghkEa={{
 ,"Steady state solve failed to converge.",
 "Initial conditions solve failed to converge.","Stiffness calculation failed."
 ,"Stiffness indicator calculation failed.",
-"State derivative calculation failed, possibly due to singular upper-left (differential states and equations) corner of mass matrix."
+"StatePackage derivative calculation failed, possibly due to singular upper-left (differential states and equations) corner of mass matrix."
 ,"Calculation for differential and algebraic state derivatives failed.","%s",
 "... (Truncated error message at maximum length of buffer.)",
 "Event iteration failed to converge within the iteration limit (100).",

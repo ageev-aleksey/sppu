@@ -216,7 +216,7 @@ typedef struct {
   real_T sdd_modelElectricScheneInductor;/* '<S13>/LTI_STATE_1' */
 } X_sdd_model_T;
 
-/* State derivatives (default storage) */
+/* StatePackage derivatives (default storage) */
 typedef struct {
   real_T Integrator1_CSTATE;           /* '<S5>/Integrator1' */
   real_T Integrator_CSTATE;            /* '<S5>/Integrator' */
@@ -226,7 +226,7 @@ typedef struct {
   real_T sdd_modelElectricScheneInductor;/* '<S13>/LTI_STATE_1' */
 } XDot_sdd_model_T;
 
-/* State disabled  */
+/* StatePackage disabled  */
 typedef struct {
   boolean_T Integrator1_CSTATE;        /* '<S5>/Integrator1' */
   boolean_T Integrator_CSTATE;         /* '<S5>/Integrator' */

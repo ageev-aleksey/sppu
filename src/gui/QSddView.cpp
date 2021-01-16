@@ -1,30 +1,31 @@
-#include "gui/QSddModelView.h"
+#include "gui/QSddView.h"
 #include <QGroupBox>
 #include <QPushButton>
 
 
-QSddModelView::QSddModelView(std::shared_ptr<QSddModelExecutor> model, QWidget *parent)
-: QWidget(parent), mModel(std::move(model)) {
+QSddView::QSddView(std::shared_ptr<sdd::conn::IConnection> sddConnector, QWidget *parent)
+: QWidget(parent), mSddConnect(std::move(sddConnector)) {
     setLayout(mLayout);
     guiInit();
-    QObject::connect(&mTimerGraphUpdate, &QTimer::timeout, this, &QSddModelView::stateInGui);
-    QObject::connect(&(*mModel), &QSddModelExecutor::modelTakeStep, this, &QSddModelView::takeModelState);
+    QObject::connect(&mTimerGraphUpdate, &QTimer::timeout, this, &QSddView::stateInGui);
+    mSddConnect->regCallbackDataReady([](sdd::conn::State &s) {
+    });
     mTimerGraphUpdate.start(50);
 }
 
 
-QSddModelView::~QSddModelView() noexcept {
+QSddView::~QSddView() noexcept {
     // TODO(aleksey) 1
 }
 
 
 
 
-void QSddModelView::guiInit() {
+void QSddView::guiInit() {
     //Графики состояния модели
-    QGridDimanicPlots::Property p;
-    p.limits[0].keyType = QGridDimanicPlots::Property::Limits::Type::WINDOW;
-    p.limits[0].valueType = QGridDimanicPlots::Property::Limits::Type::AUTO;
+    QGridDynamicPlots::Property p;
+    p.limits[0].keyType = QGridDynamicPlots::Property::Limits::Type::WINDOW;
+    p.limits[0].valueType = QGridDynamicPlots::Property::Limits::Type::AUTO;
     p.limits[0].value = {-1, 1};  // {-1, 1};
     p.limits[0].key = {10, 0};  // {0, 0.5};
     auto *plot = mPlots->addPlot(0, 0, &p);
@@ -57,7 +58,7 @@ void QSddModelView::guiInit() {
 
     auto *dashboardLayout = new QHBoxLayout;
 
-    //Тектостове описание состояния модели
+    // Текстовое описание состояния модели
     auto layout = new QGridLayout;
     auto *box = new QGroupBox("Current model state");
     box->setLayout(layout);
@@ -86,9 +87,9 @@ void QSddModelView::guiInit() {
     layout->addWidget(stopButton, 2, 1);
     layout->addWidget(resetButton, 2, 2);
 
-    QObject::connect(startButton, &QPushButton::released, this, &QSddModelView::modelRunFromGui);
-    QObject::connect(stopButton, &QPushButton::released, this, &QSddModelView::modelStopFromGui);
-    QObject::connect(resetButton, &QPushButton::released, this, &QSddModelView::modelResetFromGui);
+    QObject::connect(startButton, &QPushButton::released, this, &QSddView::modelRunFromGui);
+    QObject::connect(stopButton, &QPushButton::released, this, &QSddView::modelStopFromGui);
+    QObject::connect(resetButton, &QPushButton::released, this, &QSddView::modelResetFromGui);
 
     // Параметры модели
     // 1. начальное положение
@@ -130,17 +131,20 @@ void QSddModelView::guiInit() {
     defaultParameterButton->setText("set default");
     ParametersLayout->addWidget(defaultParameterButton, 2, 3);
 
-    QObject::connect(applyParametersButton, &QPushButton::released, this, &QSddModelView::updateModelParameters);
-    QObject::connect(defaultParameterButton, &QPushButton::released, this, &QSddModelView::setDefaultModelParameters);
+    QObject::connect(applyParametersButton, &QPushButton::released, this, &QSddView::updateModelParameters);
+    QObject::connect(defaultParameterButton, &QPushButton::released, this, &QSddView::setDefaultModelParameters);
 
     boxParameters->setLayout(ParametersLayout);
+
+    QTabWidget *mainTabs = new QTabWidget;
 
     QTabWidget *paramTabs = new QTabWidget;
     paramTabs->addTab(boxParameters, "Model parameters");
     QWidget *pwmControl = pwmControlInit();
     paramTabs->addTab(pwmControl, "Online PWM Control");
 
-    layout->addWidget(paramTabs, 0, 0, 2, 6);
+    mainTabs->addTab(paramTabs, "Model");
+    layout->addWidget(mainTabs, 0, 0, 2, 6);
 
 
     dashboardLayout->addWidget(box);
@@ -150,8 +154,9 @@ void QSddModelView::guiInit() {
     setDefaultGuiState();
 }
 
-void QSddModelView::modelRunFromGui() {
-    if (!mModel->isRun()) {
+void QSddView::modelRunFromGui() {
+    // TODO(ageev) изменить установку модели через фабрику
+  //  if (!mSddConnect->isRun()) {
         startButton->setDisabled(true);
         stopButton->setDisabled(false);
         applyParametersButton->setDisabled(true);
@@ -165,26 +170,28 @@ void QSddModelView::modelRunFromGui() {
                                                         pwmMinSignalValue->value(),
                                                         pwmMaxSignalValue->value());
             pwmParametersUpdate();
-            mModel->setInputGenerator(pwdGenerator);
+         //   mSddConnect->setInputGenerator(pwdGenerator);
         }
-        mModel->run();
-    }
+      //  mSddConnect->run();
+      // }
 }
 
-void QSddModelView::modelStopFromGui() {
-    if (mModel->isRun()) {
-        mModel->stop();
-        startButton->setDisabled(false);
-        stopButton->setDisabled(true);
-        applyParametersButton->setDisabled(true);
-        resetButton->setDisabled(false);
-    }
+void QSddView::modelStopFromGui() {
+    // if (mSddConnect->isRun()) {
+    // mSddConnect->stop();
+    startButton->setDisabled(false);
+    stopButton->setDisabled(true);
+    applyParametersButton->setDisabled(true);
+    resetButton->setDisabled(false);
+    // }
 }
 
 
-void QSddModelView::modelResetFromGui() {
-    if (!mModel->isRun()) {
-        mModel->reset();
+void QSddView::modelResetFromGui() {
+       if (auto *ptr = dynamic_cast<QSddModelExecutor*>(mSddConnect.get());
+            ptr != nullptr) {
+            ptr->reset();
+       }
         startButton->setDisabled(false);
         stopButton->setDisabled(true);
         applyParametersButton->setDisabled(false);
@@ -200,11 +207,10 @@ void QSddModelView::modelResetFromGui() {
         mPlots->plot(1, 2)->graph(0)->data()->clear();
         mPlots->allReplot();
         setDefaultGuiState();
-    }
 }
 
-void QSddModelView::stateInGui() {
-    std::vector<SddModel::State> state;
+void QSddView::stateInGui() {
+    std::vector<sdd::conn::State> state;
     {
         std::lock_guard<std::mutex> lock(mMutexState);
         state = std::move(mState);
@@ -214,38 +220,45 @@ void QSddModelView::stateInGui() {
         auto &centerState = state[state.size()/2];
         auto &beginState = state[0];
 
-        mPlots->addPlotData(0, 0, 0, beginState.time, beginState.positionOx);
-        mPlots->addPlotData(0, 0, 0, centerState.time, centerState.positionOx);
-        mPlots->addPlotData(0, 0, 0, endState.time, endState.positionOx);
+        auto beginTime = std::chrono::duration_cast<std::chrono::seconds>(beginState.time.time_since_epoch()).count();
+        auto centerTime = std::chrono::duration_cast<std::chrono::seconds>(centerState.time.time_since_epoch()).count();
+        auto endTime = std::chrono::duration_cast<std::chrono::seconds>(endState.time.time_since_epoch()).count();
 
-        mPlots->addPlotData(0, 1, 0, beginState.time, beginState.speedOx);
-        mPlots->addPlotData(0, 1, 0, centerState.time, centerState.speedOx);
-        mPlots->addPlotData(0, 1, 0, endState.time, endState.speedOx);
+        mPlots->addPlotData(0, 0, 0, beginTime, beginState.ox);
+        mPlots->addPlotData(0, 0, 0, centerTime, centerState.ox);
+        mPlots->addPlotData(0, 0, 0, endTime, endState.ox);
 
-        mPlots->addPlotData(1, 0, 0, beginState.time, beginState.positionOz);
-        mPlots->addPlotData(1, 0, 0, centerState.time, centerState.positionOz);
-        mPlots->addPlotData(1, 0, 0, endState.time, endState.positionOz);
+        // TODO(ageev) расчет моментальной скорости
+//        mPlots->addPlotData(0, 1, 0, beginTime, beginState.speedOx);
+//        mPlots->addPlotData(0, 1, 0, centerTime, centerState.speedOx);
+//        mPlots->addPlotData(0, 1, 0, endTime, endState.speedOx);
 
-        mPlots->addPlotData(1, 1, 0, beginState.time, beginState.speedOz);
-        mPlots->addPlotData(1, 1, 0, centerState.time, centerState.speedOz);
-        mPlots->addPlotData(1, 1, 0, endState.time, endState.speedOz);
+        mPlots->addPlotData(1, 0, 0, beginTime, beginState.oy);
+        mPlots->addPlotData(1, 0, 0, centerTime, centerState.oy);
+        mPlots->addPlotData(1, 0, 0, endTime, endState.oy);
 
-        mPlots->addPlotData(0, 2, 0, beginState.time, beginState.IOx);
-        mPlots->addPlotData(0, 2, 0, centerState.time, centerState.IOx);
-        mPlots->addPlotData(0, 2, 0, endState.time, endState.IOx);
+        // TODO(ageev) расчет моментальной скорости
+//        mPlots->addPlotData(1, 1, 0, beginTime, beginState.speedOz);
+//        mPlots->addPlotData(1, 1, 0, centerTime, centerState.speedOz);
+//        mPlots->addPlotData(1, 1, 0, endTime, endState.speedOz);
 
-        mPlots->addPlotData(1, 2, 0, beginState.time, beginState.IOz);
-        mPlots->addPlotData(1, 2, 0, centerState.time, centerState.IOz);
-        mPlots->addPlotData(1, 2, 0, endState.time, endState.IOz);
+        mPlots->addPlotData(0, 2, 0, beginTime, beginState.pwmX);
+        mPlots->addPlotData(0, 2, 0, centerTime, centerState.pwmX);
+        mPlots->addPlotData(0, 2, 0, endTime, endState.pwmX);
+
+        mPlots->addPlotData(1, 2, 0, beginTime, beginState.pwmY);
+        mPlots->addPlotData(1, 2, 0, centerTime, centerState.pwmY);
+        mPlots->addPlotData(1, 2, 0, endTime, endState.pwmY);
 
 
 
         mPlots->allReplot();
 
-        mXPosition->setText(QString::number(endState.positionOx));
-        mZPosition->setText(QString::number(endState.positionOz));
-        mXSpeed->setText(QString::number(endState.speedOx));
-        mZSpeed->setText(QString::number(endState.speedOz));
+        // TODO(ageev) расчет моментальной скорости
+        mXPosition->setText(QString::number(endState.ox));
+        mZPosition->setText(QString::number(endState.oy));
+      //  mXSpeed->setText(QString::number(endState.speedOx));
+       // mZSpeed->setText(QString::number(endState.speedOz));
     }
 
 //    if (!state.empty()) {
@@ -265,21 +278,21 @@ void QSddModelView::stateInGui() {
 }
 
 
-void QSddModelView::updateModelParameters() {
-    SddModel::Parameters param{};
-    param.positionOx0 = Ox0Parameter->text().toDouble();
-    param.positionOz0 = Oz0Parameter->text().toDouble();
-    param.speedOx0 = Vx0Parameter->text().toDouble();
-    param.speedOz0 = Vz0Parameter->text().toDouble();
-    param.structCoeff = ModelStructParameter->text().toDouble();
-    param.frictionCoeff = frictionParameter->text().toDouble();
-    param.frictionLinearCoeff = frictionLinearParameter->text().toDouble();
-    param.frictionQuadraticCoeff = frictionQuadraticParameter->text().toDouble();
-    delayModeling = delayModelingField->text().toInt();
-    mModel->setParameters(param);
+void QSddView::updateModelParameters() {
+//    SddModel::Parameters param{};
+//    param.positionOx0 = Ox0Parameter->text().toDouble();
+//    param.positionOz0 = Oz0Parameter->text().toDouble();
+//    param.speedOx0 = Vx0Parameter->text().toDouble();
+//    param.speedOz0 = Vz0Parameter->text().toDouble();
+//    param.structCoeff = ModelStructParameter->text().toDouble();
+//    param.frictionCoeff = frictionParameter->text().toDouble();
+//    param.frictionLinearCoeff = frictionLinearParameter->text().toDouble();
+//    param.frictionQuadraticCoeff = frictionQuadraticParameter->text().toDouble();
+//    delayModeling = delayModelingField->text().toInt();
+//    mSddConnect->setParameters(param);
 }
 
-void QSddModelView::setDefaultGuiState() {
+void QSddView::setDefaultGuiState() {
     mXPosition->setText("undefined");
     mZPosition->setText("undefined");
     mXSpeed->setText("undefined");
@@ -288,31 +301,31 @@ void QSddModelView::setDefaultGuiState() {
     updateGuiParametersValue();
 }
 
-void QSddModelView::updateGuiParametersValue() {
-    auto modelParam = mModel->getParameters();
-    Ox0Parameter->setText(QString::number(modelParam.positionOx0));
-    Oz0Parameter->setText(QString::number(modelParam.positionOz0));
-    Vx0Parameter->setText(QString::number(modelParam.speedOx0));
-    Vz0Parameter->setText(QString::number(modelParam.speedOz0));
-    ModelStructParameter->setText(QString::number(modelParam.structCoeff));
-    frictionParameter->setText(QString::number(modelParam.frictionCoeff));
-    frictionLinearParameter->setText(QString::number(modelParam.frictionLinearCoeff));
-    frictionQuadraticParameter->setText(QString::number(modelParam.frictionQuadraticCoeff));
-    delayModelingField->setText(QString::number(delayModeling));
+void QSddView::updateGuiParametersValue() {
+//    auto modelParam = mSddConnect->getParameters();
+//    Ox0Parameter->setText(QString::number(modelParam.positionOx0));
+//    Oz0Parameter->setText(QString::number(modelParam.positionOz0));
+//    Vx0Parameter->setText(QString::number(modelParam.speedOx0));
+//    Vz0Parameter->setText(QString::number(modelParam.speedOz0));
+//    ModelStructParameter->setText(QString::number(modelParam.structCoeff));
+//    frictionParameter->setText(QString::number(modelParam.frictionCoeff));
+//    frictionLinearParameter->setText(QString::number(modelParam.frictionLinearCoeff));
+//    frictionQuadraticParameter->setText(QString::number(modelParam.frictionQuadraticCoeff));
+//    delayModelingField->setText(QString::number(delayModeling));
 }
 
-void QSddModelView::setDefaultModelParameters() {
-    mModel->setParametersDefault();
+void QSddView::setDefaultModelParameters() {
+    // mSddConnect->setParametersDefault();
     updateGuiParametersValue();
 }
 
 
 
-void QSddModelView::setModelInput(const SddModel::Input &input) {
-    mModel->setInput(input);
+void QSddView::setModelInput(const SddModel::Input &input) {
+  //  mSddConnect->setInput(input);
 }
 
-void QSddModelView::takeModelState(SddModel::State state) {
+void QSddView::takeModelState(sdd::conn::State &state) {
     {
         std::lock_guard<std::mutex> lock(mMutexState);
         mState.push_back(state);
@@ -325,7 +338,7 @@ void QSddModelView::takeModelState(SddModel::State state) {
 }
 
 
-QWidget* QSddModelView::pwmControlInit() {
+QWidget* QSddView::pwmControlInit() {
     auto layout = new QGridLayout;
 
     auto *label = new QFormLayout;
@@ -350,20 +363,20 @@ QWidget* QSddModelView::pwmControlInit() {
     layout->addLayout(label, 2, 1);
 
     QObject::connect(pwmFrequency, QOverload<int>::of(&QSpinBox::valueChanged), this,
-                     &QSddModelView::pwmParametersUpdate);
+                     &QSddView::pwmParametersUpdate);
     QObject::connect(pwmDutyCycle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-                     &QSddModelView::pwmParametersUpdate);
+                     &QSddView::pwmParametersUpdate);
     QObject::connect(pwmMinSignalValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-                     &QSddModelView::pwmParametersUpdate);
+                     &QSddView::pwmParametersUpdate);
     QObject::connect(pwmMaxSignalValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this,
-                     &QSddModelView::pwmParametersUpdate);
+                     &QSddView::pwmParametersUpdate);
     pwmOnlineControl->addLayout(layout);
     return pwmOnlineControl;
 }
 
 
 // TODO(aleksey) Сделать установку скважности шим по двум осям отдельно
-void QSddModelView::pwmParametersUpdate(double) {
+void QSddView::pwmParametersUpdate(double) {
     double v = pwmDutyCycle->value();
     if (pwdGenerator) {
         pwdGenerator->setDutyCycle(v, v);

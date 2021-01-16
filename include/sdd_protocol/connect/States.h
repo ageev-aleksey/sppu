@@ -4,6 +4,9 @@
 
 #ifndef TESTSIMULINKMODEL_STATE_H
 #define TESTSIMULINKMODEL_STATE_H
+
+#include <chrono>
+
 namespace sdd::conn {
     struct Light {
         int blinking;
@@ -24,6 +27,7 @@ namespace sdd::conn {
         int pwmX;
         int pwmY;
         TaskPosition task;
+        std::chrono::steady_clock::time_point time;
     };
 }
 #endif //TESTSIMULINKMODEL_STATE_H

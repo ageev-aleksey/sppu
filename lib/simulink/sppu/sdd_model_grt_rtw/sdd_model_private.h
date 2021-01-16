@@ -24,7 +24,7 @@
 #include "builtin_typeid_types.h"
 #include "multiword_types.h"
 
-/* Private macros used by the generated code to access rtModel */
+/* Private macros used by the generated code to connect rtModel */
 #ifndef rtmSetFirstInitCond
 # define rtmSetFirstInitCond(rtm, val) ((rtm)->Timing.firstInitCondFlag = (val))
 #endif

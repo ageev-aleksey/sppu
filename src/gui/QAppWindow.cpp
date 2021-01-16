@@ -40,7 +40,8 @@ void QAppWindow::windowInit() {
 }
 
 void QAppWindow::sddModelInit() {
-    auto model = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
+    auto v = new QSddModelExecutor(std::make_unique<SddModel>());
+   // auto model = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
     QObject::connect(&(*model), &QSddModelExecutor::parametersUpdate, this, &QAppWindow::saveModelParameters);
 
     auto param = model->getParameters();
@@ -75,7 +76,7 @@ void QAppWindow::sddModelInit() {
         mLayout->addWidget(errorParamRead);
     }
 
-    mModel = new QSddModelView(std::move(model));
+    mModel = new QSddView(std::move(model));
     FormatsContainer<SddModelDescriptor> f;
     f.add(std::make_shared<QSddModelJsonSerializer>());
     f.add(std::make_shared<QSddModelXmlSerializer>());

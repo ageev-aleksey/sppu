@@ -35,7 +35,7 @@ void rt_ForwardSubstitutionRR_Dbl(real_T        *pL,
     for(i=0; i<N; i++) {
       real_T *xj = x + k*N;
       real_T s = 0.0;
-      real_T *pLrow = pLcol++;          /* access current row of L */
+      real_T *pLrow = pLcol++;          /* connect current row of L */
 
       {
         int_T j = i;

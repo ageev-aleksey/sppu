@@ -10,10 +10,10 @@ namespace sdd {
     /**
      * Пакеь управления светодиодом
      */
-    class Light : public Package {
+    class LightPackage : public Package {
     public:
-        Light();
-        Light(std::vector<Package::byte_t> &buff);
+        LightPackage();
+        LightPackage(std::vector<Package::byte_t> &buff);
 
         /// Включить светодиод
         void lightOn();

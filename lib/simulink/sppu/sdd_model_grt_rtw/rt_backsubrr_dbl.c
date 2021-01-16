@@ -34,7 +34,7 @@ void rt_BackwardSubstitutionRR_Dbl(real_T          *pU,
     for(i=0; i<N; i++) {
       real_T *xj = x + k*N-1;
       real_T s = 0.0;
-      real_T *pUrow = pUcol--;          /* access current row of U */
+      real_T *pUrow = pUcol--;          /* connect current row of U */
 
       {
         int_T j = i;

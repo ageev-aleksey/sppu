@@ -4,7 +4,7 @@
  * File: rtw_extmode.h     
  *
  * Abstract:
- *   Type definitions for Simulink External Mode support.
+ *   Type definitions for Simulink External ModePackage support.
  */
 
 #ifndef RTW_EXTMODE_H__

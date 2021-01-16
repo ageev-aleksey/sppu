@@ -1,9 +1,12 @@
 #include "model/QSddModelExecutor.h"
+#include "sdd_protocol/connect/States.h"
 
 #include <utility>
 
 
-QSddModelExecutor::QSddModelExecutor(std::unique_ptr<SddModel> model) : mModel(std::move(model)) {
+QSddModelExecutor::QSddModelExecutor(std::unique_ptr<SddModel> model)
+    : mModel(std::move(model)), m_dataReceived(nullptr)
+{
     qRegisterMetaType<SddModel::Input>("Input");
     qRegisterMetaType<SddModel::Parameters>("Parameters");
     qRegisterMetaType<SddModel::State>("StatePackage");
@@ -40,9 +43,12 @@ void QSddModelExecutor::stop() {
     emit modelStop();
 }
 
+int64_t dSecondsToINanoseconds(double seconds) {
+    return static_cast<int64_t>(seconds * 1000000000ull);
+}
+
 void QSddModelExecutor::worker_thread() {
     while(mIsRun) {
-
         {
             std::lock_guard<std::mutex> lock(mMutexUpdInputModel);
             if(mInputGenerator != nullptr) {
@@ -61,6 +67,17 @@ void QSddModelExecutor::worker_thread() {
 
         mCurrentState = mModel->step();
 
+        sdd::conn::State stateValue{};
+        stateValue.ox = mCurrentState.positionOx;
+        stateValue.oy = mCurrentState.positionOz;
+        stateValue.pwmX = mCurrentState.oxSignal;
+        stateValue.pwmY = mCurrentState.ozSignal;
+        stateValue.task.ox = 0;
+        stateValue.task.oy = 0;
+        stateValue.time = std::chrono::steady_clock::time_point(
+                std::chrono::steady_clock::duration(dSecondsToINanoseconds(mCurrentState.time))
+                );
+        m_dataReceived(stateValue);
         emit modelTakeStep(mCurrentState);
     }
 }
@@ -101,6 +118,18 @@ std::shared_ptr<InputGenerator> QSddModelExecutor::setInputGenerator(std::shared
 
 std::shared_ptr<InputGenerator> QSddModelExecutor::resetInputGenerator() {
     return setInputGenerator(nullptr);
+}
+
+sdd::conn::State QSddModelExecutor::recvState() {
+    return sdd::conn::State();
+}
+
+void QSddModelExecutor::sendPackage(sdd::Package *package) {
+    // TODO (извлечение из пакате параметров для уаправления устройством)
+}
+
+void QSddModelExecutor::regCallbackDataReady(std::function<Handle> handler) {
+    m_dataReceived = handler;
 }
 
 

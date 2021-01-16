@@ -1,7 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
-project(TestSimulinkModel)
+project(SddClient)
 
-set(CMAKE_CXX_STANDARD 20)
+#FOR IDEA
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 message(STATUS ${CMAKE_ROOT})
 option(COMPILE_TESTS "" ON)
 
@@ -21,6 +25,17 @@ set(RESOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/resource)
 include(./cmake/Cpplint.cmake)
 
 add_subdirectory(${SRC_DIR})
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+endif()
+
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        message(STATUS "Using debug GCC")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O0")
+    endif()
+endif()
 
 if(COMPILE_TESTS)
     message(STATUS "Compiling unit test")

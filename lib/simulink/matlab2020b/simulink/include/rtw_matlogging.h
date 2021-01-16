@@ -41,7 +41,7 @@ typedef struct RTWLogSignalInfo_tag {
     int_T          *numCols;
     int_T          *numDims;
     int_T          *dims;
-    boolean_T      *isVarDims;       /* Dimension Mode: true -- VarDims / false -- fixed dims */
+    boolean_T      *isVarDims;       /* Dimension ModePackage: true -- VarDims / false -- fixed dims */
     void           **currSigDims;    /* current signal dimensions */
     int_T          *currSigDimsSize; /* Size of currSigDims in bytes */
     BuiltInDTypeId *dataTypes;

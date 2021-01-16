@@ -6,12 +6,12 @@
 namespace sdd {
     /**
      * Создание класса пакета на основи его бинарного представления
-     * Для этого используется код в начале пакета
+     * Для этого используется код в начале пакета.
      */
     class PackageFactory {
     public:
         explicit PackageFactory(Message::Endianness endianness = Message::Endianness::MSG_LITTLE_ENDIAN);
-        std::shared_ptr<Package> createPackage(const std::vector<char> &bin_buffer);
+        static std::shared_ptr<Package> createPackage(const std::vector<char> &bin_buffer);
     private:
         Message::Endianness _endianness;
     };

@@ -23,7 +23,7 @@
 #include "rtwtypes.h"
 
 /*
- * Definitions supporting external data access
+ * Definitions supporting external data connect
  */
 typedef int64_T chunk_T;
 typedef uint64_T uchunk_T;
