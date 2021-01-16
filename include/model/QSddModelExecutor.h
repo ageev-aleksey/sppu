@@ -22,10 +22,13 @@ public:
     SddModel::Parameters getParameters();
     SddModel::Input getInput();
     bool isRun();
+    void brakingModeling(long milliseconds);
     std::shared_ptr<InputGenerator> setInputGenerator(std::shared_ptr<InputGenerator> generator);
     std::shared_ptr<InputGenerator> resetInputGenerator();
     sdd::conn::State recvState() override;
-    void sendPackage(sdd::Package *package) override;
+    void sendLight(sdd::conn::Light package) override;
+    void sendMode(sdd::conn::Mode package) override;
+    void sendTaskPosition(sdd::conn::TaskPosition task) override;
     void regCallbackDataReady(std::function<Handle> handler) override;
 public slots:
     void setParameters(const SddModel::Parameters &parameters);
@@ -44,13 +47,15 @@ signals:
     void modelReset();
 private:
     void worker_thread();
+    sdd::conn::State makePackageState();
 
     std::shared_ptr<SddModel> mModel;
     std::atomic<bool> mIsRun = false;
+    long mBreakingMilliseconds = 0;
 
     std::mutex mMutexUpdInputModel;
     std::shared_ptr<InputGenerator> mInputGenerator = nullptr;
-    SddModel::State mCurrentState{};
+    std::atomic<SddModel::State> mCurrentState{};
     bool mIsNewInput = false;
     SddModel::Input mNewInput{};
     std::function<Handle> m_dataReceived;
