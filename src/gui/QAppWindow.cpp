@@ -1,11 +1,12 @@
-
 #include "gui/QAppWindow.h"
-#include <qcustomplot.h>
-#include <iostream>
+#include "gui/QSddModelControl.h"
 #include "gui/QConditionalControl.h"
+#include "gui/QISddStateWidgetFactory.h"
 #include "model/parser/QSddModelJsonSerializer.h"
 #include "model/parser/QSddModelXmlSerializer.h"
-#include "gui/QSddModelControl.h"
+#include <iostream>
+#include <qcustomplot.h>
+
 
 
 QAppWindow::QAppWindow() :  mSettings("AVV", "TestApp") {
@@ -41,42 +42,9 @@ void QAppWindow::windowInit() {
 }
 
 void QAppWindow::sddModelInit() {
-    auto model = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
-    QObject::connect(model.get(), &QSddModelExecutor::parametersUpdate, this, &QAppWindow::saveModelParameters);
-
-    auto param = model->getParameters();
-    bool okRead = true;
-    bool readRes = true;
-    param.positionOx0 = mSettings.value("model/positionOx0", param.positionOx0).toDouble(&okRead);
-    readRes &= okRead;
-    param.positionOz0 = mSettings.value("model/positionOz0", param.positionOz0).toDouble(&okRead);
-    readRes &= okRead;
-    param.speedOx0 = mSettings.value("model/speedOx0", param.speedOx0).toDouble(&okRead);
-    readRes &= okRead;
-    param.speedOz0 = mSettings.value("model/speedOz0", param.speedOz0).toDouble(&okRead);
-    readRes &= okRead;
-    param.structCoeff = mSettings.value("model/structCoeff", param.structCoeff).toDouble(&okRead);
-    readRes &= okRead;
-    param.frictionCoeff = mSettings.value("model/frictionCoeff", param.frictionCoeff).toDouble(&okRead);
-    readRes &= okRead;
-    param.frictionLinearCoeff =
-            mSettings.value("model/frictionLinearCoeff", param.frictionLinearCoeff).toDouble(&okRead);
-    readRes &= okRead;
-    param.frictionQuadraticCoeff =
-            mSettings.value("model/frictionQuadraticCoeff", param.frictionQuadraticCoeff).toDouble(&okRead);
-    readRes &= okRead;
-    if (readRes) {
-        model->setParameters(param);
-    } else {
-        auto *errorParamRead =
-                new QLabel("Error parameters of model reading from config. Using default model parameters");
-        auto p(errorParamRead->palette());
-        p.setColor(QPalette::ColorRole::Text, Qt::GlobalColor::red);
-        errorParamRead->setPalette(p);
-        mLayout->addWidget(errorParamRead);
-    }
-    // TODO(ageev) требуется фабрика для построения QISddStateWidget
-    mModel = new QSddView(new QSddModelControl(std::move(model)));
+    QSddModelControlFactory factory;
+    auto sdd = factory.makeWidget(mSettings);
+    mModel = new QSddView(sdd);
     FormatsContainer<SddModelDescriptor> f;
     f.add(std::make_shared<QSddModelJsonSerializer>());
     f.add(std::make_shared<QSddModelXmlSerializer>());

@@ -53,7 +53,9 @@ int64_t dSecondsToINanoseconds(double seconds) {
 }
 
 void QSddModelExecutor::worker_thread() {
+    int nstep = 0;
     while(mIsRun) {
+        nstep++;
         {
             std::lock_guard<std::mutex> lock(mMutexUpdInputModel);
             if(mInputGenerator != nullptr) {
@@ -74,16 +76,20 @@ void QSddModelExecutor::worker_thread() {
 
         sdd::conn::State stateValue = makePackageState();
 
-        if (m_dataReceived) {
-            m_dataReceived(stateValue);
+        if (nstep == mBreakingMilliseconds) {
+            nstep = 0;
+            if (m_dataReceived) {
+                m_dataReceived(stateValue);
+            }
+
+            emit modelTakeStep(mCurrentState);
+            emit modelTakeStep_pack(stateValue);
         }
 
-        emit modelTakeStep(mCurrentState);
-        emit modelTakeStep_pack(stateValue);
         //QCoreApplication::processEvents();
-        if (mBreakingMilliseconds > 0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(mBreakingMilliseconds));
-        }
+//        if (mBreakingMilliseconds > 0) {
+//            std::this_thread::sleep_for(std::chrono::milliseconds(mBreakingMilliseconds));
+//        }
     }
 }
 
@@ -154,8 +160,8 @@ sdd::conn::State QSddModelExecutor::makePackageState() {
     auto modelState = mCurrentState.load();
     sdd::conn::State stateValue{};
     // TODO(ageev) выполнить преобразование из double в short int
-    stateValue.ox = modelState.positionOx;
-    stateValue.oy = modelState.positionOz;
+    stateValue.ox = modelState.positionOx*255;
+    stateValue.oy = modelState.positionOz*255;
     stateValue.pwmX = modelState.oxSignal;
     stateValue.pwmY = modelState.ozSignal;
     stateValue.task.ox = 0;

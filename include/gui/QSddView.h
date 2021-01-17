@@ -23,6 +23,7 @@ class QSddView : public QWidget
 public:
     explicit QSddView(QISddStateWidget *sddConnector, QWidget *parent = nullptr);
     ~QSddView() noexcept override;
+    QISddStateWidget* setSddStateWidget(QISddStateWidget *sddConnector);
 
 public slots:
     void setModelInput(const SddModel::Input &input);

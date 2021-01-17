@@ -12,6 +12,8 @@
 class QISddStateWidget : public QWidget {
 public:
     virtual std::vector<sdd::conn::State> getSddStates() = 0;
+    // addCallbackStateReceived()
+    // removeCallbackStateReceived()
 };
 
 #endif //SDDCLIENT_SDDCONTROLLER_H

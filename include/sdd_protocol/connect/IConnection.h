@@ -19,6 +19,7 @@ namespace sdd::conn {
         virtual void sendLight(Light package) = 0;
         virtual void sendMode(Mode package) = 0;
         virtual void sendTaskPosition(TaskPosition task) = 0;
+        // TODO (ageev) регистрация множества обратных вызовов!
         virtual void regCallbackDataReady(std::function<Handle> handler) = 0;
     };
 

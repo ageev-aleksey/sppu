@@ -137,5 +137,12 @@ void QSddView::setModelInput(const SddModel::Input &input) {
   //  mSddConnect->setInput(input);
 }
 
+QISddStateWidget* QSddView::setSddStateWidget(QISddStateWidget *sddConnector) {
+    mLayout->replaceWidget(mSddConnect, sddConnector);
+    auto *tmp = mSddConnect;
+    mSddConnect = sddConnector;
+    return tmp;
+}
+
 
 

@@ -111,7 +111,9 @@ void QSddModelControl::guiInit() {
 
     dashboardLayout->addWidget(box);
     dashboardLayout->addLayout(layout);
-    mLayout->addLayout(dashboardLayout);;
+    mLayout->addLayout(dashboardLayout);
+
+    setDefaultGuiState();
 }
 
 void QSddModelControl::setDefaultGuiState() {
@@ -139,6 +141,11 @@ void QSddModelControl::updateGuiParametersValue() {
 void QSddModelControl::takeModelState(sdd::conn::State state) {
     std::lock_guard<std::mutex> lock(mMutexState);
     mStates.push_back(state);
+    mXPosition->setText(QString::number(state.ox));
+    mZPosition->setText(QString::number(state.oy));
+    // TODO(ageev) вычисление моментальной скорости
+//    mXSpeed->setText("undefined");
+//    mZSpeed->setText("undefined");
 }
 
 void QSddModelControl::modelRunFromGui() {
@@ -199,12 +206,12 @@ void QSddModelControl::updateModelParameters() {
 }
 
 void QSddModelControl::setDefaultModelParameters() {
-    mXPosition->setText("undefined");
-    mZPosition->setText("undefined");
-    mXSpeed->setText("undefined");
-    mZSpeed->setText("undefined");
-
-    updateGuiParametersValue();
+//    mXPosition->setText("undefined");
+//    mZPosition->setText("undefined");
+//    mXSpeed->setText("undefined");
+//    mZSpeed->setText("undefined");
+//
+//    updateGuiParametersValue();
 }
 
 // TODO(ageev) Сделать настройку скважности для отдельных осей
