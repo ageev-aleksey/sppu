@@ -41,7 +41,7 @@ add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
 target_include_directories(app_gui PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}
                             ${Qt5Widgets_INCLUDE_DIRS} ${QT_ADDITIONAL_QCUSTOMPLOT})
 
-target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport  pthread)
+target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport  pthread atomic)
 target_enable_cpplint(app_gui
                       SOURCES ${SRC_GUI}
                       FILTERS "-legal/copyright"

@@ -2,7 +2,7 @@
 #include "sdd_protocol/connect/States.h"
 
 #include <utility>
-
+// TODO(ageev) применить декоратор для конвертации из одной структуры в другую
 
 QSddModelExecutor::QSddModelExecutor(std::unique_ptr<SddModel> model)
     : mModel(std::move(model)), m_dataReceived(nullptr)
@@ -10,6 +10,7 @@ QSddModelExecutor::QSddModelExecutor(std::unique_ptr<SddModel> model)
     qRegisterMetaType<SddModel::Input>("Input");
     qRegisterMetaType<SddModel::Parameters>("Parameters");
     qRegisterMetaType<SddModel::State>("StatePackage");
+    qRegisterMetaType<sdd::conn::State>("sdd::conn::State");
 }
 
 void QSddModelExecutor::setParameters(const SddModel::Parameters &parameters) {
@@ -47,7 +48,8 @@ void QSddModelExecutor::stop() {
 }
 
 int64_t dSecondsToINanoseconds(double seconds) {
-    return static_cast<int64_t>(seconds * 1000000000ull);
+    auto val = static_cast<int64_t>(seconds * 1000000000ull);
+    return val;
 }
 
 void QSddModelExecutor::worker_thread() {
@@ -71,8 +73,14 @@ void QSddModelExecutor::worker_thread() {
         mCurrentState = mModel->step();
 
         sdd::conn::State stateValue = makePackageState();
-        m_dataReceived(stateValue);
+
+        if (m_dataReceived) {
+            m_dataReceived(stateValue);
+        }
+
         emit modelTakeStep(mCurrentState);
+        emit modelTakeStep_pack(stateValue);
+        //QCoreApplication::processEvents();
         if (mBreakingMilliseconds > 0) {
             std::this_thread::sleep_for(std::chrono::milliseconds(mBreakingMilliseconds));
         }
@@ -153,13 +161,17 @@ sdd::conn::State QSddModelExecutor::makePackageState() {
     stateValue.task.ox = 0;
     stateValue.task.oy = 0;
     stateValue.time = std::chrono::steady_clock::time_point(
-            std::chrono::steady_clock::duration(dSecondsToINanoseconds(mCurrentState.time))
+            std::chrono::steady_clock::duration(dSecondsToINanoseconds(modelState.time))
     );
     return stateValue;
 }
 
-void QSddModelExecutor::brakingModeling(uint milliseconds) {
+void QSddModelExecutor::brakingModeling(long milliseconds) {
+    mBreakingMilliseconds  = milliseconds;
+}
 
+long QSddModelExecutor::brakingModeling() {
+    return mBreakingMilliseconds;
 }
 
 

@@ -5,6 +5,7 @@
 #include "gui/QConditionalControl.h"
 #include "model/parser/QSddModelJsonSerializer.h"
 #include "model/parser/QSddModelXmlSerializer.h"
+#include "gui/QSddModelControl.h"
 
 
 QAppWindow::QAppWindow() :  mSettings("AVV", "TestApp") {
@@ -40,9 +41,8 @@ void QAppWindow::windowInit() {
 }
 
 void QAppWindow::sddModelInit() {
-    auto v = new QSddModelExecutor(std::make_unique<SddModel>());
-   // auto model = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
-    QObject::connect(&(*model), &QSddModelExecutor::parametersUpdate, this, &QAppWindow::saveModelParameters);
+    auto model = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
+    QObject::connect(model.get(), &QSddModelExecutor::parametersUpdate, this, &QAppWindow::saveModelParameters);
 
     auto param = model->getParameters();
     bool okRead = true;
@@ -75,8 +75,8 @@ void QAppWindow::sddModelInit() {
         errorParamRead->setPalette(p);
         mLayout->addWidget(errorParamRead);
     }
-
-    mModel = new QSddView(std::move(model));
+    // TODO(ageev) требуется фабрика для построения QISddStateWidget
+    mModel = new QSddView(new QSddModelControl(std::move(model)));
     FormatsContainer<SddModelDescriptor> f;
     f.add(std::make_shared<QSddModelJsonSerializer>());
     f.add(std::make_shared<QSddModelXmlSerializer>());

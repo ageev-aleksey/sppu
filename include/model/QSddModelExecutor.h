@@ -23,6 +23,7 @@ public:
     SddModel::Input getInput();
     bool isRun();
     void brakingModeling(long milliseconds);
+    long brakingModeling();
     std::shared_ptr<InputGenerator> setInputGenerator(std::shared_ptr<InputGenerator> generator);
     std::shared_ptr<InputGenerator> resetInputGenerator();
     sdd::conn::State recvState() override;
@@ -42,6 +43,7 @@ signals:
     void parametersUpdate(SddModel::Parameters parameters);
     void inputUpdate(SddModel::Input input);
     void modelTakeStep(SddModel::State state);
+    void modelTakeStep_pack(sdd::conn::State state);
     void modelRun();
     void modelStop();
     void modelReset();
@@ -51,7 +53,7 @@ private:
 
     std::shared_ptr<SddModel> mModel;
     std::atomic<bool> mIsRun = false;
-    long mBreakingMilliseconds = 0;
+    std::atomic<long> mBreakingMilliseconds = 0;
 
     std::mutex mMutexUpdInputModel;
     std::shared_ptr<InputGenerator> mInputGenerator = nullptr;
