@@ -42,7 +42,8 @@ void QAppWindow::windowInit() {
 }
 
 void QAppWindow::sddModelInit() {
-    QSddModelControlFactory factory;
+    QSddSerialPortControlFactory factory;
+   // QSddModelControlFactory factory;
     auto sdd = factory.makeWidget(mSettings);
     mModel = new QSddView(sdd);
     FormatsContainer<SddModelDescriptor> f;

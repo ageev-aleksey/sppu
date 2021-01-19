@@ -13,14 +13,19 @@
 namespace sdd::conn {
     class IConnection {
     public:
-        using Handle = void(State &state);
+        using Handle = void(const State &state);
 
-        virtual State recvState() = 0;
         virtual void sendLight(Light package) = 0;
         virtual void sendMode(Mode package) = 0;
         virtual void sendTaskPosition(TaskPosition task) = 0;
-        // TODO (ageev) регистрация множества обратных вызовов!
-        virtual void regCallbackDataReady(std::function<Handle> handler) = 0;
+        virtual void addCallbackDataReady(const std::function<Handle> &handler);
+       // virtual void removeCallback(const std::function<Handle> &handler);
+    protected:
+        void allCall(const State &state);
+    private:
+       // bool callbackIsContain(const std::function<Handle> &handler);
+        std::mutex m_callbackMutex;
+        std::vector<std::function<Handle>> m_callbacks;
     };
 
 } // namespace

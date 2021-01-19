@@ -20,13 +20,12 @@ namespace sdd::conn {
     class QSerialPortConnection : public QObject, public IConnection {
         Q_OBJECT
     public:
-        explicit QSerialPortConnection(std::shared_ptr<QSerialPort> serialPort);
-        QSerialPortConnection(std::shared_ptr<QSerialPort> serialPort, std::function<Handle> handler);
-        State recvState() override;
+        explicit QSerialPortConnection();
+        void setPort(std::shared_ptr<QSerialPort> port);
+        State recvState() ;
         void sendLight(Light package) override;
         void sendMode(Mode package) override;
         void sendTaskPosition(TaskPosition task) override;
-        void regCallbackDataReady(std::function<Handle> handler) override;
     public slots:
         void send(Package &package);
 
@@ -35,9 +34,12 @@ namespace sdd::conn {
 
     private:
         void read(StatePackage &package);
+        bool callbackIsContain(const std::function<Handle> &handler);
 
         std::shared_ptr<QSerialPort> m_serialPort;
-        std::function<Handle> m_dataReceived;
+        QMetaObject::Connection m_qtEventConnection;
+        std::vector<std::function<Handle>> m_callBacks;
+        std::mutex m_callBackMutex;
         std::mutex m_mutex;
         std::condition_variable m_cv;
     };

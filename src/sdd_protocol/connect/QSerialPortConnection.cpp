@@ -16,14 +16,8 @@ void sdd::conn::QSerialPortConnection::send(Package &package)  {
     m_serialPort->write(&package.toBinary()[0]);
 }
 
-sdd::conn::QSerialPortConnection::QSerialPortConnection(std::shared_ptr<QSerialPort> serialPort,
-                                                        std::function<Handle> handler) {
-    if (!serialPort->isOpen()) {
-        throw std::runtime_error("Serial port not opened");
-    }
-    m_serialPort = std::move(serialPort);
-    m_dataReceived = std::move(handler);
-    QObject::connect(m_serialPort.get(), &QSerialPort::readyRead, this, &QSerialPortConnection::readIsReady);
+sdd::conn::QSerialPortConnection::QSerialPortConnection() {
+   m_serialPort = nullptr;
 }
 
 sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
@@ -40,13 +34,15 @@ sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
 
 void sdd::conn::QSerialPortConnection::readIsReady() {
     StatePackage pack;
-    std::lock_guard lock(m_mutex);
+    std::unique_lock lock(m_mutex);
 
     if (m_serialPort->readBufferSize() >= pack.size()) {
         try {
             read(pack);
+            lock.release();
+
             State state = statePackageToStruct(pack);
-            m_dataReceived(state);
+            allCall(state);
         } catch (PackageParseError &exp) {
             qWarning() << "Invalid package: " << exp.what();
         } catch (std::exception &exp) {
@@ -57,21 +53,7 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
     }
 }
 
-
-void sdd::conn::QSerialPortConnection::regCallbackDataReady(std::function<Handle> handler) {
-    if (!handler) {
-        throw std::runtime_error("handler pointer not be a nullptr");
-    }
-    m_dataReceived = std::move(handler);
-}
-
-sdd::conn::QSerialPortConnection::QSerialPortConnection(std::shared_ptr<QSerialPort> serialPort) {
-    if (!serialPort->isOpen()) {
-        throw std::runtime_error("Serial port not opened");
-    }
-    m_serialPort = std::move(serialPort);
-}
-
+// TODO(ageev) не работает
 sdd::conn::State sdd::conn::QSerialPortConnection::recvState() {
     StatePackage pack;
     std::unique_lock lock(m_mutex);
@@ -138,8 +120,30 @@ void sdd::conn::QSerialPortConnection::sendTaskPosition(sdd::conn::TaskPosition 
 }
 
 void sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
-    QByteArray buffer = m_serialPort->read(package.size());
-    // TODO (ageev) убрать копирование из одного буфера в другой
-    package.fromBinary(std::vector<char>(buffer.begin(), buffer.end()));
+    QByteArray array = m_serialPort->read(package.size());
+    std::vector<char> data(array.size());
+    // TODO(ageev) избавиться от копирования
+    for (auto &el : array) {
+        data.push_back(el);
+    }
+    package.fromBinary(data);
 }
+
+void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port) {
+    if (port == nullptr) {
+        throw std::runtime_error("invalid serial port pointer");
+    }
+    if (!port->isOpen()) {
+        throw std::runtime_error("Serial port not opened");
+    }
+    if (m_serialPort != nullptr) {
+        QObject::disconnect(m_qtEventConnection);
+    }
+
+    m_serialPort = std::move(port);
+    m_qtEventConnection = QObject::connect(m_serialPort.get(), &QSerialPort::readyRead, this, &QSerialPortConnection::readIsReady);
+}
+
+
+
 

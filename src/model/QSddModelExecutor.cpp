@@ -131,14 +131,6 @@ std::shared_ptr<InputGenerator> QSddModelExecutor::resetInputGenerator() {
     return setInputGenerator(nullptr);
 }
 
-sdd::conn::State QSddModelExecutor::recvState() {
-    return makePackageState();
-}
-
-
-void QSddModelExecutor::regCallbackDataReady(std::function<Handle> handler) {
-    m_dataReceived = handler;
-}
 
 void QSddModelExecutor::sendLight(sdd::conn::Light package) {
     // empty. Not effect
@@ -179,5 +171,6 @@ void QSddModelExecutor::brakingModeling(long milliseconds) {
 long QSddModelExecutor::brakingModeling() {
     return mBreakingMilliseconds;
 }
+
 
 

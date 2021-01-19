@@ -2,8 +2,8 @@
 // Created by nrx on 17.01.2021.
 //
 
-#ifndef SDDCLIENT_QSDDDEVICECONTROL_H
-#define SDDCLIENT_QSDDDEVICECONTROL_H
+#ifndef SDDCLIENT_QSDDSERIALPORTCONTROL_H
+#define SDDCLIENT_QSDDSERIALPORTCONTROL_H
 #include "gui/QISddStateWidget.h"
 #include "sdd_protocol/connect/QSerialPortConnection.h"
 #include <QtWidgets>
@@ -11,15 +11,19 @@
 #include <memory>
 
 
-class QSddDeviceControl : public QISddStateWidget {
+class QSddSerialPortControl : public QISddStateWidget {
 public:
-    explicit QSddDeviceControl(std::unique_ptr<QSerialPort> SerialPort);
+    explicit QSddSerialPortControl(std::unique_ptr<QSerialPort> SerialPort);
     std::vector<sdd::conn::State> getSddStates() override;
 private:
     void guiInit();
+    void setGuiDefault();
+private slots:
+    void serialConnect();
 
-    std::unique_ptr<sdd::conn::QSerialPortConnection> m_pSender;
     std::shared_ptr<QSerialPort> m_pSerialPort;
+    sdd::conn::QSerialPortConnection m_pSender;
+
 
     QVBoxLayout *mLayout = new QVBoxLayout;
 
@@ -41,9 +45,13 @@ private:
     QSpinBox *mPwmOy = new QSpinBox;
     QCheckBox *mModePwmControl = new QCheckBox;
     // Вкладка настройки КомПорта
+    QWidget *mSerialSettingsWidget = new QWidget;
+    QLineEdit *mSerialNameInput = new QLineEdit; /// Сптсок доступных портов
+    QLineEdit *mBaudRate = new QLineEdit; /// Настройка скорости передачи
+    QPushButton *mSerialConnect = new QPushButton; /// Подключение к ком-порту
     // 1. Скорость передачи битэ
     // 2. ...
 
 };
 
-#endif //SDDCLIENT_QSDDDEVICECONTROL_H
+#endif //SDDCLIENT_QSDDSERIALPORTCONTROL_H

@@ -17,7 +17,8 @@ public:
     QISddStateWidget *makeWidget(QSettings &settings) override;
 };
 
-class QSddDeviceControlFactory : public QISddWidgetFactory {
+class QSddSerialPortControlFactory : public QISddWidgetFactory {
+public:
     QISddStateWidget *makeWidget(QSettings &settings) override;
 };
 

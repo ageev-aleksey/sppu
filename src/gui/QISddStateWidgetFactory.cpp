@@ -1,5 +1,6 @@
 #include "gui/QISddStateWidgetFactory.h"
-
+#include "gui/QSddSerialPortControl.h"
+#include <QtSerialPort>
 
 QISddStateWidget *QSddModelControlFactory::makeWidget(QSettings &settings) {
     auto model = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
@@ -39,6 +40,16 @@ QISddStateWidget *QSddModelControlFactory::makeWidget(QSettings &settings) {
     return new QSddModelControl(std::move(model));
 }
 
-QISddStateWidget *QSddDeviceControlFactory::makeWidget(QSettings &settings) {
-    return nullptr;
+QISddStateWidget *QSddSerialPortControlFactory::makeWidget(QSettings &settings) {
+    auto port = std::make_unique<QSerialPort>();
+    port->setFlowControl(QSerialPort::NoFlowControl);
+    port->setParity(QSerialPort::Parity::NoParity);
+    port->setBaudRate(QSerialPort::BaudRate::Baud38400);
+    port->setDataBits(QSerialPort::DataBits::Data7);
+    QString portName = settings.value("serialport/name").toString();
+    port->setPortName(portName);
+//    if (!port->open(QIODevice::OpenModeFlag::ReadWrite)) {
+//        throw std::runtime_error("error opening serial port");
+//    }
+    return new QSddSerialPortControl(std::move(port));
 }

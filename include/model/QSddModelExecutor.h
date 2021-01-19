@@ -26,11 +26,9 @@ public:
     long brakingModeling();
     std::shared_ptr<InputGenerator> setInputGenerator(std::shared_ptr<InputGenerator> generator);
     std::shared_ptr<InputGenerator> resetInputGenerator();
-    sdd::conn::State recvState() override;
     void sendLight(sdd::conn::Light package) override;
     void sendMode(sdd::conn::Mode package) override;
     void sendTaskPosition(sdd::conn::TaskPosition task) override;
-    void regCallbackDataReady(std::function<Handle> handler) override;
 public slots:
     void setParameters(const SddModel::Parameters &parameters);
     void setParametersDefault();
