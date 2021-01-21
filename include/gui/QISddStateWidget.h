@@ -12,6 +12,8 @@
 class QISddStateWidget : public QWidget {
 public:
     virtual std::vector<sdd::conn::State> getSddStates() = 0;
+    virtual void settingsLoad(const QSettings &settings) = 0;
+    virtual void settingsStore(QSettings &settings) = 0;
     // addCallbackStateReceived()
     // removeCallbackStateReceived()
 };

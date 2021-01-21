@@ -46,6 +46,8 @@ void QSddSerialPortControl::guiInit() {
     formLayout->addRow(new QLabel("Pwm Oy:"), mPwmOy);
     formLayout->addRow(new QLabel("Light:"), mLightBlinking);
     controlLayout->addLayout(formLayout, 0, 1);
+    mButtonSendOptions->setText("Send");
+    controlLayout->addWidget(mButtonSendOptions, 1, 1);
 
     auto *rbGroupLayout = new QHBoxLayout;
     mRbPwmControl->setText("PwmControl");
@@ -92,7 +94,7 @@ void QSddSerialPortControl::serialConnect() {
     auto serialName = mSerialNameInput->text();
     m_pSerialPort->setPortName(serialName);
     if (!m_pSerialPort->open(QSerialPort::ReadWrite)) {
-        qCritical() << "error opening comport: " << serialName;
+        qCritical() << "error opening comport [" << m_pSerialPort->error() << "]: " << serialName;
         return;
     }
 
@@ -118,32 +120,47 @@ void QSddSerialPortControl::controlSettings() {
 
     QObject::connect(mOxTask,  QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updateTaskControlValue);
     QObject::connect(mPwmOx,  QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updatePwmControlValue);
+
+    mModeControl->setCheckState(Qt::Unchecked);
+    mButtonSendOptions->setEnabled(false);
+    QObject::connect(mButtonSendOptions, &QPushButton::released, this, &QSddSerialPortControl::buttonSend);
+    QObject::connect(mModeControl, &QCheckBox::stateChanged, this, &QSddSerialPortControl::takeModeControl);
+
+    QObject::connect(mLightBlinking, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                     this, &QSddSerialPortControl::blinkingUpdate);
 }
 
 void QSddSerialPortControl::updateTaskControlValue(double value) {
-    if (mRbTaskControl->isChecked()) {
+    if (mRbTaskControl->isChecked() && !mModeControl->isChecked()) {
         if (m_pSerialPort->isOpen()) {
-            sdd::conn::TaskPosition task;
-            task.ox = mOxTask->value();
-            task.oy = mOyTask->value();
-            qInfo() << "Send: Task{" << task.ox << "; " << task.oy << "}";
-            m_pSender.sendTaskPosition(task);
+            sendTaskPackage();
         }
     }
 }
 
+void QSddSerialPortControl::sendTaskPackage() {
+    sdd::conn::TaskPosition task;
+    task.ox = mOxTask->value();
+    task.oy = mOyTask->value();
+    qInfo() << "Send: Task{" << task.ox << "; " << task.oy << "}";
+    m_pSender.sendTaskPosition(task);
+}
 
 
 void QSddSerialPortControl::updatePwmControlValue(double value) {
-    if (mRbPwmControl->isChecked()) {
+    if (mRbPwmControl->isChecked() && !mModeControl->isChecked()) {
         if (m_pSerialPort->isOpen()) {
-            sdd::conn::Pwm pwm;
-            pwm.ox = mPwmOx->value();
-            pwm.oy = mPwmOy->value();
-            qInfo() << "Send: Pwm{" << pwm.ox << "; " << pwm.oy << "}";
-            m_pSender.sendPwm(pwm);
+            sendPwmPackage();
         }
     }
+}
+
+void QSddSerialPortControl::sendPwmPackage() {
+    sdd::conn::Pwm pwm;
+    pwm.ox = mPwmOx->value();
+    pwm.oy = mPwmOy->value();
+    qInfo() << "Send: Pwm{" << pwm.ox << "; " << pwm.oy << "}";
+    m_pSender.sendPwm(pwm);
 }
 
 void QSddSerialPortControl::serialInit() {
@@ -151,5 +168,60 @@ void QSddSerialPortControl::serialInit() {
         std::lock_guard lock(m_mutexStates);
         m_vStates.push_back(state);
     });
+}
+
+void QSddSerialPortControl::takeModeControl(int state) {
+    if (state == Qt::Checked) {
+        mButtonSendOptions->setEnabled(true);
+    } else {
+        mButtonSendOptions->setEnabled(false);
+    }
+}
+
+void QSddSerialPortControl::buttonSend() {
+    if (m_pSerialPort->isOpen()) {
+        if (mModeControl->isChecked()) {
+            if (mRbPwmControl->isChecked()) {
+                sendPwmPackage();
+            } else if (mRbTaskControl->isChecked()) {
+                sendTaskPackage();
+            }
+        }
+    }
+}
+
+void QSddSerialPortControl::blinkingUpdate(double value) {
+    if (m_pSerialPort->isOpen()) {
+        sdd::conn::Light light;
+        if (value >= 1.0) {
+            light.blinking = -1;
+        } else {
+            light.blinking = static_cast<int>(value * 10.0);
+        }
+        qInfo() << "Send: Light{" << light.blinking << "}";
+        m_pSender.sendLight(light);
+    }
+}
+
+QSddSerialPortControl::~QSddSerialPortControl() {
+    m_pSerialPort->close();
+}
+
+void QSddSerialPortControl::settingsLoad(const QSettings &settings) {
+    mSerialNameInput->setText(settings.value("sddSerial/devName", "").toString());
+    mBaudRate->setText(settings.value("sddSerial/baudrate", "").toString());
+    mPwmOx->setValue(settings.value("sddControl/pwmx", 0).toInt());
+    mPwmOy->setValue(settings.value("sddControl/pwmy", 0).toInt());
+    mOxTask->setValue(settings.value("sddControl/taskx", 0).toInt());
+    mOyTask->setValue(settings.value("sddControl/tasky", 0).toInt());
+}
+
+void QSddSerialPortControl::settingsStore(QSettings &settings) {
+    settings.setValue("sddSerial/devName", mSerialNameInput->text());
+    settings.setValue("sddSerial/baudrate", mBaudRate->text());
+    settings.setValue("sddControl/pwmx", mPwmOx->text());
+    settings.setValue("sddControl/pwmy", mPwmOy->text());
+    settings.setValue("sddControl/taskx", mOxTask->text());
+    settings.setValue("sddControl/tasky", mOyTask->text());
 }
 

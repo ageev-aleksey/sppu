@@ -46,10 +46,7 @@ QISddStateWidget *QSddSerialPortControlFactory::makeWidget(QSettings &settings) 
     port->setParity(QSerialPort::Parity::NoParity);
     port->setBaudRate(QSerialPort::BaudRate::Baud38400);
     port->setDataBits(QSerialPort::DataBits::Data7);
-    QString portName = settings.value("serialport/name").toString();
-    port->setPortName(portName);
-//    if (!port->open(QIODevice::OpenModeFlag::ReadWrite)) {
-//        throw std::runtime_error("error opening serial port");
-//    }
-    return new QSddSerialPortControl(std::move(port));
+    auto *widget = new QSddSerialPortControl(std::move(port));;
+    widget->settingsLoad(settings);
+    return widget;
 }

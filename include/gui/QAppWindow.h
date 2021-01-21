@@ -28,6 +28,7 @@ private:
 
     //QModelPlots *plots;
     QSddView *mModel;
+    QISddStateWidget *mSdd;
     QSddModelSaver *mSaver;
     QVBoxLayout *mLayout;
     QSettings mSettings;

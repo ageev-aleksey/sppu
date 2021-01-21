@@ -18,6 +18,7 @@ QAppWindow::~QAppWindow() noexcept {
     QSize s = size();
     mSettings.setValue("window/height", s.height());
     mSettings.setValue("window/width", s.width());
+    mSdd->settingsStore(mSettings);
     mSettings.sync();
 }
 
@@ -44,8 +45,8 @@ void QAppWindow::windowInit() {
 void QAppWindow::sddModelInit() {
     QSddSerialPortControlFactory factory;
    // QSddModelControlFactory factory;
-    auto sdd = factory.makeWidget(mSettings);
-    mModel = new QSddView(sdd);
+    mSdd = factory.makeWidget(mSettings);
+    mModel = new QSddView(mSdd);
     FormatsContainer<SddModelDescriptor> f;
     f.add(std::make_shared<QSddModelJsonSerializer>());
     f.add(std::make_shared<QSddModelXmlSerializer>());
@@ -63,14 +64,15 @@ void QAppWindow::showModelDescribe() {
 }
 
 void QAppWindow::saveModelParameters(SddModel::Parameters parameters) {
-    mSettings.setValue("model/positionOx0", parameters.positionOx0);
-    mSettings.setValue("model/positionOz0", parameters.positionOz0);
-    mSettings.setValue("model/speedOx0", parameters.speedOx0);
-    mSettings.setValue("model/speedOz0", parameters.speedOz0);
-    mSettings.setValue("model/structCoeff", parameters.structCoeff);
-    mSettings.setValue("model/frictionCoeff", parameters.frictionCoeff);
-    mSettings.setValue("model/frictionLinearCoeff", parameters.frictionLinearCoeff);
-    mSettings.setValue("model/frictionQuadraticCoeff", parameters.frictionQuadraticCoeff);
+//    mSettings.setValue("model/positionOx0", parameters.positionOx0);
+//    mSettings.setValue("model/positionOz0", parameters.positionOz0);
+//    mSettings.setValue("model/speedOx0", parameters.speedOx0);
+//    mSettings.setValue("model/speedOz0", parameters.speedOz0);
+//    mSettings.setValue("model/structCoeff", parameters.structCoeff);
+//    mSettings.setValue("model/frictionCoeff", parameters.frictionCoeff);
+//    mSettings.setValue("model/frictionLinearCoeff", parameters.frictionLinearCoeff);
+//    mSettings.setValue("model/frictionQuadraticCoeff", parameters.frictionQuadraticCoeff);
+
 }
 
 

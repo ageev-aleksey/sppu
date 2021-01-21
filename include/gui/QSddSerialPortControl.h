@@ -15,7 +15,10 @@ class QSddSerialPortControl : public QISddStateWidget {
     Q_OBJECT
 public:
     explicit QSddSerialPortControl(std::unique_ptr<QSerialPort> SerialPort);
+    ~QSddSerialPortControl() override;
     std::vector<sdd::conn::State> getSddStates() override;
+    void settingsLoad(const QSettings &settings) override;
+    void settingsStore(QSettings &settings) override;
 private:
     void guiInit();
     void setGuiDefault();
@@ -24,6 +27,9 @@ private slots:
     void serialConnect();
     void updateTaskControlValue(double value);
     void updatePwmControlValue(double value);
+    void takeModeControl(int state);
+    void buttonSend();
+    void blinkingUpdate(double value);
 private:
 
     void serialInit();
@@ -65,6 +71,10 @@ private:
 
     std::mutex m_mutexStates;
     std::vector<sdd::conn::State> m_vStates;
+
+    void sendTaskPackage();
+
+    void sendPwmPackage();
 };
 
 #endif //SDDCLIENT_QSDDSERIALPORTCONTROL_H

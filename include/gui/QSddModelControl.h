@@ -23,6 +23,8 @@ class QSddModelControl : public QISddStateWidget {
 public:
     explicit QSddModelControl(std::unique_ptr<QSddModelExecutor> mExec, QWidget *parent = nullptr);
     std::vector<sdd::conn::State> getSddStates() override;
+    void settingsLoad(const QSettings &settings) override;
+    void settingsStore(QSettings &settings) override;
 private slots:
     void modelRunFromGui();
     void modelStopFromGui();

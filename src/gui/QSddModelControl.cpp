@@ -257,3 +257,11 @@ QWidget *QSddModelControl::pwmControlInit() {
     pwmOnlineControl->addLayout(layout);
     return pwmOnlineControl;
 }
+
+void QSddModelControl::settingsLoad(const QSettings &settings) {
+    // empty
+}
+
+void QSddModelControl::settingsStore(QSettings &settings) {
+    // empty
+}
