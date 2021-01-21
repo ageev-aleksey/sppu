@@ -26,6 +26,7 @@ namespace sdd::conn {
         void sendLight(Light package) override;
         void sendMode(Mode package) override;
         void sendTaskPosition(TaskPosition task) override;
+        void sendPwm(Pwm pwm) override;
     public slots:
         void send(Package &package);
 
@@ -33,6 +34,7 @@ namespace sdd::conn {
         void readIsReady();
 
     private:
+        void packageWrite(Package *pack);
         void read(StatePackage &package);
         bool callbackIsContain(const std::function<Handle> &handler);
 

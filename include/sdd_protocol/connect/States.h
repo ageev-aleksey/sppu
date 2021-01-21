@@ -20,12 +20,14 @@ namespace sdd::conn {
         int ox;
         int oy;
     };
-
+    struct Pwm {
+        int ox;
+        int oy;
+    };
     struct State {
         int ox;
         int oy;
-        int pwmX;
-        int pwmY;
+        Pwm pwm;
         TaskPosition task;
         std::chrono::steady_clock::time_point time;
     };

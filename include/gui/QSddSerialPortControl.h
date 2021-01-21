@@ -12,15 +12,21 @@
 
 
 class QSddSerialPortControl : public QISddStateWidget {
+    Q_OBJECT
 public:
     explicit QSddSerialPortControl(std::unique_ptr<QSerialPort> SerialPort);
     std::vector<sdd::conn::State> getSddStates() override;
 private:
     void guiInit();
     void setGuiDefault();
+    void controlSettings();
 private slots:
     void serialConnect();
+    void updateTaskControlValue(double value);
+    void updatePwmControlValue(double value);
+private:
 
+    void serialInit();
     std::shared_ptr<QSerialPort> m_pSerialPort;
     sdd::conn::QSerialPortConnection m_pSender;
 
@@ -43,7 +49,12 @@ private slots:
     // 3. Установка скважности ШИМ
     QSpinBox *mPwmOx = new QSpinBox;
     QSpinBox *mPwmOy = new QSpinBox;
-    QCheckBox *mModePwmControl = new QCheckBox;
+    // 4. Настройка режима управления, через задание или скважность ШИМ
+    QGroupBox *mRbGroup = new QGroupBox;
+    QRadioButton *mRbPwmControl = new QRadioButton;
+    QRadioButton *mRbTaskControl = new QRadioButton;
+    QCheckBox *mModeControl = new QCheckBox;
+    QPushButton *mButtonSendOptions = new QPushButton;
     // Вкладка настройки КомПорта
     QWidget *mSerialSettingsWidget = new QWidget;
     QLineEdit *mSerialNameInput = new QLineEdit; /// Сптсок доступных портов
@@ -52,6 +63,8 @@ private slots:
     // 1. Скорость передачи битэ
     // 2. ...
 
+    std::mutex m_mutexStates;
+    std::vector<sdd::conn::State> m_vStates;
 };
 
 #endif //SDDCLIENT_QSDDSERIALPORTCONTROL_H

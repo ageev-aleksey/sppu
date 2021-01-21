@@ -18,6 +18,7 @@ namespace sdd::conn {
         virtual void sendLight(Light package) = 0;
         virtual void sendMode(Mode package) = 0;
         virtual void sendTaskPosition(TaskPosition task) = 0;
+        virtual void sendPwm(Pwm pwm) = 0;
         virtual void addCallbackDataReady(const std::function<Handle> &handler);
        // virtual void removeCallback(const std::function<Handle> &handler);
     protected:

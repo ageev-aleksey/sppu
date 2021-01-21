@@ -29,6 +29,7 @@ public:
     void sendLight(sdd::conn::Light package) override;
     void sendMode(sdd::conn::Mode package) override;
     void sendTaskPosition(sdd::conn::TaskPosition task) override;
+    void sendPwm(sdd::conn::Pwm pwm) override;
 public slots:
     void setParameters(const SddModel::Parameters &parameters);
     void setParametersDefault();

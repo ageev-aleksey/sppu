@@ -7,10 +7,13 @@ QSddSerialPortControl::QSddSerialPortControl(std::unique_ptr<QSerialPort> connec
 {
     setLayout(mLayout);
     guiInit();
+    controlSettings();
+    serialInit();
 }
 
 std::vector<sdd::conn::State> QSddSerialPortControl::getSddStates() {
-    return std::vector<sdd::conn::State>();
+    std::lock_guard lock (m_mutexStates);
+    return std::move(m_vStates);
 }
 
 void QSddSerialPortControl::guiInit() {
@@ -35,6 +38,7 @@ void QSddSerialPortControl::guiInit() {
     auto formLayout = new QFormLayout;
     formLayout->addRow(new QLabel("Task Ox:"), mOxTask);
     formLayout->addRow(new QLabel("Task Oy"), mOyTask);
+    formLayout->addRow(new QLabel("send by button"), mModeControl);
     controlLayout->addLayout(formLayout, 0, 0);
 
     formLayout = new QFormLayout;
@@ -42,6 +46,15 @@ void QSddSerialPortControl::guiInit() {
     formLayout->addRow(new QLabel("Pwm Oy:"), mPwmOy);
     formLayout->addRow(new QLabel("Light:"), mLightBlinking);
     controlLayout->addLayout(formLayout, 0, 1);
+
+    auto *rbGroupLayout = new QHBoxLayout;
+    mRbPwmControl->setText("PwmControl");
+    rbGroupLayout->addWidget(mRbPwmControl);
+    mRbTaskControl->setText("TaskControl");
+    rbGroupLayout->addWidget(mRbTaskControl);
+    mRbGroup->setTitle("Mode control");
+    mRbGroup->setLayout(rbGroupLayout);
+    controlLayout->addWidget(mRbGroup, 1, 0);
     mControlWidget->setLayout(controlLayout);
   //  mLayout->addLayout(controlLayout);
 
@@ -79,16 +92,64 @@ void QSddSerialPortControl::serialConnect() {
     auto serialName = mSerialNameInput->text();
     m_pSerialPort->setPortName(serialName);
     if (!m_pSerialPort->open(QSerialPort::ReadWrite)) {
-        qCritical() << "error oppening comport: " << serialName;
-    } else {
-        qInfo() << "Open comport: " << serialName;
-        m_pSerialPort->write("Hello\n");
+        qCritical() << "error opening comport: " << serialName;
+        return;
     }
+
+    qInfo() << "Open comport: " << serialName;
+    // m_pSerialPort->write("Hello\n");
     bool isOK = false;
     int64_t baudRate = mBaudRate->text().toLong(&isOK);
     if (!isOK) {
         qCritical() << "Invalid baudrate value : " << mBaudRate->text();
     }
     m_pSerialPort->setBaudRate(baudRate);
-
+    m_pSender.setPort(m_pSerialPort);
 }
+
+void QSddSerialPortControl::controlSettings() {
+    mOxTask->setMinimum(-255);
+    mOxTask->setMaximum(255);
+    mOyTask->setMinimum(-255);
+    mOyTask->setMaximum(255);
+    mLightBlinking->setMinimum(0);
+    mLightBlinking->setMaximum(1);
+    mLightBlinking->setSingleStep(0.1);
+
+    QObject::connect(mOxTask,  QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updateTaskControlValue);
+    QObject::connect(mPwmOx,  QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updatePwmControlValue);
+}
+
+void QSddSerialPortControl::updateTaskControlValue(double value) {
+    if (mRbTaskControl->isChecked()) {
+        if (m_pSerialPort->isOpen()) {
+            sdd::conn::TaskPosition task;
+            task.ox = mOxTask->value();
+            task.oy = mOyTask->value();
+            qInfo() << "Send: Task{" << task.ox << "; " << task.oy << "}";
+            m_pSender.sendTaskPosition(task);
+        }
+    }
+}
+
+
+
+void QSddSerialPortControl::updatePwmControlValue(double value) {
+    if (mRbPwmControl->isChecked()) {
+        if (m_pSerialPort->isOpen()) {
+            sdd::conn::Pwm pwm;
+            pwm.ox = mPwmOx->value();
+            pwm.oy = mPwmOy->value();
+            qInfo() << "Send: Pwm{" << pwm.ox << "; " << pwm.oy << "}";
+            m_pSender.sendPwm(pwm);
+        }
+    }
+}
+
+void QSddSerialPortControl::serialInit() {
+    m_pSender.addCallbackDataReady([this](const sdd::conn::State &state) {
+        std::lock_guard lock(m_mutexStates);
+        m_vStates.push_back(state);
+    });
+}
+

@@ -96,13 +96,13 @@ void QSddView::stateInGui() {
 //        mPlots->addPlotData(1, 1, 0, centerTime, centerState.speedOz);
 //        mPlots->addPlotData(1, 1, 0, endTime, endState.speedOz);
 
-        mPlots->addPlotData(0, 2, 0, beginTime, beginState.pwmX);
-        mPlots->addPlotData(0, 2, 0, centerTime, centerState.pwmX);
-        mPlots->addPlotData(0, 2, 0, endTime, endState.pwmX);
+        mPlots->addPlotData(0, 2, 0, beginTime, beginState.pwm.ox);
+        mPlots->addPlotData(0, 2, 0, centerTime, centerState.pwm.ox);
+        mPlots->addPlotData(0, 2, 0, endTime, endState.pwm.ox);
 
-        mPlots->addPlotData(1, 2, 0, beginTime, beginState.pwmY);
-        mPlots->addPlotData(1, 2, 0, centerTime, centerState.pwmY);
-        mPlots->addPlotData(1, 2, 0, endTime, endState.pwmY);
+        mPlots->addPlotData(1, 2, 0, beginTime, beginState.pwm.oy);
+        mPlots->addPlotData(1, 2, 0, centerTime, centerState.pwm.oy);
+        mPlots->addPlotData(1, 2, 0, endTime, endState.pwm.oy);
 
 
 

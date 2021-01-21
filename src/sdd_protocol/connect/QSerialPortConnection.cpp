@@ -8,6 +8,7 @@
 #include "sdd_protocol/LightPackage.h"
 #include "sdd_protocol/ModePackage.h"
 #include "sdd_protocol/PositionPackage.h"
+#include "sdd_protocol/PwmPackage.h"
 
 #include <sstream>
 
@@ -24,8 +25,8 @@ sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
     sdd::conn::State state{};
     state.ox = pack.OX();
     state.oy = pack.OY();
-    state.pwmX = pack.PWMX();
-    state.pwmY = pack.PWMY();
+    state.pwm.ox = pack.PWMX();
+    state.pwm.oy = pack.PWMY();
     state.task.ox = pack.positionX();
     state.task.oy = pack.positionY();
     state.time = std::chrono::steady_clock::now();
@@ -76,10 +77,7 @@ void sdd::conn::QSerialPortConnection::sendLight(sdd::conn::Light package) {
     } else {
         pack.lightOn();
     }
-    auto bin = pack.toBinary();
-
-    std::lock_guard lock(m_mutex);
-    m_serialPort->write(&bin[0]);
+    packageWrite(&pack);
 }
 
 void sdd::conn::QSerialPortConnection::sendMode(sdd::conn::Mode package) {
@@ -91,13 +89,16 @@ void sdd::conn::QSerialPortConnection::sendMode(sdd::conn::Mode package) {
     } else {
         pack.coilOff();
     }
-    auto bin = pack.toBinary();
-
-    std::lock_guard lock(m_mutex);
-    m_serialPort->write(&bin[0]);
+    packageWrite(&pack);
 }
 
 void sdd::conn::QSerialPortConnection::sendTaskPosition(sdd::conn::TaskPosition task) {
+    if (m_serialPort == nullptr) {
+        throw std::runtime_error("Serial port not inserted");
+    }
+    if (!m_serialPort->isOpen()) {
+        throw std::runtime_error("Serial port not opened");
+    }
     if (task.ox > 255) {
         std::stringstream msg;
         msg << "Invalid TaskPosition.ox:  TaskPosition{ox: " << task.ox << "; oy: " << task.oy << "}";
@@ -109,15 +110,26 @@ void sdd::conn::QSerialPortConnection::sendTaskPosition(sdd::conn::TaskPosition 
         msg << "Invalid TaskPosition.oy:  TaskPosition{ox: " << task.ox << "; oy: " << task.oy << "}";
         throw std::runtime_error(msg.str());
     }
-    StatePackage pack;
+    PositionPackage pack;
 
-    pack.setPositionX(static_cast<short>(task.ox));
-    pack.setPositionY(static_cast<short>(task.oy));
-    auto bin = pack.toBinary();
-    std::lock_guard lock(m_mutex);
-    m_serialPort->write(&bin[0]);
-
+    pack.setPosX(static_cast<short>(task.ox));
+    pack.setPosY(static_cast<short>(task.oy));
+    packageWrite(&pack);
 }
+
+void sdd::conn::QSerialPortConnection::sendPwm(sdd::conn::Pwm pwm) {
+    if (m_serialPort == nullptr) {
+        throw std::runtime_error("Serial port not inserted");
+    }
+    if (!m_serialPort->isOpen()) {
+        throw std::runtime_error("Serial port not opened");
+    }
+    PwmPackage pack;
+    pack.pwmOx(static_cast<short>(pwm.ox));
+    pack.pwmOy(static_cast<short>(pwm.oy));
+    packageWrite(&pack);
+}
+
 
 void sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
     QByteArray array = m_serialPort->read(package.size());
@@ -143,6 +155,13 @@ void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port
     m_serialPort = std::move(port);
     m_qtEventConnection = QObject::connect(m_serialPort.get(), &QSerialPort::readyRead, this, &QSerialPortConnection::readIsReady);
 }
+
+void sdd::conn::QSerialPortConnection::packageWrite(Package *pack) {
+    auto bin = pack->toBinary();
+    std::lock_guard lock(m_mutex);
+    m_serialPort->write(&bin[0]);
+}
+
 
 
 

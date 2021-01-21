@@ -154,8 +154,8 @@ sdd::conn::State QSddModelExecutor::makePackageState() {
     // TODO(ageev) выполнить преобразование из double в short int
     stateValue.ox = modelState.positionOx*255;
     stateValue.oy = modelState.positionOz*255;
-    stateValue.pwmX = modelState.oxSignal;
-    stateValue.pwmY = modelState.ozSignal;
+    stateValue.pwm.ox = modelState.oxSignal;
+    stateValue.pwm.oy = modelState.ozSignal;
     stateValue.task.ox = 0;
     stateValue.task.oy = 0;
     stateValue.time = std::chrono::steady_clock::time_point(
@@ -170,6 +170,10 @@ void QSddModelExecutor::brakingModeling(long milliseconds) {
 
 long QSddModelExecutor::brakingModeling() {
     return mBreakingMilliseconds;
+}
+
+void QSddModelExecutor::sendPwm(sdd::conn::Pwm pwm) {
+    // empty
 }
 
 
