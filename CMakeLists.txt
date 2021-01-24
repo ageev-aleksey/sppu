@@ -41,3 +41,6 @@ if(COMPILE_TESTS)
     message(STATUS "Compiling unit test")
     add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/test)
 endif()
+
+
+add_subdirectory(sub_project/ip_cam)
