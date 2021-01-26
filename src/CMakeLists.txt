@@ -58,7 +58,7 @@ add_executable(model_to_com_port ${QT_MOC_SDD_MODEL_HEADERS} ${CMAKE_CURRENT_LIS
 target_include_directories(model_to_com_port PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}
                                                     ${Qt5SerialPort_INCLUDE_DIRS})
 target_link_libraries(model_to_com_port ${Qt5Core_LIBRARIES} ${Qt5SerialPort_LIBRARIES}
-                                        qt_model_components sdd_model pthread sdd_protocol)
+                                        qt_model_components sdd_model pthread sdd_protocol atomic)
 
 add_custom_command(
         TARGET model_to_com_port PRE_BUILD

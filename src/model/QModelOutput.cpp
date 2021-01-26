@@ -2,6 +2,8 @@
 #include "sdd_protocol/StatePackage.h"
 #include <math.h>
 
+#include <iostream>
+
 static const double PI =  3.14;
 static const double CORNENR45 = std::cos(PI);
 static const double INTEGER_CORNER45 = 255.0;
@@ -35,5 +37,8 @@ void QModelOutput::writeModelState(SddModel::State state) {
     statePackage.setPositionX(convertCorner(state.positionOz));
     statePackage.setPWMX(convertPwm(state.oxSignal));
     statePackage.setPWMY(convertPwm(state.ozSignal));
+    std::cout << "State {ox: " << state.positionOx << "; oz:" << state.positionOz
+                << "; pwmOx: " << state.oxSignal << "; pwmOz: " << state.ozSignal
+                << "}" << std::endl;
     m_pDevice->write(&statePackage.toBinary()[0]);
 }

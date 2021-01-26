@@ -2,6 +2,7 @@
 #include "sdd_protocol/PackageError.h"
 #include <exception>
 #include <string>
+#include <sstream>
 using namespace sdd;
 
 Package::Package(std::string pname, char id, Message::Endianness end) : bworker(end) {
@@ -152,16 +153,24 @@ std::vector<Package::byte_t> Package::toBinary() const{
 }
 
 void Package::fromBinary(const std::vector<byte_t> &bin_buff) {
-    if((bin_buff.size() == (bworker.size() + 1)) && (bin_buff[0] == id())) {
-        if(*(--bin_buff.cend()) == hash(bin_buff.cbegin(), (--bin_buff.cend()))) {
-            bworker.fromBinary(bin_buff, 1); //TODO �����������
+    if((bin_buff.size() == (bworker.size() + 1))) {
+        if ((bin_buff[0] == id())) {
+           // if(*(--bin_buff.cend()) == hash(bin_buff.cbegin(), (--bin_buff.cend()))) {
+                bworker.fromBinary(bin_buff, 1); //TODO �����������
+//            } else {
+//                throw PackageControlSumError("control sum in package don't equal with calculated checksum");
+//            }
         } else {
-            throw PackageControlSumError("control sum in package don't equal with calculated checksum");
+            std::stringstream msg;
+            msg << "Invalid package id [" << bin_buff[0] << "]. Id must be equal to " << id();
+            throw PackageParseError(msg.str());
         }
+
     } else {
-        throw PackageParseError(std::string("length of buffer dont't equal with binary representation package ") + name() +
-                                std::string(". Thsi package have length a " ) + std::to_string(bworker.size() + 1) +
-                                std::string(". This binary buffer have langth a ") +std::to_string(bin_buff.size()));
+        std::stringstream msg;
+        msg << "length of buffer dont't equal with binary representation package " << bworker.size() + 1
+            << ". This package have length a " << bin_buff.size();
+        throw PackageParseError(msg.str());
     }
 }
 

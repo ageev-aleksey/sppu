@@ -1,5 +1,6 @@
 
 #include "model/QModelOutput.h"
+#include "model/PwdInputGenerator.h"
 
 #include <QtCore/QCoreApplication>
 #include <QtCore>
@@ -97,6 +98,10 @@ std::unique_ptr<QModelOutput> make(const QString &file_path) {
 
     auto modelExecutor = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
     modelExecutor->setParameters(params);
+    modelExecutor->brakingModeling(50);
+    auto pwdGenerator = std::make_shared<PwdInputGenerator>(1, -1, 1);
+    pwdGenerator->setDutyCycle(0.5, 0.5);
+    modelExecutor->setInputGenerator(pwdGenerator);
     auto modelOutput = std::make_unique<QModelOutput>(std::move(modelExecutor), std::move(device));
     return std::move(modelOutput);
 }
@@ -165,6 +170,14 @@ SddModel::Parameters modelParametersParse(const QJsonObject &obj) {
     ret.frictionLinearCoeff = obj["frictionLinearCoeff"].toDouble();
     ret.frictionQuadraticCoeff = obj["frictionQuadraticCoeff"].toDouble();
     ret.structCoeff = obj["structCoeff"].toDouble();
+
+    ret.speedOz0 = 0;
+    ret.positionOx0 = 0;
+    ret.positionOz0 = 0;
+    ret.frictionCoeff = 0.000001;
+    ret.frictionLinearCoeff = 1;
+    ret.frictionQuadraticCoeff = 0.001;
+    ret.structCoeff = 15000;
     return ret;
 }
 

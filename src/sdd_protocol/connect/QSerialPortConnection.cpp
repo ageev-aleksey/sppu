@@ -36,8 +36,8 @@ sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
 void sdd::conn::QSerialPortConnection::readIsReady() {
     StatePackage pack;
     std::unique_lock lock(m_mutex);
-
-    if (m_serialPort->readBufferSize() >= pack.size()) {
+    auto readBufferSize = m_serialPort->bytesAvailable();
+    if (readBufferSize >= pack.size()) {
         try {
             read(pack);
             lock.release();
@@ -133,7 +133,8 @@ void sdd::conn::QSerialPortConnection::sendPwm(sdd::conn::Pwm pwm) {
 
 void sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
     QByteArray array = m_serialPort->read(package.size());
-    std::vector<char> data(array.size());
+    std::vector<char> data;
+    data.reserve(array.size());
     // TODO(ageev) избавиться от копирования
     for (auto &el : array) {
         data.push_back(el);
