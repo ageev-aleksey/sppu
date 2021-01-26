@@ -1,6 +1,6 @@
 project(ip_web_cam)
 
-set(OpenCV_DIR /opt/opencv/release)
+#set(OpenCV_DIR /opt/opencv/release)
 set(INCLUDE_DIR include)
 set(SRC_DIR src)
 
