@@ -11,7 +11,7 @@ option(COMPILE_TESTS "" ON)
 
 
 set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
-set(QT_ADDITIONAL_QCUSTOMPLOT /home/nrx/Qt/5.15.0/additional/qcustomplot)
+
 
 
 #include(${CMAKE_CURRENT_LIST_DIR}/MatlabLibrary.cmake)
