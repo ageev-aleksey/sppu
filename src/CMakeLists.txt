@@ -41,7 +41,10 @@ add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
 target_include_directories(app_gui PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}
                             ${Qt5Widgets_INCLUDE_DIRS} ${LIB_DIR}/qcustomplot/)
 
-target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport  pthread atomic)
+target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(app_gui pthread atomic)
+endif()
 #target_enable_cpplint(app_gui
 #                      SOURCES ${SRC_GUI}
 #                      FILTERS "-legal/copyright"
@@ -58,7 +61,11 @@ add_executable(model_to_com_port ${QT_MOC_SDD_MODEL_HEADERS} ${CMAKE_CURRENT_LIS
 target_include_directories(model_to_com_port PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}
                                                     ${Qt5SerialPort_INCLUDE_DIRS})
 target_link_libraries(model_to_com_port ${Qt5Core_LIBRARIES} ${Qt5SerialPort_LIBRARIES}
-                                        qt_model_components sdd_model pthread sdd_protocol atomic)
+                                        qt_model_components sdd_model sdd_protocol)
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(model_to_com_port pthread atomic)
+endif()
+
 
 add_custom_command(
         TARGET model_to_com_port PRE_BUILD

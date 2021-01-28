@@ -3,7 +3,7 @@
 
 
 QSddSerialPortControl::QSddSerialPortControl(std::unique_ptr<QSerialPort> connection)
-    : m_pSerialPort(std::move(connection)),  m_pSender(sdd::conn::QSerialPortConnection)
+    : m_pSerialPort(std::move(connection)),  m_pSender(new sdd::conn::QSerialPortConnection)
 {
     setLayout(mLayout);
     guiInit();
@@ -13,7 +13,8 @@ QSddSerialPortControl::QSddSerialPortControl(std::unique_ptr<QSerialPort> connec
 
 std::vector<sdd::conn::State> QSddSerialPortControl::getSddStates() {
     std::lock_guard lock (m_mutexStates);
-    return std::move(m_vStates);
+   /// return std::move(m_vStates);
+    return { m_lastState };
 }
 
 void QSddSerialPortControl::guiInit() {
@@ -109,7 +110,7 @@ void QSddSerialPortControl::serialConnect() {
         qCritical() << "Invalid baudrate value : " << mBaudRate->text();
     }
     m_pSerialPort->setBaudRate(baudRate);
-    m_pSender.setPort(m_pSerialPort);
+    m_pSender->setPort(m_pSerialPort);
 }
 
 void QSddSerialPortControl::controlSettings() {
@@ -146,7 +147,7 @@ void QSddSerialPortControl::sendTaskPackage() {
     task.ox = mOxTask->value();
     task.oy = mOyTask->value();
     qInfo() << "Send: Task{" << task.ox << "; " << task.oy << "}";
-    m_pSender.sendTaskPosition(task);
+    m_pSender->sendTaskPosition(task);
 }
 
 
@@ -163,16 +164,16 @@ void QSddSerialPortControl::sendPwmPackage() {
     pwm.ox = mPwmOx->value();
     pwm.oy = mPwmOy->value();
     qInfo() << "Send: Pwm{" << pwm.ox << "; " << pwm.oy << "}";
-    m_pSender.sendPwm(pwm);
+    m_pSender->sendPwm(pwm);
 }
 
 void QSddSerialPortControl::serialInit() {
-    m_pSender.addCallbackDataReady([this](const sdd::conn::State &state) {
-        mBeforeTimePackageGet;
-        auto time = std::chrono::steady_clock::now();
+    m_pSender->addCallbackDataReady([this](const sdd::conn::State &state) {
+
         {
             std::lock_guard lock(m_mutexStates);
-            m_vStates.push_back(state);
+           // m_vStates.push_back(state);
+            m_lastState = state;
         }
         textUpdate(state);
     });
@@ -207,7 +208,7 @@ void QSddSerialPortControl::blinkingUpdate(double value) {
             light.blinking = static_cast<int>(value * 10.0);
         }
         qInfo() << "Send: Light{" << light.blinking << "}";
-        m_pSender.sendLight(light);
+        m_pSender->sendLight(light);
     }
 }
 

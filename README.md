@@ -9,3 +9,16 @@
 ```commandline
 socat -d -d pty,raw,echo=0 pty,raw,echo=0
 ```
+
+## Параметры последовательного порта
+
+- BaudRate 38400
+- ParityControl Disable
+- FlowControl Disable
+- ByteSize 8
+- StopBit 1
+
+# TODO
+ - Написать буфиризацию пакетов, так как сбивается последовательность байет
+ и пакет не может быть разобран
+ - Написать функцию для сохранения значения пакетов в файл в виде массива JSON

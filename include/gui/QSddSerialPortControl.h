@@ -74,7 +74,8 @@ private:
     sdd::conn::State mBeforePackageValue{};
 
     std::mutex m_mutexStates;
-    std::vector<sdd::conn::State> m_vStates;
+    //std::vector<sdd::conn::State> m_vStates;
+    sdd::conn::State m_lastState{};
 
     void sendTaskPackage();
 

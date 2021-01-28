@@ -7,10 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 message(STATUS ${CMAKE_ROOT})
-option(COMPILE_TESTS "" ON)
+option(COMPILE_TESTS "" OFF)
 
 
-set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
+set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
 
 
 
@@ -22,7 +22,7 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 set(SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 set(RESOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/resource)
 
-include(./cmake/Cpplint.cmake)
+#include(./cmake/Cpplint.cmake)
 
 add_subdirectory(${SRC_DIR})
 

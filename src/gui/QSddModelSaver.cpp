@@ -19,7 +19,7 @@ QSddModelSaver::QSddModelSaver(const FormatsContainer<SddModelDescriptor> &forma
                     // TODO (ageev) организовать контоль размер буффера и реализовать
                     //  функцию WriteBlock, которая запишет весь буффер файл у класса FormatsContainer
                 }
-    })
+    });
 }
 
 void QSddModelSaver::addModelState(const sdd::conn::State &state) {

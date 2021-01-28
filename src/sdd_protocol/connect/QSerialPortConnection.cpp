@@ -160,7 +160,7 @@ void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port
 void sdd::conn::QSerialPortConnection::packageWrite(Package *pack) {
     auto bin = pack->toBinary();
     std::lock_guard lock(m_mutex);
-    m_serialPort->write(&bin[0]);
+    m_serialPort->write(bin.data(), bin.size());
 }
 
 

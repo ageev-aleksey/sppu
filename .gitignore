@@ -1,2 +1,8 @@
 .idea/
 cmake-*/
+.vs/
+.vscode/
+CMakeLists.txt.user
+build/
+out/
+*.pdb

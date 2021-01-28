@@ -1,5 +1,5 @@
 #include "serialization/Message.h"
-
+#include <stdexcept>
 
 Message::Message(Endianness endianness)
 {
