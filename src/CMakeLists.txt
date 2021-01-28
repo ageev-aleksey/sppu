@@ -21,6 +21,11 @@ target_include_directories(sdd_model PRIVATE ${INCLUDE_DIR} ${MATLAB_SIMULINK_IN
 
 find_package(Qt5 COMPONENTS Core Widgets PrintSupport REQUIRED)
 find_package(Qt5 COMPONENTS SerialPort REQUIRED)
+find_package(Boost REQUIRED COMPONENTS container)
+if(Boost_FOUND) 
+    message("BOOST: ${Boost_LIBRARY_DIRS} : ${Boost_LIBRARIES}")
+    message("BOOST headers: ${Boost_INCLUDE_DIRS}")
+endif()
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -39,9 +44,10 @@ add_library(SDD::QT_MODEL_COMPONENTS ALIAS qt_model_components)
 add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
         ${LIB_DIR}/qcustomplot/qcustomplot.cpp  ${QT_MOC_HEADERS} ${QRC})
 target_include_directories(app_gui PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}
-                            ${Qt5Widgets_INCLUDE_DIRS} ${LIB_DIR}/qcustomplot/)
+                            ${Qt5Widgets_INCLUDE_DIRS} ${LIB_DIR}/qcustomplot/
+                             ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport)
+target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport ${Boost_LIBRARIES})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(app_gui pthread atomic)
 endif()
