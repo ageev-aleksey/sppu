@@ -7,10 +7,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 message(STATUS ${CMAKE_ROOT})
-option(COMPILE_TESTS "" OFF)
+option(COMPILE_TESTS "" ON)
 
-
-set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
+set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
+#set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
 #Boost
 set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
 set(BOOST_INCLUDEDIR "include/boost-1_61")

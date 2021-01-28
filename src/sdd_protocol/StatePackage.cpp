@@ -7,7 +7,7 @@ StatePackage::StatePackage() : Package("state", 20, Message::Endianness::MSG_LIT
 
 
 
-StatePackage::StatePackage(const std::vector<Package::byte_t> &bin_buff) : Package("state", 20, Message::Endianness::MSG_LITTLE_ENDIAN) {
+StatePackage::StatePackage(const std::vector<Package::byte_t> &bin_buff) : Package("state", ID, Message::Endianness::MSG_LITTLE_ENDIAN) {
     create_all_fields();
     fromBinary(bin_buff);
 }
@@ -98,3 +98,5 @@ void StatePackage::create_all_fields() {
 	bworker.addField("-2", 17);//Байты, значения которых не удалось определить
 	bworker.addField("R", 1);
 }
+
+

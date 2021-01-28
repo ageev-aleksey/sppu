@@ -5,7 +5,7 @@
 #include <sstream>
 using namespace sdd;
 
-Package::Package(std::string pname, char id, Message::Endianness end) : bworker(end) {
+Package::Package(std::string pname, char id, Message::Endianness end) : bworker(end), idValue(id){
 	bworker.addField("CC", 1);
 	bworker.get("CC")->fill(&id, 1);
 	package_name = std::move(pname);

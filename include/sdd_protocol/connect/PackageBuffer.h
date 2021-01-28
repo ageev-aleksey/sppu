@@ -5,20 +5,24 @@
 #ifndef SPPU_SERIAL_PACKAGEBUFFER_H
 #define SPPU_SERIAL_PACKAGEBUFFER_H
 
-#include "StatePackage.h"
-#include <>///?
-#include <ostream>
+#include "sdd_protocol/StatePackage.h"
+#include <boost/circular_buffer.hpp>
+#include <iostream>
 
-namespace sdd {
+namespace sdd::conn {
     class PackageBuffer {
     public:
         explicit PackageBuffer(size_t size);
-        void addBytes(const std::vector<unsigned char> &bytes);
-        StatePackage formPackage();
+        template <typename Iterator>
+        void addBytes(const Iterator &begin, const Iterator &end) {
+            buffer.insert(buffer.end(), begin, end);
+        }
+        bool formPackage(StatePackage &state);
         void flush();
-        friend std::ostream &operator<<(std::ostream &stream, const PackageBuffer &buff);
+
 private:
-        boost::circular_buffer<unsigned char> buffer;
+        //friend std::ostream &operator<<(std::ostream &stream, const sdd::conn::PackageBuffer &buff);
+        boost::circular_buffer<char> buffer;
     };
 }
 ////TODO ����� ���������� ������� ��� ������ ���� ������� - StatePackage. /
@@ -26,6 +30,6 @@ private:
 //// ��� ����� ���������� ����������� ����� �������
 
 
-std::ostream &operator<<(std::ostream &stream, const sdd::PackageBuffer &buff);
+//std::ostream &operator<<(std::ostream &stream, const sdd::conn::PackageBuffer &buff);
 
 #endif //SPPU_SERIAL_PACKAGEBUFFER_H

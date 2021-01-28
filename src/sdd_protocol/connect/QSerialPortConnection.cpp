@@ -4,11 +4,13 @@
 
 #include <sdd_protocol/PackageError.h>
 #include "sdd_protocol/connect/QSerialPortConnection.h"
+#include "sdd_protocol/connect/PackageBuffer.h"
 #include "sdd_protocol/StatePackage.h"
 #include "sdd_protocol/LightPackage.h"
 #include "sdd_protocol/ModePackage.h"
 #include "sdd_protocol/PositionPackage.h"
 #include "sdd_protocol/PwmPackage.h"
+
 
 #include <sstream>
 
@@ -17,7 +19,9 @@ void sdd::conn::QSerialPortConnection::send(Package &package)  {
     m_serialPort->write(&package.toBinary()[0]);
 }
 
-sdd::conn::QSerialPortConnection::QSerialPortConnection() {
+sdd::conn::QSerialPortConnection::QSerialPortConnection()
+    : m_buffer(StatePackage::NUM_BYTES*2)
+{
    m_serialPort = nullptr;
 }
 
@@ -39,11 +43,11 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
     auto readBufferSize = m_serialPort->bytesAvailable();
     if (readBufferSize >= pack.size()) {
         try {
-            read(pack);
-            lock.unlock();
-
-            State state = statePackageToStruct(pack);
-            allCall(state);
+            if (read(pack)) {
+                lock.unlock();
+                State state = statePackageToStruct(pack);
+                allCall(state);
+            }
         } catch (PackageParseError &exp) {
             qWarning() << "Invalid package: " << exp.what();
         } catch (std::exception &exp) {
@@ -131,15 +135,18 @@ void sdd::conn::QSerialPortConnection::sendPwm(sdd::conn::Pwm pwm) {
 }
 
 
-void sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
+bool sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
     QByteArray array = m_serialPort->read(package.size());
-    std::vector<char> data;
-    data.reserve(array.size());
-    // TODO(ageev) избавиться от копирования
-    for (auto &el : array) {
-        data.push_back(el);
-    }
-    package.fromBinary(data);
+    m_buffer.addBytes(array.begin(), array.end());
+    return m_buffer.formPackage(package);
+
+//    std::vector<char> data;
+//    data.reserve(array.size());
+//    // TODO(ageev) избавиться от копирования
+//    for (auto &el : array) {
+//        data.push_back(el);
+//    }
+//    package.fromBinary(data);
 }
 
 void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port) {
