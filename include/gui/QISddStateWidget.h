@@ -14,6 +14,7 @@ public:
     virtual std::vector<sdd::conn::State> getSddStates() = 0;
     virtual void settingsLoad(const QSettings &settings) = 0;
     virtual void settingsStore(QSettings &settings) = 0;
+    virtual std::shared_ptr<sdd::conn::IConnection> getSddConnection() = 0;
     // addCallbackStateReceived()
     // removeCallbackStateReceived()
 };

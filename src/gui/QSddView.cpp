@@ -82,17 +82,20 @@ void QSddView::stateInGui() {
         mPlots->addPlotData(0, 0, 0, centerTime, centerState.ox);
         mPlots->addPlotData(0, 0, 0, endTime, endState.ox);
 
-        // TODO(ageev) расчет моментальной скорости
-//        mPlots->addPlotData(0, 1, 0, beginTime, beginState.speedOx);
-//        mPlots->addPlotData(0, 1, 0, centerTime, centerState.speedOx);
-//        mPlots->addPlotData(0, 1, 0, endTime, endState.speedOx);
+
+        double beforeTime = std::chrono::duration_cast<std::chrono::milliseconds>(mBeforeState.time.time_since_epoch())
+                                    .count() / 1000.0;
+        double speedOx = (endState.ox - mBeforeState.ox)/(endTime - beforeTime);
+        double speedOy = (endState.oy - mBeforeState.oy)/(endTime - beforeTime);
+       // mPlots->addPlotData(0, 1, 0, beginTime, beginState.speedOx);
+        // mPlots->addPlotData(0, 1, 0, centerTime, centerState.speedOx);
+        mPlots->addPlotData(0, 1, 0, endTime, speedOx);
 
         mPlots->addPlotData(1, 0, 0, beginTime, beginState.oy);
         mPlots->addPlotData(1, 0, 0, centerTime, centerState.oy);
         mPlots->addPlotData(1, 0, 0, endTime, endState.oy);
 
-        // TODO(ageev) расчет моментальной скорости
-//        mPlots->addPlotData(1, 1, 0, beginTime, beginState.speedOz);
+        mPlots->addPlotData(1, 1, 0, beginTime, speedOy);
 //        mPlots->addPlotData(1, 1, 0, centerTime, centerState.speedOz);
 //        mPlots->addPlotData(1, 1, 0, endTime, endState.speedOz);
 
@@ -107,12 +110,11 @@ void QSddView::stateInGui() {
 
 
         mPlots->allReplot();
-
-        // TODO(ageev) расчет моментальной скорости
+        mBeforeState = endState;
 //        mXPosition->setText(QString::number(endState.ox));
 //        mZPosition->setText(QString::number(endState.oy));
-      //  mXSpeed->setText(QString::number(endState.speedOx));
-       // mZSpeed->setText(QString::number(endState.speedOz));
+//        mXSpeed->setText(QString::number(endState.speedOx));
+//        mZSpeed->setText(QString::number(endState.speedOz));
     }
 
 //    if (!state.empty()) {

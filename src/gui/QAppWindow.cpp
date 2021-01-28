@@ -49,13 +49,13 @@ void QAppWindow::sddModelInit() {
     mModel = new QSddView(mSdd);
     FormatsContainer<SddModelDescriptor> f;
     f.add(std::make_shared<QSddModelJsonSerializer>());
-    f.add(std::make_shared<QSddModelXmlSerializer>());
-    mSaver = new QSddModelSaver(f);
+//    f.add(std::make_shared<QSddModelXmlSerializer>());
+    mSaver = new QSddModelSaver(f, mSdd->getSddConnection());
     mLayout->addWidget(mModel, 1);
     auto *tab = new QTabWidget;
-    auto *page = new QConditionalControl;
-    page->addWidget(mSaver);
-    tab->addTab(page, "save to file");
+    // auto *page = new QConditionalControl;
+    // page->addWidget(mSaver);
+    tab->addTab(mSaver, "save to file");
     mLayout->addWidget(tab, 0);
 }
 

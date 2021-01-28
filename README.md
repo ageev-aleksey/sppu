@@ -2,4 +2,10 @@
 
 ## Требуемы доп библиотеки
 
-	- Qt5.15 (Необходимо указать путь до Qt5Find.cmake в корневом CMakeLists.txt данного проекта)
+- Qt5.15 (Необходимо указать путь до Qt5Find.cmake в корневом CMakeLists.txt данного проекта)
+
+## Создание виртуальной пары последовательных портов в Ubuntu
+
+```commandline
+socat -d -d pty,raw,echo=0 pty,raw,echo=0
+```

@@ -5,7 +5,7 @@
 #include <iostream>
 
 static const double PI =  3.14;
-static const double CORNENR45 = std::cos(PI);
+static const double CORNENR45 = PI/4;
 static const double INTEGER_CORNER45 = 255.0;
 static const double INTEGER_PWM = 255.0;
 
@@ -40,5 +40,6 @@ void QModelOutput::writeModelState(SddModel::State state) {
     std::cout << "State {ox: " << state.positionOx << "; oz:" << state.positionOz
                 << "; pwmOx: " << state.oxSignal << "; pwmOz: " << state.ozSignal
                 << "}" << std::endl;
-    m_pDevice->write(&statePackage.toBinary()[0]);
+    auto bin = statePackage.toBinary();
+    m_pDevice->write(bin.data(), bin.size());
 }

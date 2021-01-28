@@ -99,6 +99,7 @@ std::unique_ptr<QModelOutput> make(const QString &file_path) {
     auto modelExecutor = std::make_unique<QSddModelExecutor>(std::make_unique<SddModel>());
     modelExecutor->setParameters(params);
     modelExecutor->brakingModeling(50);
+   // modelExecutor->brakingModeling(1000);
     auto pwdGenerator = std::make_shared<PwdInputGenerator>(1, -1, 1);
     pwdGenerator->setDutyCycle(0.5, 0.5);
     modelExecutor->setInputGenerator(pwdGenerator);

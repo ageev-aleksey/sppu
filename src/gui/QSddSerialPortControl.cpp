@@ -3,7 +3,7 @@
 
 
 QSddSerialPortControl::QSddSerialPortControl(std::unique_ptr<QSerialPort> connection)
-    : m_pSerialPort(std::move(connection)),  m_pSender()
+    : m_pSerialPort(std::move(connection)),  m_pSender(sdd::conn::QSerialPortConnection)
 {
     setLayout(mLayout);
     guiInit();
@@ -26,10 +26,12 @@ void QSddSerialPortControl::guiInit() {
     textDeviceStateLayout->addWidget(new QLabel("Z position:"), 1, 0);
     textDeviceStateLayout->addWidget(new QLabel("X speed:"), 2, 0);
     textDeviceStateLayout->addWidget(new QLabel("Z speed:"), 3, 0);
+    textDeviceStateLayout->addWidget(new QLabel("Diff time recv packs:"), 4, 0);
     textDeviceStateLayout->addWidget(mXPosition, 0, 1);
     textDeviceStateLayout->addWidget(mYPosition, 1, 1);
     textDeviceStateLayout->addWidget(mXSpeed, 2, 1);
     textDeviceStateLayout->addWidget(mYSpeed, 3, 1);
+    textDeviceStateLayout->addWidget(mSpeedPackageValue, 4, 1);
 
   //  dashBoardLayout->addLayout(textDeviceStateLayout);
 
@@ -88,6 +90,7 @@ void QSddSerialPortControl::setGuiDefault() {
     mYPosition->setText("undefined");
     mXSpeed->setText("undefined");
     mYSpeed->setText("undefined");
+    mSpeedPackageValue->setText("undefined");
 }
 
 void QSddSerialPortControl::serialConnect() {
@@ -165,8 +168,13 @@ void QSddSerialPortControl::sendPwmPackage() {
 
 void QSddSerialPortControl::serialInit() {
     m_pSender.addCallbackDataReady([this](const sdd::conn::State &state) {
-        std::lock_guard lock(m_mutexStates);
-        m_vStates.push_back(state);
+        mBeforeTimePackageGet;
+        auto time = std::chrono::steady_clock::now();
+        {
+            std::lock_guard lock(m_mutexStates);
+            m_vStates.push_back(state);
+        }
+        textUpdate(state);
     });
 }
 
@@ -223,5 +231,25 @@ void QSddSerialPortControl::settingsStore(QSettings &settings) {
     settings.setValue("sddControl/pwmy", mPwmOy->text());
     settings.setValue("sddControl/taskx", mOxTask->text());
     settings.setValue("sddControl/tasky", mOyTask->text());
+}
+
+
+void QSddSerialPortControl::textUpdate(const sdd::conn::State &state) {
+    auto time = std::chrono::steady_clock::now();
+    mXPosition->setText(QString::number(state.ox));
+    mYPosition->setText(QString::number(state.oy));
+    auto elapsedTime = time-mBeforeTimePackageGet;
+    mSpeedPackageValue->setText(QString::number(std::chrono::duration_cast<std::chrono::milliseconds>(elapsedTime).count()));
+    mBeforeTimePackageGet = time;
+    mXSpeed->setText(QString::number(
+            (mBeforePackageValue.ox - state.ox) /
+                    (std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count() + 0.1)));
+    mYSpeed->setText(QString::number((mBeforePackageValue.oy - state.oy) /
+                                     (std::chrono::duration_cast<std::chrono::seconds>(elapsedTime).count() + 0.1)));
+    mBeforePackageValue = state;
+}
+
+std::shared_ptr<sdd::conn::IConnection> QSddSerialPortControl::getSddConnection() {
+    return m_pSender;
 }
 

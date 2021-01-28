@@ -40,7 +40,7 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
     if (readBufferSize >= pack.size()) {
         try {
             read(pack);
-            lock.release();
+            lock.unlock();
 
             State state = statePackageToStruct(pack);
             allCall(state);

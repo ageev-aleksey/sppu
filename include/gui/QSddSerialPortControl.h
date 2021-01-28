@@ -19,6 +19,7 @@ public:
     std::vector<sdd::conn::State> getSddStates() override;
     void settingsLoad(const QSettings &settings) override;
     void settingsStore(QSettings &settings) override;
+    std::shared_ptr<sdd::conn::IConnection> getSddConnection();
 private:
     void guiInit();
     void setGuiDefault();
@@ -31,10 +32,10 @@ private slots:
     void buttonSend();
     void blinkingUpdate(double value);
 private:
-
+    void textUpdate(const sdd::conn::State &state);
     void serialInit();
     std::shared_ptr<QSerialPort> m_pSerialPort;
-    sdd::conn::QSerialPortConnection m_pSender;
+    std::shared_ptr<sdd::conn::QSerialPortConnection> m_pSender;
 
 
     QVBoxLayout *mLayout = new QVBoxLayout;
@@ -66,8 +67,11 @@ private:
     QLineEdit *mSerialNameInput = new QLineEdit; /// Сптсок доступных портов
     QLineEdit *mBaudRate = new QLineEdit; /// Настройка скорости передачи
     QPushButton *mSerialConnect = new QPushButton; /// Подключение к ком-порту
-    // 1. Скорость передачи битэ
-    // 2. ...
+    // 1. Скорость передачи бит
+    QLabel *mSpeedPackageLabel = new QLabel;
+    QLabel *mSpeedPackageValue = new QLabel;
+    std::chrono::steady_clock::time_point mBeforeTimePackageGet = std::chrono::steady_clock::now();
+    sdd::conn::State mBeforePackageValue{};
 
     std::mutex m_mutexStates;
     std::vector<sdd::conn::State> m_vStates;
