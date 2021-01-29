@@ -9,7 +9,11 @@
 #include <boost/circular_buffer.hpp>
 #include <iostream>
 
+
+
 namespace sdd::conn {
+
+
     class PackageBuffer {
     public:
         explicit PackageBuffer(size_t size);
@@ -20,16 +24,17 @@ namespace sdd::conn {
         bool formPackage(StatePackage &state);
         void flush();
 
+        void toStream(std::ostream& stream);
+
 private:
-        //friend std::ostream &operator<<(std::ostream &stream, const sdd::conn::PackageBuffer &buff);
+        friend std::ostream& operator<<(std::ostream &stream, const PackageBuffer &buff);
         boost::circular_buffer<char> buffer;
     };
+
 }
-////TODO ����� ���������� ������� ��� ������ ���� ������� - StatePackage. /
-//// ���������� ����������, ����� ����� ������� ��� ����� �������. /
-//// ��� ����� ���������� ����������� ����� �������
+
+std::ostream &operator<<(std::ostream &stream, const sdd::conn::PackageBuffer &buff);
 
 
-//std::ostream &operator<<(std::ostream &stream, const sdd::conn::PackageBuffer &buff);
 
 #endif //SPPU_SERIAL_PACKAGEBUFFER_H

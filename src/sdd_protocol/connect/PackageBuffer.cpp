@@ -15,15 +15,26 @@ bool PackageBuffer::formPackage(sdd::StatePackage &state) {
         auto endPackage = begin + StatePackage::NUM_BYTES;
         auto endBuffer = buffer.end();
         StatePackage res;
-        while(endPackage != endBuffer) {
+        bool isContinue = true;
+        bool isEndStep = endPackage == endBuffer;
+        while(isContinue) {
             if (StatePackage::checkStruct(begin, endPackage)) {
                 std::vector<char> tmp(begin, endPackage);
                 state.fromBinary(tmp);
                 buffer.erase_begin(std::distance(buffer.begin(), endPackage));
                 return true;
             }
-            ++begin;
-            ++endPackage;
+
+            if (!isEndStep) {
+                ++begin;
+                ++endPackage;
+                if (endPackage == endBuffer) {
+                    isEndStep = true;
+                }
+            } else {
+                isContinue = false;
+            }
+
         }
 	}
 	return false;
@@ -32,12 +43,13 @@ bool PackageBuffer::formPackage(sdd::StatePackage &state) {
 void PackageBuffer::flush() {
     buffer.clear();
 }
-//
-//std::ostream &operator<<(std::ostream &stream, const PackageBuffer &buff) {
-//	for (const auto &el : buff.buffer) {
-//stream << (int)el << "-";
-//	}
-//	return stream;
-//}
+
+void PackageBuffer::toStream(std::ostream &stream) {
+
+    for (const auto &el : buffer) {
+        stream  << uint {(unsigned char) el} << "-";
+    }
+    stream << std::endl;
+}
 
 
