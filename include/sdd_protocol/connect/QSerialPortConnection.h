@@ -5,7 +5,7 @@
 #ifndef TESTSIMULINKMODEL_QCOMPORT_H
 #define TESTSIMULINKMODEL_QCOMPORT_H
 
-#include "sdd_protocol/connect/IConnection.h"
+#include "sdd_protocol/connect/QIConnection.h"
 #include "sdd_protocol/connect/PackageBuffer.h"
 #include "sdd_protocol/Package.h"
 #include <QtCore>
@@ -18,7 +18,7 @@
 // TODO(ageev) Выделить все пакате протокола в отдельный интерфейс, что бы можно было сделать фабрику для
 //  разных видов протокола
 namespace sdd::conn {
-    class QSerialPortConnection : public QObject, public IConnection {
+    class QSerialPortConnection : public QIConnection {
         Q_OBJECT
     public:
         explicit QSerialPortConnection();

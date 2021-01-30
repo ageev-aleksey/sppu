@@ -267,6 +267,6 @@ void QSddModelControl::settingsStore(QSettings &settings) {
 }
 
 // TODO (ageev) Реализовать
-std::shared_ptr<sdd::conn::IConnection> QSddModelControl::getSddConnection() {
+std::shared_ptr<sdd::conn::QIConnection> QSddModelControl::getSddConnection() {
     return nullptr;
 }

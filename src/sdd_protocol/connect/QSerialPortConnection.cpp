@@ -46,7 +46,8 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
             if (read(pack)) {
                 lock.unlock();
                 State state = statePackageToStruct(pack);
-                allCall(state);
+                // allCall(state);
+                emit recvStatePackage(state);
             }
         } catch (PackageParseError &exp) {
             qWarning() << "Invalid package: " << exp.what();

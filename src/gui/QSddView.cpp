@@ -14,7 +14,7 @@ QSddView::QSddView(QISddStateWidget *sddConnector, QWidget *parent)
     setLayout(mLayout);
     guiInit();
     QObject::connect(&mTimerGraphUpdate, &QTimer::timeout, this, &QSddView::stateInGui);
-    mTimerGraphUpdate.start(50);
+    mTimerGraphUpdate.start(40);
 }
 
 

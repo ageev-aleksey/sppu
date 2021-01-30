@@ -11,7 +11,8 @@
 #include <functional>
 
 namespace sdd::conn {
-    class IConnection {
+    class QIConnection : public QObject {
+        Q_OBJECT
     public:
         using Handle = void(const State &state);
 
@@ -19,8 +20,10 @@ namespace sdd::conn {
         virtual void sendMode(Mode package) = 0;
         virtual void sendTaskPosition(TaskPosition task) = 0;
         virtual void sendPwm(Pwm pwm) = 0;
-        virtual void addCallbackDataReady(const std::function<Handle> &handler);
+        // virtual void addCallbackDataReady(const std::function<Handle> &handler);
        // virtual void removeCallback(const std::function<Handle> &handler);
+    signals:
+        void recvStatePackage(const State &state);
     protected:
         void allCall(const State &state);
     private:

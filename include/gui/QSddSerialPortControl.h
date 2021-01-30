@@ -19,12 +19,13 @@ public:
     std::vector<sdd::conn::State> getSddStates() override;
     void settingsLoad(const QSettings &settings) override;
     void settingsStore(QSettings &settings) override;
-    std::shared_ptr<sdd::conn::IConnection> getSddConnection();
+    std::shared_ptr<sdd::conn::QIConnection> getSddConnection();
 private:
     void guiInit();
     void setGuiDefault();
     void controlSettings();
 private slots:
+    void addSddState(const sdd::conn::State &state);
     void serialConnect();
     void updateTaskControlValue(double value);
     void updatePwmControlValue(double value);
@@ -76,6 +77,7 @@ private:
     std::mutex m_mutexStates;
     //std::vector<sdd::conn::State> m_vStates;
     sdd::conn::State m_lastState{};
+    bool m_isGet = false;
 
     void sendTaskPackage();
 

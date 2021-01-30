@@ -3,8 +3,8 @@
 #include <QtGlobal>
 
 
-QSddModelSaver::QSddModelSaver(const FormatsContainer<SddModelDescriptor> &formats,
-                               std::shared_ptr<sdd::conn::IConnection> connection,
+QSddModelSaver::QSddModelSaver(const FormatsContainer<sdd::conn::State> &formats,
+                               std::shared_ptr<sdd::conn::QIConnection> connection,
                                QWidget *parent)
     : QWidget(parent), mFormats(formats), mSddConnection(std::move(connection))
 {
@@ -12,19 +12,17 @@ QSddModelSaver::QSddModelSaver(const FormatsContainer<SddModelDescriptor> &forma
     this->setLayout(mLayout);
     mLayout->addWidget(mSaveButton);
     QObject::connect(mSaveButton, &QPushButton::released, this, &QSddModelSaver::save);
-    mSddConnection->addCallbackDataReady(
-            [this](const sdd::conn::State &state) {
-                if (mFile.isOpen()) {
-                    mStates.push_back(state);
-                    // TODO (ageev) организовать контоль размер буффера и реализовать
-                    //  функцию WriteBlock, которая запишет весь буффер файл у класса FormatsContainer
-                }
-    });
+    QObject::connect(mSddConnection.get(), &sdd::conn::QIConnection::recvStatePackage,
+                     this, &QSddModelSaver::addModelState);
 }
 
 void QSddModelSaver::addModelState(const sdd::conn::State &state) {
-    if (isEnabled()) {
+    if (mFile.isOpen()) {
         mStates.push_back(state);
+
+        if (mStates.size() >= 5000) {
+            QSddModelSaver::fileWrite();
+        }
     }
 }
 
@@ -45,8 +43,9 @@ void QSddModelSaver::save() {
     if (!mFile.isOpen()) {
         qCritical() << "Ошибка открытия файла [" << filename << "] на запись";
     }
-
-
+    auto fname = mFormats.names().first();
+    auto format = mFormats.get(fname);
+    mFile.write(format->begin());
     // QByteArray bytes =  mFormats.get(type)->write()
 }
 
@@ -56,4 +55,26 @@ QString QSddModelSaver::filesTypeToString() {
         types.append(el).append(" (").append("*.").append(el).append(");;");
     }
     return types;
+}
+
+QSddModelSaver::~QSddModelSaver() {
+    if (mFile.isOpen()) {
+        fileWrite();
+        auto fname = mFormats.names().first();
+        auto format = mFormats.get(fname);
+        mFile.write(format->end());
+        mFile.close();
+    }
+}
+
+void QSddModelSaver::fileWrite() {
+    auto fname =  mFormats.names().first();
+    auto formatter = mFormats.get(fname);
+    QByteArray result;
+    for (const auto &el : mStates) {
+        result.append(formatter->write(el));
+        result.append(formatter->next());
+    }
+    mStates.clear();
+    mFile.write(result);
 }

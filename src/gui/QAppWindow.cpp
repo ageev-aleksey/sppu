@@ -4,6 +4,7 @@
 #include "gui/QISddStateWidgetFactory.h"
 #include "model/parser/QSddModelJsonSerializer.h"
 #include "model/parser/QSddModelXmlSerializer.h"
+#include "sdd_protocol/connect/QSddJsonSerializer.h"
 #include <iostream>
 #include <qcustomplot.h>
 
@@ -47,8 +48,8 @@ void QAppWindow::sddModelInit() {
    // QSddModelControlFactory factory;
     mSdd = factory.makeWidget(mSettings);
     mModel = new QSddView(mSdd);
-    FormatsContainer<SddModelDescriptor> f;
-    f.add(std::make_shared<QSddModelJsonSerializer>());
+    FormatsContainer<sdd::conn::State> f;
+    f.add(std::make_shared<sdd::conn::QSddJsonSerializer>());
 //    f.add(std::make_shared<QSddModelXmlSerializer>());
     mSaver = new QSddModelSaver(f, mSdd->getSddConnection());
     mLayout->addWidget(mModel, 1);

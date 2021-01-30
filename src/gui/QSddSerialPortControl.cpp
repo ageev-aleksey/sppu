@@ -14,7 +14,12 @@ QSddSerialPortControl::QSddSerialPortControl(std::unique_ptr<QSerialPort> connec
 std::vector<sdd::conn::State> QSddSerialPortControl::getSddStates() {
     std::lock_guard lock (m_mutexStates);
    /// return std::move(m_vStates);
-    return { m_lastState };
+   if (!m_isGet) {
+       m_isGet = true;
+       return { m_lastState };
+   }
+
+   return {};
 }
 
 void QSddSerialPortControl::guiInit() {
@@ -168,15 +173,27 @@ void QSddSerialPortControl::sendPwmPackage() {
 }
 
 void QSddSerialPortControl::serialInit() {
-    m_pSender->addCallbackDataReady([this](const sdd::conn::State &state) {
+//    m_pSender->addCallbackDataReady([this](const sdd::conn::State &state) {
+//
+//        {
+//            std::lock_guard lock(m_mutexStates);
+//           // m_vStates.push_back(state);
+//            m_lastState = state;
+//        }
+//        textUpdate(state);
+//    });
+    QObject::connect(m_pSender.get(), &sdd::conn::QIConnection::recvStatePackage,
+                     this, &QSddSerialPortControl::addSddState);
+}
 
+void QSddSerialPortControl::addSddState(const sdd::conn::State &state) {
         {
             std::lock_guard lock(m_mutexStates);
            // m_vStates.push_back(state);
             m_lastState = state;
+            m_isGet = false;
         }
         textUpdate(state);
-    });
 }
 
 void QSddSerialPortControl::takeModeControl(int state) {
@@ -250,7 +267,7 @@ void QSddSerialPortControl::textUpdate(const sdd::conn::State &state) {
     mBeforePackageValue = state;
 }
 
-std::shared_ptr<sdd::conn::IConnection> QSddSerialPortControl::getSddConnection() {
+std::shared_ptr<sdd::conn::QIConnection> QSddSerialPortControl::getSddConnection() {
     return m_pSender;
 }
 
