@@ -6,3 +6,5 @@ CMakeLists.txt.user
 build/
 out/
 *.pdb
+__pycache__/
+.ipynb_checkpoints/
