@@ -1,6 +1,7 @@
-from typing import List
+from typing import List, Callable, Any
 from scipy import integrate
 import numpy as np
+import neural
 
 
 class LogicError(Exception):
@@ -113,7 +114,7 @@ def model_predict(m, start, norm_value,  steps):
         predict.append(m.predict(predict[-1]))
     return np.stack(predict).reshape(-1, 2)
 
-def make_plots(predict_data, model_data, ploter = ):
+def make_plots(predict_data, model_data):
     """Формирование графиков на основе данных"""
     if len(predict_data) != len(model_data):
         raise RuntimeError("lenthg of predict_data and model_data must be equal")

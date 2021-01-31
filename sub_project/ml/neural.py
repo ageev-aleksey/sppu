@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import pydot
 from scipy.spatial import distance
+from typing import List
 
 
 class Ann:
@@ -16,7 +17,7 @@ class Ann:
         return "MODEL"
     @property
     def name(self):
-        raise NotImplementedError;
+        raise NotImplementedError
 
 
 
@@ -53,8 +54,8 @@ class ResNet (Ann):
         for i in range(nblocks):
             layer = ResBlock(nunits, size, activation)(layer)
         outputs = keras.layers.Dense(shape_output, "linear")(layer)
-        self.__inputs = inputs;
-        self.__outputs = outputs;
+        self.__inputs = inputs
+        self.__outputs = outputs
         self.__shape_input = shape_input
         self.__shape_output = shape_output
         self.__nunits = nunits
@@ -97,6 +98,45 @@ class RelativeApproximationError(tf.keras.metrics.Metric):
         return self.value / self.num
     
     def reset_states(self):
-        self.value = 0;
-        self.num = 0;
+        self.value = 0
+        self.num = 0
 
+
+class NeuralMaker:
+    """Базовый класс для построения неросетевых моделей"""
+    def __init__(self):
+        self._isNext = True
+    def isNext(self):
+        return self._isNext
+    def next(self) -> Ann:
+        raise NotImplementedError
+
+class ResNetPoperties:
+    def __init__(self, shape_input, shape_output, nunits, nblocks, size, activation = "relu", regularization = None, path = ""):
+        self.shape_input = shape_input
+        self.shape_output = shape_output
+        self.nunits = nunits
+        self.nblocks = nblocks
+        self.size = size
+        self.activation = activation
+        self.regularization = regularization
+        self.path = path
+    
+class ResNetMaker (NeuralMaker):
+    """Построитель ИНС типа ResNet"""
+    def __init__(self, props : List[ResNetPoperties]):
+        self.props = props
+        self.model_index = 0;
+    
+    def next(self, is_print = False):
+        self.model_index = 0;
+        for p in self.props:
+            self.model_index = self.model_index + 1
+            if is_print:
+                #utils.print_progress(self.model_index, len(self.props))
+                print("Model", self.model_index, "from", len(self.props))
+            resnet = neural.ResNet(p.shape_input, p.shape_output, p.nunits, p.nblocks, p.size, p.activation, p.regularization)
+            resnet = keras.Model(inputs=resnet.inputs, outputs=resnet.outputs)
+            resnet.compile(keras.optimizers.Adam(), loss="mse", metrics=['mae',neural.RelativeApproximationError()])
+            yield {"model": resnet, "props": p}
+    
