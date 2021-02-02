@@ -61,6 +61,10 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
         } catch (...) {
             qWarning() << "Undefined error";
         }
+        if (m_serialPort->bytesAvailable() > pack.size()) {
+            m_serialPort->clear(QSerialPort::Direction::Input);
+        }
+       
     }
 }
 
@@ -109,17 +113,17 @@ void sdd::conn::QSerialPortConnection::sendTaskPosition(sdd::conn::TaskPosition 
     if (!m_serialPort->isOpen()) {
         throw std::runtime_error("Serial port not opened");
     }
-    if (task.ox > 255) {
+   /* if (task.ox > 255) {
         std::stringstream msg;
         msg << "Invalid TaskPosition.ox:  TaskPosition{ox: " << task.ox << "; oy: " << task.oy << "}";
         throw std::runtime_error(msg.str());
-    }
+    }*/
 
-    if (task.oy > 255) {
+    /*if (task.oy > 255) {
         std::stringstream msg;
         msg << "Invalid TaskPosition.oy:  TaskPosition{ox: " << task.ox << "; oy: " << task.oy << "}";
         throw std::runtime_error(msg.str());
-    }
+    }*/
     PositionPackage pack;
 
     pack.setPosX(static_cast<short>(task.ox));
