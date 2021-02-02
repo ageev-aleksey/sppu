@@ -1,6 +1,7 @@
 import sys
 import os
 import pandas as pd
+import json
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
@@ -33,11 +34,17 @@ def params_parse(params_str: str):
     Если существует ключ без значения то это будет ключ
     в словаре со значением None
     """
+    params = {}
     s = params_str.split("_")
-    model_name = s[0]
-    params = {"name": model_name}
-    for i in range(1, len(s)):
+    model_name = s[0].split(".")
+    begin = 0
+    if len(model_name) == 1:
+        params["name"] = model_name
+        begin = 1
+    
+    for i in range(begin, len(s)):
         key_value = s[i].split(".")
+        print(key_value)
         if len(key_value) == 2:
             params[key_value[0]] = int(key_value[1])
         elif len(key_value) == 1:
@@ -54,7 +61,8 @@ def load_info(path) -> dict:
     - Набор файлов в с весами модели, которые формировались во время обучения модели, как набор весов,
     дающий наименьшию ошибку. Файл с наибольшим номером содержит те веса, которые дают лучшие результаты
     """
-    info = {"history": None, "params": [], "model": params_parse(path)}
+    dirname = os.path.basename(path)
+    info = {"history": None, "params": [], "model": params_parse(dirname)}
     for path, dirs, files in os.walk(path):
         print("--", path)
         for file in files:
@@ -78,6 +86,7 @@ def model_info_load(path : str) -> pd.DataFrame:
     max_epoch = -1
 
     for param in info["params"]:
+        print(param)
         if param["epoch"] > max_epoch:
             max_epoch = param["epoch"]
     history = info["history"]
@@ -92,7 +101,7 @@ def model_info_load(path : str) -> pd.DataFrame:
 
 def load_info_all_models(models_root : str) -> pd.DataFrame:
     df = pd.DataFrame()
-    root, dirs, files = next(os.walk(model_root))
+    root, dirs, files = next(os.walk(models_root))
     for dir in dirs:
         df = pd.concat([df, model_info_load(os.path.join(root, dir))])
     return df.reset_index()
