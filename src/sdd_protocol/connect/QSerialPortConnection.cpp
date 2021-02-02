@@ -13,6 +13,7 @@
 
 
 #include <sstream>
+#include <iostream>
 
 
 void sdd::conn::QSerialPortConnection::send(Package &package)  {
@@ -27,18 +28,19 @@ sdd::conn::QSerialPortConnection::QSerialPortConnection()
 
 sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
     sdd::conn::State state{};
+    state.time = std::chrono::steady_clock::now();
     state.ox = pack.OX();
     state.oy = pack.OY();
     state.pwm.ox = pack.PWMX();
     state.pwm.oy = pack.PWMY();
     state.task.ox = pack.positionX();
     state.task.oy = pack.positionY();
-    state.time = std::chrono::steady_clock::now();
     return state;
 }
 
 void sdd::conn::QSerialPortConnection::readIsReady() {
     StatePackage pack;
+    static size_t errIndex = 0;
     std::unique_lock lock(m_mutex);
     auto readBufferSize = m_serialPort->bytesAvailable();
     if (readBufferSize >= pack.size()) {
@@ -48,6 +50,9 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
                 State state = statePackageToStruct(pack);
                 // allCall(state);
                 emit recvStatePackage(state);
+            } else {
+                qWarning() << "[" << errIndex << "] Not found correct package in buffer";
+                errIndex++;
             }
         } catch (PackageParseError &exp) {
             qWarning() << "Invalid package: " << exp.what();
@@ -139,15 +144,18 @@ void sdd::conn::QSerialPortConnection::sendPwm(sdd::conn::Pwm pwm) {
 bool sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
     QByteArray array = m_serialPort->read(package.size());
     m_buffer.addBytes(array.begin(), array.end());
+    // m_buffer.toStream(std::cout);
     return m_buffer.formPackage(package);
 
-//    std::vector<char> data;
-//    data.reserve(array.size());
-//    // TODO(ageev) избавиться от копирования
-//    for (auto &el : array) {
-//        data.push_back(el);
-//    }
-//    package.fromBinary(data);
+/*    std::vector<char> data;
+    data.reserve(array.size());
+    // TODO(ageev) избавиться от копирования
+    for (auto &el : array) {
+        data.push_back(el);
+
+    }*/
+   // package.fromBinary(data);
+    return true;
 }
 
 void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port) {

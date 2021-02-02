@@ -14,6 +14,7 @@ bool PackageBuffer::formPackage(sdd::StatePackage &state) {
         auto begin = buffer.begin();
         auto endPackage = begin + StatePackage::NUM_BYTES;
         auto endBuffer = buffer.end();
+      //  std::cout << "is end: " << (endBuffer == endPackage) << std::endl;
         StatePackage res;
         bool isContinue = true;
         bool isEndStep = endPackage == endBuffer;
@@ -47,7 +48,7 @@ void PackageBuffer::flush() {
 void PackageBuffer::toStream(std::ostream &stream) {
 
     for (const auto &el : buffer) {
-        stream  << uint {(unsigned char) el} << "-";
+        stream  << uint32_t {(unsigned char) el} << "-";
     }
     stream << std::endl;
 }

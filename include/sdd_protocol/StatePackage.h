@@ -55,8 +55,8 @@ namespace sdd {
         static bool checkStruct(const Iterator &begin, const Iterator &end) {
             if (std::distance(begin, end) == NUM_BYTES && *begin == ID) {
                 auto last = end - 1;
-                auto payloadEnd = last - 2;
-                return *last == hash(begin, payloadEnd);
+                //auto payloadEnd = last - 2;
+                return *last == hash(begin, last);
             }
             return false;
         }
