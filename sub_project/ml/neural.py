@@ -122,6 +122,24 @@ class ResNetPoperties:
         self.regularization = regularization
         self.path = path
     
+    @staticmethod
+    def from_dict(data : dict):
+        prop = ResNetPoperties(data["shape_input"], data["shape_output"], data["nunits"], data["nblocks"],
+        data["size"], data["activation"], data["regularization"], data["path"])
+        return prop
+    
+    def to_dict(self) -> dict:
+        return {
+            "shape_input": self.shape_input,
+            "shape_output": self.shape_output,
+            "nunits": self.nunits,
+            "nblocks": self.nblocks,
+            "size": self.size,
+            "activation": self.activation,
+            "regularization": self.regularization,
+            "path": self.path
+        }
+    
 class ResNetMaker (NeuralMaker):
     """Построитель ИНС типа ResNet"""
     def __init__(self, props : List[ResNetPoperties]):

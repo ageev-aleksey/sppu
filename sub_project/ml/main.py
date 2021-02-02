@@ -3,7 +3,11 @@ import neural
 import model
 import tensorflow.keras as keras
 import numpy as np
-
+import os
+import argparse
+import json
+import utils
+import pandas as pd
 
 def learning_rate_update(epoch: int, lr: float) -> float:
     if epoch % 10 == 0:
@@ -59,6 +63,7 @@ def make_data():
 
 
 def make_model(p : neural.ResNetPoperties) -> neural.ResNet:
+
      """Построение модели ResNet на основе переданных параметров"""
      resnet = neural.ResNet(p.shape_input, p.shape_output, p.nunits, p.nblocks, p.size, p.activation, p.regularization)
      resnet = keras.Model(inputs=resnet.inputs, outputs=resnet.outputs)
@@ -69,7 +74,6 @@ def make_model(p : neural.ResNetPoperties) -> neural.ResNet:
 def worker (prop : neural.ResNetPoperties):
     value = make_model(prop)
     ann = value["model"]
-    print("Processing:", ann.name)
     try:
         os.makedirs(path)
     except:
@@ -81,10 +85,10 @@ def worker (prop : neural.ResNetPoperties):
                 mode='min',
                 save_best_only=True)
 
-    h = ann.fit(X, Y, batch_size=32, epochs=10, 
+    h = ann.fit(X, Y, batch_size=32, epochs=10, verbose=0,
     validation_data = [X_test, Y_test],  callbacks=[saver, LR_SCHADULER_CALLBACK])
     
-    j = pd.DataFrame(history.history)
+    j = pd.DataFrame(h.history)
     file = open(os.path.join(prop.path, "history.json"), "w")
     file.write(j.to_json())
     file.close()
@@ -99,6 +103,7 @@ def make_model_props():
                 try:
                     os.makedirs(path)
                 except:
+                    print("Ошибка создания файла")
                     pass
                 p = neural.ResNetPoperties(
                     2, 2,
@@ -111,9 +116,49 @@ def make_model_props():
                 props.append(p)
     return props
 
+
+def parse_arguments() -> dict:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--file", type = str, nargs=1, help = "Файл из которого выполнить чтение или в который записать")
+    parser.add_argument("--proc", type = int, nargs=2, help = "[число процессов, индекс текущего процесса] - запуск обучения множества моделей")
+    return vars(parser.parse_args())
+
+def print_help(parser : argparse.ArgumentParser):
+    print("""Пhограмма для обучения множества моделей нейронных сетей.
+     Если указана только file, то будет сгенерировано описание моделей и записано в файл.
+     Если так же указан --proc, то из указанного файла будет выполнено, чтение, и зупустится обучение часть моделей""")
+    parser.print_help()
+
 if __name__ == "__main__":
-    X, Y, X_test, Y_test, max_train, max_test = make_data()
-    props = make_model_props()
-    print ("Num neural models:", len(props))
-    pool = Pool(4)
-    pool.map(worker, props)
+    # props = make_model_props()
+    # print ("Num neural models:", len(props))
+    # # pool = Pool(4)
+    # # # pool.map(worker, props)
+    # for p in props:
+    #     worker(p)
+    arguments = parse_arguments()
+    if arguments["proc"] != None:
+        path = arguments["file"][0]
+        f = open(path, "r")
+        json_props = json.load(f)
+        f.close()
+        props = []
+        for i in range(arguments["proc"][1], len(json_props), arguments["proc"][0]):
+            props.append(neural.ResNetPoperties.from_dict(json_props[i]))
+        
+        X, Y, X_test, Y_test, max_train, max_test = make_data()
+        print("Models:", len(props))
+        i = 0
+        for p in props:
+            utils.print_progress(i, len(props))
+            worker(p)
+            i = i + 1
+    else:
+        json_res = []
+        for p in make_model_props():
+            json_res.append(p.to_dict())
+        f = open(arguments["file"][0], "w")
+        json.dump(json_res, f)
+        f.close()
+
+

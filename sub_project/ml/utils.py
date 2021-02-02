@@ -1,6 +1,6 @@
 import sys
 import os
-import pandas
+import pandas as pd
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
