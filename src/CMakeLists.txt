@@ -77,3 +77,9 @@ add_custom_command(
         TARGET model_to_com_port PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${RESOURCE_DIR}/model_config.json
         ${CMAKE_CURRENT_BINARY_DIR}/model_config.json)
+
+
+install(TARGETS app_gui model_to_com_port
+        RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
+        LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/bin
+        )
