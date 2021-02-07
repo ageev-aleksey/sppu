@@ -13,6 +13,7 @@
 
 
 #include <sstream>
+#include <iostream>
 
 
 void sdd::conn::QSerialPortConnection::send(Package &package)  {
@@ -20,34 +21,42 @@ void sdd::conn::QSerialPortConnection::send(Package &package)  {
 }
 
 sdd::conn::QSerialPortConnection::QSerialPortConnection()
-    : m_buffer(StatePackage::NUM_BYTES*2)
+    : m_buffer(StatePackage::NUM_BYTES*100)
 {
    m_serialPort = nullptr;
+   m_file.setFileName("test.bin");
+   m_file.open(QIODevice::WriteOnly);
 }
 
 sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
     sdd::conn::State state{};
+    state.time = std::chrono::steady_clock::now();
     state.ox = pack.OX();
     state.oy = pack.OY();
     state.pwm.ox = pack.PWMX();
     state.pwm.oy = pack.PWMY();
     state.task.ox = pack.positionX();
     state.task.oy = pack.positionY();
-    state.time = std::chrono::steady_clock::now();
     return state;
 }
 
 void sdd::conn::QSerialPortConnection::readIsReady() {
     StatePackage pack;
-    std::unique_lock lock(m_mutex);
+    static size_t errIndex = 0;
+   // std::unique_lock lock(m_mutex);
     auto readBufferSize = m_serialPort->bytesAvailable();
-    if (readBufferSize >= pack.size()) {
+  /*  QByteArray bytes =  m_serialPort->read(readBufferSize);
+    m_file.write(bytes);*/
+    if (readBufferSize >= StatePackage::NUM_BYTES ) {
         try {
-            if (read(pack)) {
-                lock.unlock();
+            if (read(pack, readBufferSize)) {
+               // lock.unlock();
                 State state = statePackageToStruct(pack);
                 // allCall(state);
                 emit recvStatePackage(state);
+            } else {
+                qWarning() << "[" << errIndex << "] Not found correct package in buffer";
+                errIndex++;
             }
         } catch (PackageParseError &exp) {
             qWarning() << "Invalid package: " << exp.what();
@@ -56,6 +65,10 @@ void sdd::conn::QSerialPortConnection::readIsReady() {
         } catch (...) {
             qWarning() << "Undefined error";
         }
+        //if (m_serialPort->bytesAvailable() > pack.size()) {
+        //    m_serialPort->clear(QSerialPort::Direction::Input);
+     //  }
+       
     }
 }
 
@@ -67,7 +80,7 @@ sdd::conn::State sdd::conn::QSerialPortConnection::recvState() {
     if (m_serialPort->readBufferSize() < pack.size()) {
         m_cv.wait(lock, [&]() {return m_serialPort->readBufferSize() >= pack.size();});
     }
-    read(pack);
+  //  read(pack);
     return statePackageToStruct(pack);
 }
 
@@ -104,17 +117,17 @@ void sdd::conn::QSerialPortConnection::sendTaskPosition(sdd::conn::TaskPosition 
     if (!m_serialPort->isOpen()) {
         throw std::runtime_error("Serial port not opened");
     }
-    if (task.ox > 255) {
+   /* if (task.ox > 255) {
         std::stringstream msg;
         msg << "Invalid TaskPosition.ox:  TaskPosition{ox: " << task.ox << "; oy: " << task.oy << "}";
         throw std::runtime_error(msg.str());
-    }
+    }*/
 
-    if (task.oy > 255) {
+    /*if (task.oy > 255) {
         std::stringstream msg;
         msg << "Invalid TaskPosition.oy:  TaskPosition{ox: " << task.ox << "; oy: " << task.oy << "}";
         throw std::runtime_error(msg.str());
-    }
+    }*/
     PositionPackage pack;
 
     pack.setPosX(static_cast<short>(task.ox));
@@ -136,18 +149,27 @@ void sdd::conn::QSerialPortConnection::sendPwm(sdd::conn::Pwm pwm) {
 }
 
 
-bool sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package) {
-    QByteArray array = m_serialPort->read(package.size());
+bool sdd::conn::QSerialPortConnection::read(sdd::StatePackage &package, size_t readSize) {
+    QByteArray array = m_serialPort->read(readSize);
+    m_file.write(array);
     m_buffer.addBytes(array.begin(), array.end());
-    return m_buffer.formPackage(package);
+    // m_buffer.toStream(std::cout);
+    bool status = m_buffer.formPackage(package);
+    //if (!status) {
+    //    std::cout << "======" << std::endl;
+    //    m_buffer.toStream(std::cout);
+    //}
+    return status;
 
-//    std::vector<char> data;
-//    data.reserve(array.size());
-//    // TODO(ageev) избавиться от копирования
-//    for (auto &el : array) {
-//        data.push_back(el);
-//    }
-//    package.fromBinary(data);
+/*    std::vector<char> data;
+    data.reserve(array.size());
+    // TODO(ageev) избавиться от копирования
+    for (auto &el : array) {
+        data.push_back(el);
+
+    }*/
+   // package.fromBinary(data);
+    return true;
 }
 
 void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port) {
@@ -167,7 +189,7 @@ void sdd::conn::QSerialPortConnection::setPort(std::shared_ptr<QSerialPort> port
 
 void sdd::conn::QSerialPortConnection::packageWrite(Package *pack) {
     auto bin = pack->toBinary();
-    std::lock_guard lock(m_mutex);
+    //std::lock_guard lock(m_mutex);
     m_serialPort->write(bin.data(), bin.size());
 }
 

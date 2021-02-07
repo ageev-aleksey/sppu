@@ -115,20 +115,23 @@ void QSddSerialPortControl::serialConnect() {
         qCritical() << "Invalid baudrate value : " << mBaudRate->text();
     }
     m_pSerialPort->setBaudRate(baudRate);
-    m_pSender->setPort(m_pSerialPort);
+     m_pSender->setPort(m_pSerialPort);
 }
 
 void QSddSerialPortControl::controlSettings() {
-    mOxTask->setMinimum(-255);
-    mOxTask->setMaximum(255);
-    mOyTask->setMinimum(-255);
-    mOyTask->setMaximum(255);
+    mOxTask->setMinimum(-500);
+    mOxTask->setMaximum(500);
+    mOyTask->setMinimum(-500);
+    mOyTask->setMaximum(300);
     mLightBlinking->setMinimum(0);
     mLightBlinking->setMaximum(1);
     mLightBlinking->setSingleStep(0.1);
 
     QObject::connect(mOxTask,  QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updateTaskControlValue);
     QObject::connect(mPwmOx,  QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updatePwmControlValue);
+    QObject::connect(mOyTask, QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updateTaskControlValue);
+    QObject::connect(mPwmOy, QOverload<int>::of(&QSpinBox::valueChanged), this, &QSddSerialPortControl::updatePwmControlValue);
+
 
     mModeControl->setCheckState(Qt::Unchecked);
     mButtonSendOptions->setEnabled(false);
