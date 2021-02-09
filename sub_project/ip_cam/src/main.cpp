@@ -101,7 +101,7 @@ int main(int argc, char **argv) {
 //    Shot *s = new Shot(&a);
 //    return a.exec();
     cv::VideoCapture cap;
-    cap.open("laser_test.mp4");
+    cap.open("rtsp://192.168.1.176:5554/camera");
     if (!cap.isOpened()) {
         std::cout << "Файл не открылся" << std::endl;
         return -1;
