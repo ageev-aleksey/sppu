@@ -115,7 +115,7 @@ void QSddSerialPortControl::serialConnect() {
         qCritical() << "Invalid baudrate value : " << mBaudRate->text();
     }
     m_pSerialPort->setBaudRate(baudRate);
-    m_pSender->setPort(m_pSerialPort);
+     m_pSender->setPort(m_pSerialPort);
 }
 
 void QSddSerialPortControl::controlSettings() {

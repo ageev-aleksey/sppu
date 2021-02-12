@@ -16,15 +16,28 @@ file(GLOB_RECURSE SRC_SERIALIZATION ${CMAKE_CURRENT_LIST_DIR}/serialization/*.cp
 file(GLOB_RECURSE SRC_SDD_PROTOCOL ${CMAKE_CURRENT_LIST_DIR}/sdd_protocol/*.cpp)
 file(GLOB_RECURSE QT_MOC_SDD_PROTOCOL_HEADERS ${INCLUDE_DIR}/sdd_protocol/Q*.h)
 
+file(GLOB_RECURSE SRC_CAMERA ${CMAKE_CURRENT_LIST_DIR}/camera/*.cpp)
+file(GLOB_RECURSE QT_MOC_CAMERA_HEADERS ${INCLUDE_DIR}/camera/Q*.h)
+
 add_library(sdd_model STATIC ${SRC_MODEL} ${MATLAB_SIMULINK_SRC})
 target_include_directories(sdd_model PRIVATE ${INCLUDE_DIR} ${MATLAB_SIMULINK_INCLUDE_DIRS})
 
 find_package(Qt5 COMPONENTS Core Widgets PrintSupport REQUIRED)
 find_package(Qt5 COMPONENTS SerialPort REQUIRED)
 find_package(Boost REQUIRED COMPONENTS container)
+find_package(OpenCV REQUIRED)
+
 if(Boost_FOUND) 
     message(STATUS "BOOST: ${Boost_LIBRARY_DIRS} : ${Boost_LIBRARIES}")
     message(STATUS "BOOST headers: ${Boost_INCLUDE_DIRS}")
+endif()
+
+if(OpenCV_FOUND)
+    message("======[ OpenCV FOUND ]======")
+    message("Version: " ${OpenCV_VERSION})
+    message("libs: " ${OpenCV_LIBS})
+    message("include dirs: " ${OpenCV_INCLUDE_DIRS})
+    message("============================")
 endif()
 
 set(CMAKE_AUTOMOC ON)
@@ -40,6 +53,11 @@ target_include_directories(qt_model_components PUBLIC ${INCLUDE_DIR} ${Qt5Core_I
 target_compile_options(qt_model_components PRIVATE -fPIC)
 target_link_libraries(qt_model_components sdd_protocol)
 add_library(SDD::QT_MODEL_COMPONENTS ALIAS qt_model_components)
+
+
+add_library(camera ${SRC_CAMERA} ${QT_MOC_CAMERA_HEADERS})
+target_include_directories(camera PUBLIC ${INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${CMAKE_INCLUDE_CURRENT_DIR})
+target_link_libraries(camera PUBLIC ${OpenCV_LIBS} Qt5::Core Qt5::Widgets)
 
 add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
         ${LIB_DIR}/qcustomplot/qcustomplot.cpp  ${QT_MOC_HEADERS} ${QRC})
@@ -73,8 +91,18 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(model_to_com_port pthread atomic)
 endif()
 
+add_executable(camera_app main_camera.cpp)
+target_include_directories(camera_app PUBLIC ${INCLUDE_DIR})
+target_link_libraries(camera_app camera Qt5::Core Qt5::Widgets)
+
 
 add_custom_command(
         TARGET model_to_com_port PRE_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy ${RESOURCE_DIR}/model_config.json
         ${CMAKE_CURRENT_BINARY_DIR}/model_config.json)
+
+
+install(TARGETS app_gui model_to_com_port
+        RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/bin
+        LIBRARY DESTINATION ${PROJECT_SOURCE_DIR}/bin
+        )

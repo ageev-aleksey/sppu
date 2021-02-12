@@ -36,7 +36,7 @@ namespace sdd::conn {
 
     private:
         void packageWrite(Package *pack);
-        bool read(StatePackage &package);
+        bool read(StatePackage &package, size_t readSize);
         bool callbackIsContain(const std::function<Handle> &handler);
 
         std::shared_ptr<QSerialPort> m_serialPort;
@@ -45,6 +45,7 @@ namespace sdd::conn {
         std::mutex m_mutex;
         std::condition_variable m_cv;
         PackageBuffer m_buffer;
+        QFile m_file;
     };
 }
 

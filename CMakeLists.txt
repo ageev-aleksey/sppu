@@ -10,12 +10,30 @@ message(STATUS ${CMAKE_ROOT})
 message(STATUS "COMPILER ID: ${CMAKE_CXX_COMPILER_ID}")
 option(COMPILE_TESTS "" OFF)
 
-set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
-#set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
-#Boost
-set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
-set(BOOST_INCLUDEDIR "include/boost-1_61")
-set(BOOST_LIBRARYDIR "lib")
+
+
+if(UNIX)
+    message(STATUS "UNIX")
+    set(OpenCV_DIR ~/Загрузки/opencv/opencv/build)
+    set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
+    #set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
+    #Boost
+    #set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
+    #set(BOOST_INCLUDEDIR "include/boost-1_61")
+    #set(BOOST_LIBRARYDIR "lib")
+endif()
+
+if (WIN32)
+    message(STATUS "WIN32")
+    set(OpenCV_DIR /opt/opencv/release)
+    set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
+    set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
+    #Boost
+    set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
+    set(BOOST_INCLUDEDIR "include/boost-1_61")
+    set(BOOST_LIBRARYDIR "lib")
+endif()
+
 
 ####WIDOWS######
 
