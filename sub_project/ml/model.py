@@ -2,6 +2,7 @@ from typing import List, Callable, Any
 from scipy import integrate
 import numpy as np
 import neural
+import matplotlib.pyplot as plt
 
 
 class LogicError(Exception):

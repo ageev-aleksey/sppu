@@ -67,7 +67,7 @@ def make_model(p : neural.ResNetPoperties) -> neural.ResNet:
      """Построение модели ResNet на основе переданных параметров"""
      resnet = neural.ResNet(p.shape_input, p.shape_output, p.nunits, p.nblocks, p.size, p.activation, p.regularization)
      resnet = keras.Model(inputs=resnet.inputs, outputs=resnet.outputs)
-     resnet.compile(keras.optimizers.Adam(), loss="mse", metrics=['mae',neural.RelativeApproximationError()])
+     resnet.compile(p.optimizer, loss="mse", metrics=['mae',neural.RelativeApproximationError()])
      return {"model": resnet, "props": p}
 
 
@@ -78,20 +78,33 @@ def worker (prop : neural.ResNetPoperties):
         os.makedirs(path)
     except:
         pass
-    saver = keras.callbacks.ModelCheckpoint(
-                filepath=prop.path + "/epoch.{epoch}",
+    saver_by_loss = keras.callbacks.ModelCheckpoint(
+                filepath=prop.path + "/mse_epoch.{epoch}",
                 save_weights_only=False,
                 monitor='val_loss',
                 mode='min',
                 save_best_only=True)
+    saver_by_rae = keras.callbacks.ModelCheckpoint(
+        filepath=prop.path + "/rae_epoch.{epoch}",
+        save_weights_only=False,
+        monitor='val_RAE',
+        mode='min',
+        save_best_only=True)
 
-    h = ann.fit(X, Y, batch_size=32, epochs=10, verbose=0,
-    validation_data = [X_test, Y_test],  callbacks=[saver, LR_SCHADULER_CALLBACK])
+    h = ann.fit(X, Y, batch_size=32, epochs=500, verbose=0,
+    validation_data = [X_test, Y_test],  callbacks=[saver_by_loss, saver_by_rae])
     
     j = pd.DataFrame(h.history)
     file = open(os.path.join(prop.path, "history.json"), "w")
     file.write(j.to_json())
     file.close()
+
+    file = open(os.path.join(prop.path, "keras.json"), "w")
+    js = ann.to_json()
+    file.write(js)
+    file.close()
+
+    ann.save(os.path.join(prop.path, "epoch.last"))
 
 def make_model_props():
     #Формирование моделей
@@ -99,21 +112,23 @@ def make_model_props():
     for nunits in [4, 8, 16, 32, 64, 128]:
         for nblocks in [1, 2, 3, 4, 5]:
             for blockSize in [2, 3, 4]:
-                path = "./models2/resnet_nunits.{nunits}_nblocks.{nblocks}_blockSize.{blocksize}_relu".format(nunits=nunits, nblocks=nblocks, blocksize=blockSize)
-                try:
-                    os.makedirs(path)
-                except:
-                    print("Ошибка создания файла")
-                    pass
-                p = neural.ResNetPoperties(
-                    2, 2,
-                    nunits,
-                    nblocks,
-                    blockSize,
-                    regularization = "l1",
-                    path = path
-                )
-                props.append(p)
+                for optimizer in ["Adam", "RMSprop", "Adagrad"]:
+                    path = "./models2/resnet-{opt}_nunits.{nunits}_nblocks.{nblocks}_blockSize.{blocksize}_relu".format(opt=optimizer ,nunits=nunits, nblocks=nblocks, blocksize=blockSize)
+                    try:
+                        os.makedirs(path)
+                    except:
+                        print("Ошибка создания файла")
+                        pass
+                    p = neural.ResNetPoperties(
+                        2, 2,
+                        nunits,
+                        nblocks,
+                        blockSize,
+                        regularization = "l1",
+                        path = path,
+                        optimizer = optimizer
+                    )
+                    props.append(p)
     return props
 
 
