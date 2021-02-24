@@ -14,5 +14,7 @@ import multiprocessing
 import utils
 
 
-
-df = utils.load_info_all_models("models2")
+if __name__ == "__main__":
+    #df = utils.load_info_all_models("../opt_models2")
+    #print(df)
+    model = utils.load_model("../opt_models2/resnet-Adagrad_nunits.4_nblocks.1_blockSize.2_relu")

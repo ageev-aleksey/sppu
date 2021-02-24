@@ -2,6 +2,8 @@ import sys
 import os
 import pandas as pd
 import json
+import tensorflow.keras as keras
+import numbers
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
@@ -46,7 +48,10 @@ def params_parse(params_str: str):
         key_value = s[i].split(".")
         print(key_value)
         if len(key_value) == 2:
-            params[key_value[0]] = int(key_value[1])
+            try:
+                params[key_value[0]] = int(key_value[1])
+            except:
+                params[key_value[0]] = key_value[1]
         elif len(key_value) == 1:
             params[key_value[0]] = None
         else:
@@ -66,9 +71,9 @@ def load_info(path) -> dict:
     for path, dirs, files in os.walk(path):
         print("--", path)
         for file in files:
-            if (file != "history.json"):
+            if (file != "history.json" and file != "keras.json"):
                 info["params"].append(params_parse(file))
-            else:
+            elif file == "history.json":
                 print("----", os.path.join(path, file))
                 f = open(os.path.join(path, file), "r")
                 j = json.load(f)
@@ -76,18 +81,45 @@ def load_info(path) -> dict:
                 f.close()
     return info
 
+def load_model(path : str) -> dict:
+    """Загрузка модели с весами из последней доступной эпохи
+    (следовательно с лучшими весами)
+    param: path - Путь до папки с данными по модели"""
+    file = open(os.path.join(path, "keras.json"), "r")
+    jd = file.read()
+    model = keras.models.model_from_json(jd)
+    file.close()
+    
+    file = open(os.path.join(path, "history.json"), "r")
+    history = pd.DataFrame(json.load(file))
+    file.close()
+
+    root, dirs, files = next(os.walk(path))
+    max_epoch = -1
+    file_name = ""
+    for f in files:
+        if f != "history.json" and f != "keras.json":
+            p = params_parse(f)
+            if isinstance(p["epoch"], numbers.Number) and p["name"][0] == "mse" and p["epoch"] >= max_epoch:
+                max_epoch = p["epoch"]
+                file_name = f
+    model.load_weights(os.path.join(path, file_name))
+    return {"model": model, "history": history, "epoch": max_epoch}
 
 
 def model_info_load(path : str) -> pd.DataFrame:
     """Загрузка полной информации о модели"""
     info = load_info(path)
+    if info["history"] is None:
+        print("Model don't have a history [", path, "]")
+        return None
     for key in info["model"]:
         info["model"][key] = [info["model"][key]]
     max_epoch = -1
 
     for param in info["params"]:
         print(param)
-        if param["epoch"] > max_epoch:
+        if isinstance(param["epoch"], numbers.Number) and param["name"][0] == "mse" and param["epoch"] > max_epoch:
             max_epoch = param["epoch"]
     history = info["history"]
     row = history.iloc[[max_epoch-1]].copy()
@@ -103,5 +135,7 @@ def load_info_all_models(models_root : str) -> pd.DataFrame:
     df = pd.DataFrame()
     root, dirs, files = next(os.walk(models_root))
     for dir in dirs:
-        df = pd.concat([df, model_info_load(os.path.join(root, dir))])
+        df_info = model_info_load(os.path.join(root, dir))
+        if df_info is not None:
+            df = pd.concat([df, df_info])
     return df.reset_index()

@@ -112,7 +112,7 @@ class NeuralMaker:
         raise NotImplementedError
 
 class ResNetPoperties:
-    def __init__(self, shape_input, shape_output, nunits, nblocks, size, activation = "relu", regularization = None, path = ""):
+    def __init__(self, shape_input, shape_output, nunits, nblocks, size, activation = "relu", regularization = None, path = "", optimizer = "Adam"):
         self.shape_input = shape_input
         self.shape_output = shape_output
         self.nunits = nunits
@@ -121,11 +121,12 @@ class ResNetPoperties:
         self.activation = activation
         self.regularization = regularization
         self.path = path
+        self.optimizer = optimizer
     
     @staticmethod
     def from_dict(data : dict):
         prop = ResNetPoperties(data["shape_input"], data["shape_output"], data["nunits"], data["nblocks"],
-        data["size"], data["activation"], data["regularization"], data["path"])
+        data["size"], data["activation"], data["regularization"], data["path"], data["optimizer"])
         return prop
     
     def to_dict(self) -> dict:
@@ -137,7 +138,8 @@ class ResNetPoperties:
             "size": self.size,
             "activation": self.activation,
             "regularization": self.regularization,
-            "path": self.path
+            "path": self.path,
+            "optimizer": self.optimizer
         }
     
 class ResNetMaker (NeuralMaker):
@@ -153,7 +155,7 @@ class ResNetMaker (NeuralMaker):
             if is_print:
                 #utils.print_progress(self.model_index, len(self.props))
                 print("Model", self.model_index, "from", len(self.props))
-            resnet = neural.ResNet(p.shape_input, p.shape_output, p.nunits, p.nblocks, p.size, p.activation, p.regularization)
+            resnet = neural.ResNet(p.shape_input, p.shape_output, p.nunits, p.nblocks, p.size, p.activation, p.regularization, p.optimizer)
             resnet = keras.Model(inputs=resnet.inputs, outputs=resnet.outputs)
             resnet.compile(keras.optimizers.Adam(), loss="mse", metrics=['mae',neural.RelativeApproximationError()])
             yield {"model": resnet, "props": p}
