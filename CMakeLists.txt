@@ -71,3 +71,4 @@ endif()
 
 
 add_subdirectory(sub_project/ip_cam)
+add_subdirectory(sub_project/find_in_image)
