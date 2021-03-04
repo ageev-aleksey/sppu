@@ -204,7 +204,7 @@ int main(int argc, char **argv) {
         // auto gamma_t = gamma_table();
         img = original(cv::Rect(upperXRect, upperYRect, widthRect, heightRect));
        // cv::LUT(img, gamma_t, img);
-        cv::GaussianBlur(img, img, {5, 5}, 10 ,10);
+        cv::GaussianBlur(img, img, {5, 5}, 0.5 ,0.5);
 
         std::vector<cv::Mat> channels;
         cv::split(img, channels);
@@ -243,8 +243,9 @@ int main(int argc, char **argv) {
         cv::Mat binary;
         cv::cvtColor(hsv, rgb, cv::COLOR_HSV2BGR);
         cv::cvtColor(rgb, res, cv::COLOR_BGR2GRAY);
-        cv::threshold(res, binary, 100, 255, cv::THRESH_BINARY);
-        auto moments = cv::moments(binary, true);
+        //cv::threshold(res, binary, 100, 255, cv::THRESH_BINARY);
+        binary = res;
+        auto moments = cv::moments(binary, false);
         cv::Point p(moments.m10/moments.m00, moments.m01/moments.m00);
         std::cout << "Centroid" << cv::Mat(p) << std::endl;
         cv::Mat resized;
