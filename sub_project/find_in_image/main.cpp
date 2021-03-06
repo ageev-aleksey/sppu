@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
     char *img_path = argv[1];
     cv::namedWindow("img", cv::WINDOW_AUTOSIZE);
     cv::createTrackbar("upperX", "img", &upperXRect, 1600);
-    cv::createTrackbar("upperY", "img", &upperYRect, 1200);
+    cv::createTrackbar("upp erY", "img", &upperYRect, 1200);
     cv::createTrackbar("width", "img", &widthRect, 1600);
     cv::createTrackbar("height", "img", &heightRect, 1200);
 

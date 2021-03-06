@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(openCvTest)
 
 set(CMAKE_CXX_STANDARD 17)
-set(OpenCV_DIR /opt/opencv/release)
+set(OpenCV_DIR ~/Загрузки/opencv/opencv-master/build)
 find_package(OpenCV REQUIRED)
 
 add_executable(openCvTest main.cpp)
