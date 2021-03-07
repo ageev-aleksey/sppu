@@ -71,12 +71,13 @@ add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
         ${QT_MOC_MODEL}
         ${QT_MOC_SDD_PROTO}
         ${QT_MOC_SERIALIZATION}
+        ${QT_MOC_CAMERA}
         ${QRC})
 target_include_directories(app_gui PUBLIC ${INCLUDE_DIR} ${Qt5Core_INCLUDE_DIRS}
                             ${Qt5Widgets_INCLUDE_DIRS} ${LIB_DIR}/qcustomplot/
                              ${Boost_INCLUDE_DIRS})
 
-target_link_libraries(app_gui sdd_model qt_model_components Qt5::Core Qt5::Widgets Qt5::PrintSupport ${Boost_LIBRARIES})
+target_link_libraries(app_gui sdd_model qt_model_components camera Qt5::Core Qt5::Widgets Qt5::PrintSupport ${Boost_LIBRARIES})
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(app_gui pthread atomic)
 endif()

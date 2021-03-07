@@ -2,8 +2,8 @@
 // Created by nrx on 07.02.2021.
 //
 
-#ifndef SDDCLIENT_QCAMERA_H
-#define SDDCLIENT_QCAMERA_H
+#ifndef SDDCLIENT_QICAMERA_H
+#define SDDCLIENT_QICAMERA_H
 
 #include <QtCore>
 #include <QImage>
@@ -31,4 +31,4 @@ public:
 
 
 
-#endif //SDDCLIENT_QCAMERA_H
+#endif //SDDCLIENT_QICAMERA_H

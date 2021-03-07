@@ -10,7 +10,7 @@
 #include <thread>
 #include <atomic>
 #include "gui/QSddView.h"
-#include "gui/QSddModelSaver.h"
+#include "gui/model_saver/QSddModelSaver.h"
 
 class QAppWindow : public QWidget
 {
