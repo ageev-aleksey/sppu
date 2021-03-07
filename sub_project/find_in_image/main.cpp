@@ -157,7 +157,8 @@ cv::Mat make_table() {
     }
     int step = 256 - alpha;
     int value = 0;
-    for (int i = alpha; i < 255; i++) {
+
+    for (int i = alpha; i < 256; i++) {
         value += step;
         table.at<uchar>(i) = value;
     }
@@ -259,7 +260,12 @@ int main(int argc, char **argv) {
         cv::imshow("binary", imageViewBinary);
         if (cv::waitKey(20) == ESCAPE_BUTTON_CODE) {
             break;
-        }
-    }
+            }
     return 0;
+
+  
+  /*  cv::circle(img, p, 10, {0, 0, 255}, cv::FILLED);
+    cv::imwrite("test.bmp", img);
+   return 0;*/
+
 }
