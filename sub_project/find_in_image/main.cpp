@@ -137,15 +137,27 @@
 
 const char ESCAPE_BUTTON_CODE = 27;
 
+cv::Mat gamma_table() {
+    cv::Mat table(1, 256, CV_8U);
+    double alpha = 0.9;
+    double gamma = 1.3;
+    double invGamma = 1.0/gamma;
+
+    for (double i = 0; i < 256.0; i++) {
+        table.at<uchar>((int)i) = (uchar)(alpha*std::pow((i/255.0), invGamma) * 255.0);
+    }
+    return table;
+}
 
 cv::Mat make_table() {
-    uchar alpha = 220;
+    uchar alpha = 185;
     cv::Mat table(1, 256, CV_8U);
     for (int i = 0; i < alpha; i++) {
         table.at<uchar>(i) = 0;
     }
     int step = 256 - alpha;
     int value = 0;
+
     for (int i = alpha; i < 256; i++) {
         value += step;
         table.at<uchar>(i) = value;
@@ -153,6 +165,15 @@ cv::Mat make_table() {
     return table;
 }
 
+int upperXRect = 0;
+int upperYRect = 0;
+int widthRect = 1600;
+int heightRect = 1200;
+
+cv::Mat imageOriginal;
+cv::Mat imageBinary;
+cv::Mat imageViewOriginal;
+cv::Mat imageViewBinary;
 
 int main(int argc, char **argv) {
     if (argc != 2) {
@@ -160,60 +181,91 @@ int main(int argc, char **argv) {
         return -1;
     }
     char *img_path = argv[1];
+    cv::namedWindow("img", cv::WINDOW_AUTOSIZE);
+    cv::createTrackbar("upperX", "img", &upperXRect, 1600);
+    cv::createTrackbar("upp erY", "img", &upperYRect, 1200);
+    cv::createTrackbar("width", "img", &widthRect, 1600);
+    cv::createTrackbar("height", "img", &heightRect, 1200);
 
-    cv::Mat img = cv::imread(img_path);
-    if (img.empty()) {
-        std::cout << "Error reading image [" << img_path << "]" << std::endl;
+    cv::VideoCapture cap(img_path, cv::CAP_FFMPEG);
+    if (!cap.isOpened()) {
+        std::cout << "Error opening [" << img_path << "]" << std::endl;
         return -1;
     }
-    std::vector<cv::Mat> channels;
-    cv::split(img, channels);
-    assert(channels.size() == 3);
-    std::cout << "Channels size: " << channels.size() << std::endl;
-    auto &blue = channels[0];
-    auto &green = channels[1];
-    auto &red = channels[2];
 
-    auto table = make_table();
-    cv::Mat ired;
-    cv::LUT(red, table, ired);
+    cv::Mat img;
+    cv::Mat original;
+    while (true) {
+        cap >> original;
 
-    cv::Mat iimg;
-    std::vector<cv::Mat> ichannels = {blue, green, ired};
-    cv::merge(ichannels, iimg);
-
-    cv::Mat hsv;
-    cv::cvtColor(iimg, hsv, cv::COLOR_BGR2HSV);
-
-    for (int i = 0; i < hsv.rows; i++) {
-        for (int j = 0; j < hsv.cols; j++) {
-            auto el = hsv.at<cv::Vec3b>(i, j);
-            auto &h = el[0];
-            auto &s = el[1];
-            auto &v = el[2];
-            if (!((h < 25 ||  h > 213) && s > 100)) {
-                v = 0;
-            }
-            hsv.at<cv::Vec3b>(i, j) = el;
+        if (original.empty()) {
+            std::cout << "Error reading image [" << img_path << "]" << std::endl;
+            return -1;
         }
-    }
+        // auto gamma_t = gamma_table();
+        img = original(cv::Rect(upperXRect, upperYRect, widthRect, heightRect));
+       // cv::LUT(img, gamma_t, img);
+        cv::GaussianBlur(img, img, {5, 5}, 0.5 ,0.5);
 
-    cv::Mat res;
-    cv::Mat rgb;
-    cv::Mat binary;
-    cv::cvtColor(hsv, rgb, cv::COLOR_HSV2BGR);
-    cv::cvtColor(rgb, res, cv::COLOR_BGR2GRAY);
-    cv::threshold(res, binary, 100, 255, cv::THRESH_BINARY);
-    auto moments = cv::moments(binary, true);
-    cv::Point p(moments.m10/moments.m00, moments.m01/moments.m00);
-    std::cout << "Centroid" << cv::Mat(p) << std::endl;
-    /*while (true) {
-        cv::imshow("img", img);
+        std::vector<cv::Mat> channels;
+        cv::split(img, channels);
+        assert(channels.size() == 3);
+        std::cout << "Channels size: " << channels.size() << std::endl;
+        auto &blue = channels[0];
+        auto &green = channels[1];
+        auto &red = channels[2];
+
+        auto table = make_table();
+        cv::Mat ired;
+        cv::LUT(red, table, ired);
+
+        cv::Mat iimg;
+        std::vector<cv::Mat> ichannels = {blue, green, ired};
+        cv::merge(ichannels, iimg);
+
+        cv::Mat hsv;
+        cv::cvtColor(iimg, hsv, cv::COLOR_BGR2HSV);
+
+        for (int i = 0; i < hsv.rows; i++) {
+            for (int j = 0; j < hsv.cols; j++) {
+                auto el = hsv.at<cv::Vec3b>(i, j);
+                auto &h = el[0];
+                auto &s = el[1];
+                auto &v = el[2];
+                if (!((h < 10) && s > 50 && v > 50)) {
+                    v = 0;
+                }
+                hsv.at<cv::Vec3b>(i, j) = el;
+            }
+        }
+
+        cv::Mat res;
+        cv::Mat rgb;
+        cv::Mat binary;
+        cv::cvtColor(hsv, rgb, cv::COLOR_HSV2BGR);
+        cv::cvtColor(rgb, res, cv::COLOR_BGR2GRAY);
+        //cv::threshold(res, binary, 100, 255, cv::THRESH_BINARY);
+        binary = res;
+        auto moments = cv::moments(binary, false);
+        cv::Point p(moments.m10/moments.m00, moments.m01/moments.m00);
+        std::cout << "Centroid" << cv::Mat(p) << std::endl;
+        cv::Mat resized;
+        cv::resize(binary, resized, {1280, 720});
+
+        imageOriginal = img;
+        cv::circle(imageOriginal, p, 10, {0, 0, 255}, cv::FILLED);
+        cv::resize(imageOriginal, imageViewOriginal, {640, 360});
+        cv::resize(binary, imageViewBinary, {640, 360});
+        cv::imshow("img", imageViewOriginal);
+        cv::imshow("binary", imageViewBinary);
         if (cv::waitKey(20) == ESCAPE_BUTTON_CODE) {
             break;
-        }
-    }*/
-    cv::circle(img, p, 10, {0, 0, 255}, cv::FILLED);
+            }
+    return 0;
+
+  
+  /*  cv::circle(img, p, 10, {0, 0, 255}, cv::FILLED);
     cv::imwrite("test.bmp", img);
-   return 0;
+   return 0;*/
+
 }
