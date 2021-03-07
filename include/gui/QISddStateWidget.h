@@ -8,6 +8,7 @@
 #include "sdd_protocol/connect/QIConnection.h"
 #include <vector>
 #include <QWidget>
+#include <memory>
 
 class QISddStateWidget : public QWidget {
 public:

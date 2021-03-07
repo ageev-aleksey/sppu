@@ -5,13 +5,13 @@
 #ifndef SDDCLIENT_QCOUNTURHDCAMERA_H
 #define SDDCLIENT_QCOUNTURHDCAMERA_H
 
-#include "camera/QICamera.h"
-
-class QContourHdCamera : public QICamera {
-public:
-    void play() override;
-    void stop() override;
-};
+//#include "camera/QICamera.h"
+//
+//class QContourHdCamera : public QICamera {
+//public:
+//    void play() override;
+//    void stop() override;
+//};
 
 
 #endif //SDDCLIENT_QCOUNTURHDCAMERA_H

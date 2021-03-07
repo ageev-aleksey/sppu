@@ -1,24 +1,25 @@
-#include "gui/QSddModelSaver.h"
+#include "gui/model_saver/QSddModelSaver.h"
+#include "gui/model_saver/QModelDataGetter.h"
 #include <QFileDialog>
 #include <QtGlobal>
 
 
-QSddModelSaver::QSddModelSaver(const FormatsContainer<sdd::conn::State> &formats,
-                               std::shared_ptr<sdd::conn::QIConnection> connection,
+QSddModelSaver::QSddModelSaver(const FormatsContainer<SavingData> &formats,
+                               std::shared_ptr<QModelDataGetter> getter,
                                QWidget *parent)
-    : QWidget(parent), mFormats(formats), mSddConnection(std::move(connection))
+    : QWidget(parent), mFormats(formats), mSddConnection(std::move(getter))
 {
     mSaveButton->setText("Save model data");
     this->setLayout(mLayout);
     mLayout->addWidget(mSaveButton);
     QObject::connect(mSaveButton, &QPushButton::released, this, &QSddModelSaver::save);
-    QObject::connect(mSddConnection.get(), &sdd::conn::QIConnection::recvStatePackage,
-                     this, &QSddModelSaver::addModelState);
+    mGetterConnection = QObject::connect(mSddConnection.get(), &QModelDataGetter::newData,
+                                         this, &QSddModelSaver::addModelState);
 }
 
-void QSddModelSaver::addModelState(const sdd::conn::State &state) {
+void QSddModelSaver::addModelState(const SavingData &data) {
     if (mFile.isOpen()) {
-        mStates.push_back(state);
+        mStates.push_back(data);
 
         if (mStates.size() >= 5000) {
             QSddModelSaver::fileWrite();
@@ -77,4 +78,11 @@ void QSddModelSaver::fileWrite() {
     }
     mStates.clear();
     mFile.write(result);
+}
+
+void QSddModelSaver::setGetter(std::shared_ptr<QModelDataGetter> getter) {
+    QObject::disconnect(mGetterConnection);
+    mSddConnection = getter;
+    mGetterConnection = QObject::connect(mSddConnection.get(), &QModelDataGetter::newData,
+                                         this, &QSddModelSaver::addModelState);
 }
