@@ -21,9 +21,9 @@ namespace sdd {
         }
         virtual ~Package();
         std::vector<byte_t> toBinary() const;
+       // template<typename Iterator>
         void fromBinary(const std::vector<byte_t > &bin_buff);
         size_t size();
-
 
         //virtual std::vector<int> get(std::string field_name) const;
         //virtual void set(std::string field_name, std::vector<int> value);
@@ -35,6 +35,7 @@ namespace sdd {
         //static char calc_controll_sum(char *bytes, size_t size);
         Message bworker;//TODO ����������� �����������
         std::string package_name;
+        char idValue;
     private:
         template<typename Itr>
         static byte_t hash_(Itr itr_begin, Itr itr_end) {

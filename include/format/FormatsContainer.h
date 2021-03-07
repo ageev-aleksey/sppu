@@ -17,13 +17,16 @@ public:
         }
     };
     void add(const std::shared_ptr<Format<T>> &format) {
-        container.insert(format);
+        container.push_back(format);
      }
      std::shared_ptr<Format<T>> get(const QString &formatName) {
-         auto ptr = container.find(formatName);
-         if(ptr == container.end()) {
-             return nullptr;
-         }
+        auto ptr = std::find_if(container.begin(), container.end(),
+                     [&](const std::shared_ptr<Format<T>> &el) {
+            return el->name() == formatName;
+        });
+        if (ptr == container.end()) {
+            return nullptr;
+        }
          return *ptr;
      }
      QStringList names() {
@@ -34,7 +37,8 @@ public:
          return res;
      }
 private:
-    std::unordered_set<std::shared_ptr<Format<T>>, FormatHash> container;
+    // std::unordered_set<std::shared_ptr<Format<T>>, FormatHash> container;
+    std::vector<std::shared_ptr<Format<T>>> container;
 };
 
 

@@ -7,11 +7,39 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 message(STATUS ${CMAKE_ROOT})
-option(COMPILE_TESTS "" ON)
+message(STATUS "COMPILER ID: ${CMAKE_CXX_COMPILER_ID}")
+option(COMPILE_TESTS "" OFF)
 
 
-set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
 
+if(UNIX)
+    message(STATUS "UNIX")
+    set(OpenCV_DIR ~/Загрузки/opencv/opencv/build)
+    #set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)  
+    set(Qt5_DIR ~/Qt/5.15.2/gcc_64/lib/cmake/Qt5)
+    #set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
+    #Boost
+    #set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
+    #set(BOOST_INCLUDEDIR "include/boost-1_61")
+    #set(BOOST_LIBRARYDIR "lib")
+endif()
+
+if (WIN32)
+    message(STATUS "WIN32")
+    set(OpenCV_DIR /opt/opencv/release)
+    set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)
+    set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
+    #Boost
+    set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
+    set(BOOST_INCLUDEDIR "include/boost-1_61")
+    set(BOOST_LIBRARYDIR "lib")
+endif()
+
+
+####WIDOWS######
+
+
+################
 
 
 #include(${CMAKE_CURRENT_LIST_DIR}/MatlabLibrary.cmake)
@@ -22,7 +50,7 @@ set(INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/include)
 set(SRC_DIR ${CMAKE_CURRENT_LIST_DIR}/src)
 set(RESOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/resource)
 
-include(./cmake/Cpplint.cmake)
+#include(./cmake/Cpplint.cmake)
 
 add_subdirectory(${SRC_DIR})
 
@@ -44,3 +72,4 @@ endif()
 
 
 add_subdirectory(sub_project/ip_cam)
+add_subdirectory(sub_project/find_in_image)

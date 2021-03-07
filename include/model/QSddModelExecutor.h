@@ -7,7 +7,7 @@
 #include <QtCore>
 #include "model/SddModel.h"
 #include "model/InputGenerator.h"
-#include "sdd_protocol/connect/IConnection.h"
+#include "sdd_protocol/connect/QIConnection.h"
 #include <atomic>
 #include <thread>
 
@@ -15,7 +15,7 @@
  * Класс выполняющий организацию связи модели sdd с системой сообщений QT,
  * а так же запуск моделирования в отдельном пототке.
  */
-class QSddModelExecutor : public QObject, public sdd::conn::IConnection {
+class QSddModelExecutor : public sdd::conn::QIConnection {
     Q_OBJECT
 public:
     explicit QSddModelExecutor(std::unique_ptr<SddModel> model);

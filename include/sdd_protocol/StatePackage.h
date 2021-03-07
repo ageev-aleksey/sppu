@@ -11,6 +11,8 @@ namespace sdd {
      */
     class StatePackage : public Package {
     public:
+        inline const static int ID = 20;
+        inline const static int NUM_BYTES = 36;
         StatePackage();
         explicit StatePackage(const std::vector<Package::byte_t> &bin_buff);
         //void fromBinary(std::vector<Package::byte_t> bin_buff);
@@ -49,7 +51,18 @@ namespace sdd {
 
         Package::byte_t  randomValue();
 
+        template <typename Iterator>
+        static bool checkStruct(const Iterator &begin, const Iterator &end) {
+            if (std::distance(begin, end) == NUM_BYTES && *begin == ID) {
+                auto last = end - 1;
+                //auto payloadEnd = last - 2;
+                return *last == hash(begin, last);
+            }
+            return false;
+        }
+
         // Package::byte_t getHash();
+
     private:
         void create_all_fields();
 

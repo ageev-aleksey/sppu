@@ -25,6 +25,7 @@ public:
     std::vector<sdd::conn::State> getSddStates() override;
     void settingsLoad(const QSettings &settings) override;
     void settingsStore(QSettings &settings) override;
+    std::shared_ptr<sdd::conn::QIConnection> getSddConnection() override;
 private slots:
     void modelRunFromGui();
     void modelStopFromGui();

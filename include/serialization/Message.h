@@ -23,7 +23,7 @@ public:
 	std::vector<Field>::const_iterator cbegin() const;
 	std::vector<Field>::const_iterator cend() const;
 	std::vector<byte_t> toBinary() const;
-	void fromBinary(std::vector<char> bytes, size_t start = 0);
+	void fromBinary(const std::vector<char> &bytes, size_t start = 0);
 	size_t size();
 private:
 	std::vector<Field> fields;

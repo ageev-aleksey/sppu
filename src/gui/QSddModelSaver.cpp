@@ -1,26 +1,31 @@
 #include "gui/QSddModelSaver.h"
 #include <QFileDialog>
+#include <QtGlobal>
 
 
-QSddModelSaver::QSddModelSaver(const FormatsContainer<SddModelDescriptor> &formats, QWidget *parent)
-: mFormats(formats), QWidget(parent) {
+QSddModelSaver::QSddModelSaver(const FormatsContainer<sdd::conn::State> &formats,
+                               std::shared_ptr<sdd::conn::QIConnection> connection,
+                               QWidget *parent)
+    : QWidget(parent), mFormats(formats), mSddConnection(std::move(connection))
+{
     mSaveButton->setText("Save model data");
     this->setLayout(mLayout);
     mLayout->addWidget(mSaveButton);
     QObject::connect(mSaveButton, &QPushButton::released, this, &QSddModelSaver::save);
+    QObject::connect(mSddConnection.get(), &sdd::conn::QIConnection::recvStatePackage,
+                     this, &QSddModelSaver::addModelState);
 }
 
-void QSddModelSaver::addModelState(const SddModel::State &state) {
-    if (isEnabled()) {
-        mStates.outputs.push_back(state);
+void QSddModelSaver::addModelState(const sdd::conn::State &state) {
+    if (mFile.isOpen()) {
+        mStates.push_back(state);
+
+        if (mStates.size() >= 5000) {
+            QSddModelSaver::fileWrite();
+        }
     }
 }
 
-void QSddModelSaver::setModelInput(const TimedInput &input) {
-    if (isEnabled()) {
-        // mInput = input;
-    }
-}
 
 void QSddModelSaver::save() {
     QString path = QDir::currentPath() + "/data";
@@ -29,6 +34,18 @@ void QSddModelSaver::save() {
     QString selectedFilter;
     QString filename = dialog.getSaveFileName(this, "save model states", path, filesTypeToString(), &selectedFilter);
     QString type = *selectedFilter.split(" ").begin();
+    filename += "." + type;
+    if (mFile.isOpen()) {
+        mFile.close();
+    }
+    mFile.setFileName(filename);
+    mFile.open(QIODevice::OpenModeFlag::ReadWrite);
+    if (!mFile.isOpen()) {
+        qCritical() << "Ошибка открытия файла [" << filename << "] на запись";
+    }
+    auto fname = mFormats.names().first();
+    auto format = mFormats.get(fname);
+    mFile.write(format->begin());
     // QByteArray bytes =  mFormats.get(type)->write()
 }
 
@@ -38,4 +55,26 @@ QString QSddModelSaver::filesTypeToString() {
         types.append(el).append(" (").append("*.").append(el).append(");;");
     }
     return types;
+}
+
+QSddModelSaver::~QSddModelSaver() {
+    if (mFile.isOpen()) {
+        fileWrite();
+        auto fname = mFormats.names().first();
+        auto format = mFormats.get(fname);
+        mFile.write(format->end());
+        mFile.close();
+    }
+}
+
+void QSddModelSaver::fileWrite() {
+    auto fname =  mFormats.names().first();
+    auto formatter = mFormats.get(fname);
+    QByteArray result;
+    for (const auto &el : mStates) {
+        result.append(formatter->write(el));
+        result.append(formatter->next());
+    }
+    mStates.clear();
+    mFile.write(result);
 }

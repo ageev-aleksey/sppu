@@ -1,5 +1,5 @@
 #include "serialization/Message.h"
-
+#include <stdexcept>
 
 Message::Message(Endianness endianness)
 {
@@ -79,7 +79,7 @@ std::vector<Message::byte_t> Message::toBinary() const {
 	return result;
 }
 
-void Message::fromBinary(std::vector<char> bytes, size_t start)
+void Message::fromBinary(const std::vector<char> &bytes, size_t start)
 {
 	size_t buff_index = 0;
 	auto field = fields.begin();

@@ -73,10 +73,10 @@ void QSddModelExecutor::worker_thread() {
         }
 
         mCurrentState = mModel->step();
-
         sdd::conn::State stateValue = makePackageState();
-
-        if (nstep == mBreakingMilliseconds) {
+        unsigned long long ms = std::chrono::duration_cast<std::chrono::nanoseconds>(stateValue.time.time_since_epoch()).count();
+        if (ms != 0 && ms % (mBreakingMilliseconds*1000000) == 0) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(mBreakingMilliseconds));
             nstep = 0;
             if (m_dataReceived) {
                 m_dataReceived(stateValue);
@@ -85,6 +85,8 @@ void QSddModelExecutor::worker_thread() {
             emit modelTakeStep(mCurrentState);
             emit modelTakeStep_pack(stateValue);
         }
+
+        //emit modelTakeStep(mCurrentState);
 
         //QCoreApplication::processEvents();
 //        if (mBreakingMilliseconds > 0) {

@@ -45,7 +45,7 @@ QISddStateWidget *QSddSerialPortControlFactory::makeWidget(QSettings &settings) 
     port->setFlowControl(QSerialPort::NoFlowControl);
     port->setParity(QSerialPort::Parity::NoParity);
     port->setBaudRate(QSerialPort::BaudRate::Baud38400);
-    port->setDataBits(QSerialPort::DataBits::Data7);
+    port->setDataBits(QSerialPort::DataBits::Data8);
     auto *widget = new QSddSerialPortControl(std::move(port));;
     widget->settingsLoad(settings);
     return widget;

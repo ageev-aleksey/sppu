@@ -10,23 +10,30 @@
 #include <QPushButton>
 #include "model/parser/SddModelDescriptor.h"
 #include "format/FormatsContainer.h"
+#include "sdd_protocol/connect/States.h"
+#include "sdd_protocol/connect/QIConnection.h"
 
 class QSddModelSaver : public QWidget {
     Q_OBJECT
 public:
-    explicit QSddModelSaver(const FormatsContainer<SddModelDescriptor> &formats, QWidget *parent = nullptr);
+    QSddModelSaver(const FormatsContainer<sdd::conn::State> &formats,
+                   std::shared_ptr<sdd::conn::QIConnection> connection,
+                   QWidget *parent = nullptr);
+    ~QSddModelSaver() override;
 public slots:
-    void addModelState(const SddModel::State &state);
-    void setModelInput(const TimedInput &input);
+    void addModelState(const sdd::conn::State &state);
 private slots:
     void save();
 private:
+    void fileWrite();
     QString filesTypeToString();
-    SddModelDescriptor mStates;
-    SddModel::Input mInput{};
-    FormatsContainer<SddModelDescriptor> mFormats;
+    std::vector<sdd::conn::State> mStates;
+    FormatsContainer<sdd::conn::State> mFormats;
     QHBoxLayout *mLayout = new QHBoxLayout;
     QPushButton *mSaveButton = new QPushButton;
+    QFile mFile;
+    std::shared_ptr<sdd::conn::QIConnection> mSddConnection;
+    // QMetaObject::Connection mChannelBufferWrite;
 
 };
 #endif //TESTSIMULINKMODEL_QSDDMODELSAVER_H

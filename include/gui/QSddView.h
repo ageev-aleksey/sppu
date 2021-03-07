@@ -44,6 +44,7 @@ private:
     std::mutex mMutexState;
     std::vector<sdd::conn::State> mState;
     QTimer mTimerGraphUpdate;
+    sdd::conn::State mBeforeState{};
 
 };
 
