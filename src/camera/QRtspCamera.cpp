@@ -52,16 +52,17 @@ public slots:
         cv::Mat frame;
         capture >> frame;
         if (!frame.empty()) {
-            cv::imshow("test", frame);
+           // cv::imshow("test", frame);
             //QImage img((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB32);
           //  QImage img = Mat2QImage(frame);
-            cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+            // cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+            // QImage image((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
             emit recvImg(frame);
         }
 
     }
 signals:
-    void recvImg(const cv::Mat img);
+    void recvImg(cv::Mat img);
 
 public:
     cv::VideoCapture capture;

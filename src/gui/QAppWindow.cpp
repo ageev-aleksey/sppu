@@ -6,6 +6,7 @@
 #include "model/parser/QSddModelXmlSerializer.h"
 #include "sdd_protocol/connect/QSddJsonSerializer.h"
 #include "gui/model_saver/QIConnectionWrapper.h"
+#include "gui/camera/QCameraWindow.h"
 #include <iostream>
 #include <qcustomplot.h>
 
@@ -33,8 +34,9 @@ void QAppWindow::windowInit() {
     mLayout =  new QVBoxLayout;
     setLayout(mLayout);
     auto *menu = new QMenuBar();
-    auto describeModel = menu->addMenu("file");
-    describeModel->addAction("show full model describe", this, &QAppWindow::showModelDescribe);
+    auto file_menu = menu->addMenu("file");
+    file_menu->addAction("show full model describe", this, &QAppWindow::showModelDescribe);
+    file_menu->addAction("connect to camera", this, &QAppWindow::showCameraOptions);
     // QObject::connect(describeModel, &QMenu::triggered, this, &QAppWindow::showModelDescribe);
     QLabel *img = new QLabel;
     img->setPixmap(QPixmap(":/model.png"));
@@ -75,6 +77,11 @@ void QAppWindow::saveModelParameters(SddModel::Parameters parameters) {
 //    mSettings.setValue("model/frictionLinearCoeff", parameters.frictionLinearCoeff);
 //    mSettings.setValue("model/frictionQuadraticCoeff", parameters.frictionQuadraticCoeff);
 
+}
+
+void QAppWindow::showCameraOptions() {
+    auto cameraOptions = new QCameraWindow();
+    cameraOptions->show();
 }
 
 

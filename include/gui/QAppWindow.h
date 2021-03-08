@@ -7,6 +7,7 @@
 #include <QtCore>
 #include <QWidget>
 #include "gui/QGridDynamicPlots.h"
+#include "gui/camera/QCameraWindow.h"
 #include <thread>
 #include <atomic>
 #include "gui/QSddView.h"
@@ -22,6 +23,7 @@ public:
 public slots:
     void showModelDescribe();
     void saveModelParameters(SddModel::Parameters parameters);
+    void showCameraOptions();
 private:
     void windowInit();
     void sddModelInit();
@@ -32,7 +34,8 @@ private:
     QSddModelSaver *mSaver;
     QVBoxLayout *mLayout;
     QSettings mSettings;
-    QWidget *modelDescribeWindow  = new QWidget;
+    QWidget *modelDescribeWindow  = new QWidget(this);
+    QCameraWindow *camera = new QCameraWindow;
 
 };
 

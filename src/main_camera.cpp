@@ -4,6 +4,8 @@
 #include <QLabel>
 #include <QFormLayout>
 #include <QMouseEvent>
+#include <gui/camera/QImageView.h>
+
 
 class QImageView : public QWidget {
     Q_OBJECT
@@ -11,7 +13,7 @@ public:
     QImageView(int width, int height, QWidget *parent = nullptr)
         : QWidget(parent)
     {
-        //setLayout(new QHBoxLayout);
+        setLayout(new QHBoxLayout);
         m_imgView->setFixedWidth(width);
         m_imgView->setFixedHeight(height);
         setMouseTracking(true);
@@ -31,6 +33,8 @@ signals:
 private:
     QLabel *m_imgView = new QLabel(this);
 };
+
+
 
 class App : public QWidget {
     Q_OBJECT
