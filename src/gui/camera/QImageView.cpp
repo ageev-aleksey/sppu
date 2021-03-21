@@ -6,6 +6,8 @@ QImageView::QImageView(int width, int height, QWidget *parent)
         : QWidget(parent)
 {
     //setLayout(new QHBoxLayout);
+    m_imgView->setMinimumHeight(1);
+    m_imgView->setMinimumWidth(1);
    // m_imgView->setFixedWidth(width);
    // m_imgView->setFixedHeight(height);
    auto l = new QHBoxLayout;
