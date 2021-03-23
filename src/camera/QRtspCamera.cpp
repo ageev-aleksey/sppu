@@ -4,10 +4,11 @@
 #include <stdexcept>
 #include <atomic>
 #include <QtGui/QImage>
+#include <sstream>
 
 #define GAUSS_KERNEL_SIZE cv::Size{15, 15}
 #define GAUSS_SIGMA 0
-#define WINDOW_SIZE cv::Size{100, 100}
+#define WINDOW_SIZE cv::Size{30, 30}
 #define STEP 100
 #define RED_COLOR {0, 0, 255};
 #define BLUE_COLOR {255, 0, 0};
@@ -81,7 +82,10 @@ namespace {
                 auto &h = pixel[0];
                 auto &s = pixel[1];
                 auto &v = pixel[2];
-                if (h > 15) {
+                if (h > 20) {
+                    v = 0;
+                }
+                if (v < 100) {
                     v = 0;
                 }
                 hsv.at<cv::Vec3b>(i, j) = pixel;
@@ -92,7 +96,7 @@ namespace {
         cv::split(hsv, hsv_channels);
         cv::Mat &value_channel = hsv_channels[2];
         cv::Mat binary;
-        cv::threshold(value_channel, binary, 10, 255, cv::THRESH_BINARY);
+        cv::threshold(value_channel, binary, 0, 1000, cv::THRESH_BINARY);
 
         cv::Moments m = cv::moments(binary, true);
         if (m.m00 != 0) {
@@ -155,6 +159,11 @@ public slots:
         timer->start();
     }
     void imageCapture()  {
+        if (QThread::currentThread()->isInterruptionRequested()) {
+            capture.release();
+            timer->stop();
+            QThread::currentThread()->quit();
+        }
         cv::Mat frame;
         capture >> frame;
         if (!frame.empty()) {
@@ -164,8 +173,8 @@ public slots:
             // cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
             // QImage image((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
            
-           processingImage(frame);
-            cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
+            processingImage(frame);
+            //cv::cvtColor(frame, frame, cv::COLOR_BGR2RGB);
             emit recvImg(frame);
         }
 
@@ -179,26 +188,41 @@ public:
     QTimer *timer{};
 };
 
-QRtspCamera::QRtspCamera(const std::string rtspUrl) {
+QRtspCamera::QRtspCamera(const std::string uri) {
+    m_uri = std::move(uri);
     qRegisterMetaType<cv::Mat>("cv::Mat");
-    auto worker = new QRtspCameraWorker(rtspUrl);
-   // worker->capture.open(rtspUrl);
-    if (!worker->capture.isOpened()) {
+    m_worker = new QRtspCameraWorker(m_uri);
+    if (!m_worker->capture.isOpened()) {
         throw std::runtime_error("Error connection source");
     }
     m_pWorkerThread = new QThread(this);
-    QObject::connect(m_pWorkerThread, &QThread::started, worker, &QRtspCameraWorker::capturingInit);
-    QObject::connect(worker, &QRtspCameraWorker::recvImg, this, &QRtspCamera::recvImage);
-    worker->moveToThread(m_pWorkerThread);
-    m_pWorkerThread->start();
+    QObject::connect(m_pWorkerThread, &QThread::started, m_worker, &QRtspCameraWorker::capturingInit);
+    QObject::connect(m_worker, &QRtspCameraWorker::recvImg, this, &QRtspCamera::recvImage);
+    m_worker->moveToThread(m_pWorkerThread);
 }
 
 void QRtspCamera::play() {
-
+    if (!m_pWorkerThread->isRunning()) {
+        if (!m_worker->capture.isOpened()) {
+            if (!m_worker->capture.open(m_uri)) {
+                std::stringstream  msg;
+                msg << "Error opening video source by uri: " << m_uri;
+                throw std::runtime_error(msg.str());
+            }
+        }
+        m_pWorkerThread->start();
+    }
 }
 
 void QRtspCamera::stop() {
+    if (m_pWorkerThread->isRunning()) {
+        m_pWorkerThread->requestInterruption();
+        m_pWorkerThread->wait();
+    }
+}
 
+QRtspCamera::~QRtspCamera() {
+    delete m_pWorkerThread;
 }
 
 class RtspCameraFactory : public QICameraFactory {

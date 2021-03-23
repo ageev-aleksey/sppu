@@ -12,3 +12,4 @@ __pycache__/
 models/
 models2/
 lib/VSTermo
+*.h5

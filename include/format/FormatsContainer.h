@@ -8,6 +8,11 @@
 #include <unordered_set>
 #include <memory>
 
+
+/**
+ * Контейнеро форматов для сериализации
+ * @tparam T - тип объекта для которого выполняется сериализация в разные форматы
+ */
 template<typename  T>
 class FormatsContainer {
 public:
@@ -16,9 +21,12 @@ public:
             return static_cast<size_t>(qHash(format->name()));
         }
     };
+    /// Добавить формат в контейнер
     void add(const std::shared_ptr<Format<T>> &format) {
         container.push_back(format);
      }
+
+     /// Получить формат по имени
      std::shared_ptr<Format<T>> get(const QString &formatName) {
         auto ptr = std::find_if(container.begin(), container.end(),
                      [&](const std::shared_ptr<Format<T>> &el) {
@@ -29,6 +37,7 @@ public:
         }
          return *ptr;
      }
+     /// Получить список имен форматов, хранащихся в контейнере
      QStringList names() {
          QStringList res;
          for(const auto &el : container) {
@@ -38,6 +47,7 @@ public:
      }
 private:
     // std::unordered_set<std::shared_ptr<Format<T>>, FormatHash> container;
+    /// Форматы
     std::vector<std::shared_ptr<Format<T>>> container;
 };
 

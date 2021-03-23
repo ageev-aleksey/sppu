@@ -23,6 +23,7 @@ class QCameraWindow : public QWidget {
 public:
     explicit QCameraWindow(QWidget *parnet=nullptr);
     ~QCameraWindow() override;
+    void closeEvent(QCloseEvent *event) override;
 private:
     void initDialog();
     void initImageView();
@@ -34,7 +35,8 @@ private:
 
     // Окно подключения к камере
     QComboBox *mConnectionsType = new QComboBox(this);
-    QLayout *mDialogLayout = new QHBoxLayout(this);
+    QVBoxLayout *mWindowLayout = new QVBoxLayout(this);
+    QLayout *mDialogLayout = new QHBoxLayout;
     QCameraWindowDialogContentImpl *mContent;
     // Окно получение данных с камерых
     std::unique_ptr<QImageView> mImageView = nullptr;

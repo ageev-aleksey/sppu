@@ -3,6 +3,7 @@
 #include "camera/QContourHDCamera.h"
 #include <QLineEdit>
 #include <QPushButton>
+#include <QCloseEvent>
 
 const QString IMG_SOURCE_CVCAP = "cv::VideoCapture";
 
@@ -37,11 +38,17 @@ QCameraWindow::~QCameraWindow() noexcept {
 
 
 void QCameraWindow::initDialog() {
+    auto widgetGroup = new QWidget;
+    widgetGroup->setLayout(mDialogLayout);
     mDialogLayout->addWidget(mConnectionsType);
     mDialogLayout->addWidget(mContent->videoSourceURL);
     mDialogLayout->addWidget(mContent->button);
+    mWindowLayout->addWidget(widgetGroup);
+
     mConnectionsType->addItem(IMG_SOURCE_CVCAP);
     mConnectionsType->addItem("");
+    mWindowLayout->addWidget(mImageView.get(), 1);
+
 
     QObject::connect(mConnectionsType, QOverload<const QString&>::of(&QComboBox::currentIndexChanged),
                      this, &QCameraWindow::comboBoxUpdate);
@@ -62,12 +69,15 @@ void QCameraWindow::comboBoxUpdate(const QString &name) {
 
 void QCameraWindow::cameraConnection() {
     if (mConnectionsType->currentText() == IMG_SOURCE_CVCAP) {
-        // TODO (ageev) заменить в интерфейсе std::string на QString
-       mCamera = std::make_unique<QRtspCamera>(mContent->videoSourceURL->text().toStdString());
-       // mCamera = std::make_unique<QContourHdCamera>();
+        if (mCamera == nullptr) {
+            // TODO (ageev) заменить в интерфейсе std::string на QString
+            mCamera = std::make_unique<QRtspCamera>(mContent->videoSourceURL->text().toStdString());
+            QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
+        }
 
-        
-        QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
+
+       // mCamera = std::make_unique<QContourHdCamera>();
+        mCamera->play();
         mImageView->show();
     }
 
@@ -75,6 +85,14 @@ void QCameraWindow::cameraConnection() {
 
 void QCameraWindow::initImageView() {
 
+}
+
+void QCameraWindow::closeEvent(QCloseEvent *event) {
+    if (mCamera != nullptr) {
+        mCamera->stop();
+    }
+
+    event->accept();
 }
 
 

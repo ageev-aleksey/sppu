@@ -5,7 +5,7 @@
 #include "model/parser/QSddModelJsonSerializer.h"
 #include "model/parser/QSddModelXmlSerializer.h"
 #include "sdd_protocol/connect/QSddJsonSerializer.h"
-#include "gui/model_saver/QIConnectionWrapper.h"
+#include "gui/model_saver/QIConnectionAdapter.h"
 #include "gui/camera/QCameraWindow.h"
 #include <iostream>
 #include <qcustomplot.h>
@@ -54,7 +54,7 @@ void QAppWindow::sddModelInit() {
     FormatsContainer<SavingData> f;
     f.add(std::make_shared<sdd::conn::QSddJsonSerializer>());
 //    f.add(std::make_shared<QSddModelXmlSerializer>());
-    mSaver = new QSddModelSaver(f, std::make_shared<QIConnectionWrapper>(mSdd->getSddConnection()));
+    mSaver = new QSddModelSaver(f, std::make_shared<QIConnectionAdapter>(mSdd->getSddConnection()));
     mLayout->addWidget(mModel, 1);
     auto *tab = new QTabWidget;
     // auto *page = new QConditionalControl;

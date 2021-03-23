@@ -35,3 +35,7 @@ void QImageView::setSizeWindow(int width, int height) {
     m_imgView->setFixedWidth(width);
     m_imgView->setFixedHeight(height);
 }
+
+void QImageView::closeEvent(QCloseEvent *event) {
+    QWidget::closeEvent(event);
+}

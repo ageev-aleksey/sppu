@@ -1,7 +1,11 @@
 import http.server 
 import json
+#from tensorflow import keras
 
-server_address = ("", 8888)
+server_address = ("", 8889)
+model_path = ""
+
+neural = None
 
 class HttpHandler (http.server.BaseHTTPRequestHandler):
 	def do_GET(self):
@@ -20,8 +24,11 @@ class HttpHandler (http.server.BaseHTTPRequestHandler):
 		print(body_request)
 		self.send_response(200)
 		self.end_headers()
-		self.wfile.write("")
+		self.wfile.write(b"hello")
 
 
-httpd = http.server.HTTPServer(server_address, HttpHandler)
-httpd.serve_forever()
+if __name__ == "__main__":
+	#naural = keras.models.load_model(model_path)
+	httpd = http.server.HTTPServer(server_address, HttpHandler)
+	print("server-start..")
+	httpd.serve_forever()

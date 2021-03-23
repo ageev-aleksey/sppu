@@ -269,6 +269,14 @@ public slots:
 
     }
     void imageCapture()  {
+        if (QThread::currentThread()->isInterruptionRequested()) {
+            timer->stop();
+            vkvrcap->stop();
+            delete vkvrcap;
+            vkvrcap = nullptr;
+            QThread::currentThread()->quit();
+            return;
+        }
        bool status =  vkvrcap->capture_work_routine();
        if (status == true) {
            cv::Mat img = glob_img.clone();
@@ -308,15 +316,19 @@ QContourHdCamera::QContourHdCamera() {
     QObject::connect(m_pWorkerThread, &QThread::started, worker, &QContourHdCameraWorker::capturingInit);
     QObject::connect(worker, &QContourHdCameraWorker::recvImg, this, &QContourHdCamera::recvImage);
     worker->moveToThread(m_pWorkerThread);
-    m_pWorkerThread->start();
 }
 
 void QContourHdCamera::play() {
-
+    if (!m_pWorkerThread->isRunning()) {
+        m_pWorkerThread->start();
+    }
 }
 
 void QContourHdCamera::stop() {
-
+    if (m_pWorkerThread->isRunning()) {
+        m_pWorkerThread->requestInterruption();
+        m_pWorkerThread->wait();
+    }
 }
 
 
