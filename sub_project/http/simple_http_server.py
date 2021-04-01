@@ -30,10 +30,11 @@ class S(BaseHTTPRequestHandler):
                 str(self.path), str(self.headers), post_data.decode('utf-8'))
 
         req = json.loads(post_data.decode('utf-8'))
-        resp = ann.predict(np.array([[req['error']]]))
+        # resp = ann.predict(np.array([[req['error']]])) # controll by error
+        resp = ann.predict(np.array([[req['ox_pos'], req['ox_speed'], req['end_pos']]])) #controll by state
         self._set_response()
         ret = {
-            "duty_cycle": float(resp[0, 0])
+            "duty_cycle": round(float(resp[0, 0]), 1)
         }
         print(ret)
         self.wfile.write(json.dumps(ret).encode('utf-8'))
@@ -53,7 +54,7 @@ def run(server_class=HTTPServer, handler_class=S, port=8000):
 if __name__ == '__main__':
     from sys import argv
     print("Loading model...")
-    ann = keras.models.load_model('resnet_model_control.h5')
+    ann = keras.models.load_model('resnet_model_controll_by_state.h5')
     print("...Model loaded")
     if len(argv) == 2:
         run(port=int(argv[1]))

@@ -13,6 +13,10 @@
 #include "gui/QSddView.h"
 #include "gui/model_saver/QSddModelSaver.h"
 
+/**
+ * Главный класс приложения.
+ * Создает и компанует все окна
+ */
 class QAppWindow : public QWidget
 {
     Q_OBJECT
@@ -21,11 +25,17 @@ public:
    ~QAppWindow() noexcept override;
 
 public slots:
+    /// Отображение описание модели, заложенное в программу
     void showModelDescribe();
+    /// Сохранение всех параметров программы
     void saveModelParameters(SddModel::Parameters parameters);
+    /// Отображение окна подключения камеры
     void showCameraOptions();
 private:
+    /// Инициализация главного окна
     void windowInit();
+    /// Инициализация параметров подключения
+    /// Подключение к устройству или замещение устройтсва моделью
     void sddModelInit();
 
     //QModelPlots *plots;

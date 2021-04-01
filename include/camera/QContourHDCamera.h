@@ -3,6 +3,10 @@
 
 #include "camera/QICamera.h"
 
+/**
+ * Драйвер камеры  ContourHd, реализующий
+ * передачу кадров в цикл событий
+ */
 class QContourHdCamera : public QICamera {
     Q_OBJECT
 public:

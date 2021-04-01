@@ -10,12 +10,18 @@
 #include <opencv2/opencv.hpp>
 #include <memory>
 
+/**
+ * Интерфейс доступа к камере
+ */
 class QICamera : public QObject {
     Q_OBJECT
 public slots:
+    /// Запуск передачи кадров
     virtual void play() = 0;
+    /// Отсановка передачи кадров
     virtual void stop() = 0;
 signals:
+    /// Сигнал - получен новый кадр от камеры
     void recvImage(cv::Mat img);
 };
 
