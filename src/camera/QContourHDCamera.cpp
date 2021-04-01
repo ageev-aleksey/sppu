@@ -13,7 +13,7 @@
 
 #define GAUSS_KERNEL_SIZE cv::Size{15, 15}
 #define GAUSS_SIGMA 0
-#define WINDOW_SIZE cv::Size{100, 100}
+#define WINDOW_SIZE cv::Size{30, 30}
 #define STEP 100
 #define RED_COLOR {0, 0, 255};
 #define BLUE_COLOR {255, 0, 0};
@@ -47,8 +47,8 @@ void  processingImage(cv::Mat& original) {
     cv::Point centroid;
     cv::Scalar color = BLUE_COLOR;
    // _sleep(2000);
-    cv::medianBlur(img, img, 5);
-    cv::GaussianBlur(img, img, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
+   // cv::medianBlur(img, img, 5);
+    //cv::GaussianBlur(img, img, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
 
     for (size_t x = 0; x < img.cols; x += STEP) {
         for (size_t y = 0; y < img.rows; y += STEP) {

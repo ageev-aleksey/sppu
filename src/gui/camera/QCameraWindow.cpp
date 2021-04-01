@@ -79,6 +79,7 @@ void QCameraWindow::cameraConnection() {
        // mCamera = std::make_unique<QContourHdCamera>();
         mCamera->play();
         mImageView->show();
+        emit newCamera(mCamera);
     }
 
 }

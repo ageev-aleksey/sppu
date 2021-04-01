@@ -3,6 +3,7 @@ set(SRC_MODEL ${CMAKE_CURRENT_LIST_DIR}/model/SddModel.cpp
 
 
 file(GLOB_RECURSE SRC_GUI ${CMAKE_CURRENT_LIST_DIR}/gui/*.cpp)
+file(GLOB_RECURSE SRC_ALGORITHMS ${CMAKE_CURRENT_LIST_DIR}/algorithms/*.cpp)
 file(GLOB_RECURSE SRC_MODEL_COMPONENTS ${CMAKE_CURRENT_LIST_DIR}/model/Q*.cpp)
 file(GLOB_RECURSE QT_MOC_SDD_MODEL_HEADERS ${INCLUDE_DIR}/model/Q*.h)
 
@@ -64,7 +65,7 @@ add_library(SDD::QT_MODEL_COMPONENTS ALIAS qt_model_components)
 
 add_library(camera ${SRC_CAMERA} ${QT_MOC_CAMERA})
 target_include_directories(camera PUBLIC ${INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${CMAKE_INCLUDE_CURRENT_DIR})
-target_link_libraries(camera PUBLIC ${OpenCV_LIBS} Qt5::Core Qt5::Widgets libjpeg-turbo::jpeg)
+target_link_libraries(camera PUBLIC ${OpenCV_LIBS} Qt5::Core Qt5::Widgets libjpeg-turbo::jpeg algorithms)
 
 add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
         ${LIB_DIR}/qcustomplot/qcustomplot.cpp
@@ -103,6 +104,10 @@ target_link_libraries(model_to_com_port ${Qt5Core_LIBRARIES} ${Qt5SerialPort_LIB
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(model_to_com_port pthread atomic)
 endif()
+
+add_library(algorithms ${SRC_ALGORITHMS})
+target_include_directories(algorithms PUBLIC ${INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS})
+target_link_libraries(algorithms ${OpenCV_LIBS})
 
 add_executable(camera_app main_camera.cpp)
 target_include_directories(camera_app PUBLIC ${INCLUDE_DIR})

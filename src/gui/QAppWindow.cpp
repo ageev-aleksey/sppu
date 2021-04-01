@@ -6,6 +6,7 @@
 #include "model/parser/QSddModelXmlSerializer.h"
 #include "sdd_protocol/connect/QSddJsonSerializer.h"
 #include "gui/model_saver/QIConnectionAdapter.h"
+#include "gui/model_saver/QPointPositionInserter.h"
 #include "gui/camera/QCameraWindow.h"
 #include <iostream>
 #include <qcustomplot.h>
@@ -15,6 +16,7 @@
 QAppWindow::QAppWindow() :  mSettings("AVV", "TestApp") {
         windowInit();
         sddModelInit();
+        connectionInit();
 }
 
 QAppWindow::~QAppWindow() noexcept {
@@ -54,7 +56,10 @@ void QAppWindow::sddModelInit() {
     FormatsContainer<SavingData> f;
     f.add(std::make_shared<sdd::conn::QSddJsonSerializer>());
 //    f.add(std::make_shared<QSddModelXmlSerializer>());
-    mSaver = new QSddModelSaver(f, std::make_shared<QIConnectionAdapter>(mSdd->getSddConnection()));
+    auto hardwareGetter = std::make_shared<QIConnectionAdapter>(mSdd->getSddConnection());
+    m_fullDataGetter = std::make_shared<QPointPositionInserter>(hardwareGetter,
+                                                                   nullptr);
+    mSaver = new QSddModelSaver(f, m_fullDataGetter);
     mLayout->addWidget(mModel, 1);
     auto *tab = new QTabWidget;
     // auto *page = new QConditionalControl;
@@ -62,6 +67,7 @@ void QAppWindow::sddModelInit() {
     tab->addTab(mSaver, "save to file");
     mLayout->addWidget(tab, 0);
 }
+
 
 void QAppWindow::showModelDescribe() {
     modelDescribeWindow->show();
@@ -80,9 +86,13 @@ void QAppWindow::saveModelParameters(SddModel::Parameters parameters) {
 }
 
 void QAppWindow::showCameraOptions() {
-    auto cameraOptions = new QCameraWindow();
-    cameraOptions->show();
+    camera->show();
 }
 
+
+void QAppWindow::connectionInit() {
+    QObject::connect(camera, &QCameraWindow::newCamera,
+                     m_fullDataGetter.get(), &QPointPositionInserter::setCamera);
+}
 
 

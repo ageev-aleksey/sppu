@@ -28,6 +28,12 @@ size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
     //std::cout << v << std::endl;
 }
 
+struct Request {
+    double ox_pos;
+    double ox_speed;
+    double end_pos;
+};
+
 class SFunction {
 public:
     SFunction() {
@@ -61,9 +67,14 @@ public:
         }
     }*/
 
-    double sendPostMessage(double error) {
+    double sendPostMessage(Request req) {
         std::stringstream msg;
-        msg << "{\"error\": "  << error << "}";
+        //msg << "{\"error\": "  << error << "}";
+        msg << "{\n"
+            << R"d(  "ox_pos":   )d" << req.ox_pos << ",\n"
+            << R"d(  "ox_speed": )d" << req.ox_speed << ",\n"
+            << R"d(  "end_pos":  )d" << req.end_pos << "\n"
+            << "}";
         std::string postData = msg.str();
         curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, postData.c_str());
         CURLcode res = curl_easy_perform(m_curl);
@@ -82,22 +93,29 @@ static void mdlInitializeSizes(SimStruct *S) {
     ssSetNumSFcnParams(S, 1);
     ssSetNumContStates(S, 0);
     ssSetNumDiscStates(S, 0);
-    ssSetNumInputPorts(S, 1);
+    ssSetNumInputPorts(S, 3);
     d.width = 1;
     d.numDims = 1;
     d.dims = new int[1];
     d.dims[0] = 1;
     ssSetInputPortDimensionInfo(S, 0, &d);
+    ssSetInputPortDimensionInfo(S, 1, &d);
+    ssSetInputPortDimensionInfo(S, 2, &d);
+
+    ssSetInputPortDirectFeedThrough(S, 0, 1);
+    ssSetInputPortDirectFeedThrough(S, 1, 1);
+    ssSetInputPortDirectFeedThrough(S, 2, 1);
+
     ssSetNumOutputPorts(S, 1);
     ssSetOutputPortDimensionInfo(S, 0, &d);
-    ssSetInputPortDirectFeedThrough(S, 0, 1);
+    
 
 }
 
 
 static void mdlInitializeSampleTimes(SimStruct *S)
 {
-    ssSetSampleTime(S, 0, 1); 
+    ssSetSampleTime(S, 0, 0.01); 
     ssSetOffsetTime(S, 0, 0.0);
     ssSetModelReferenceSampleTimeDefaultInheritance(S); 
 }
@@ -112,9 +130,14 @@ static void mdlStart(SimStruct *S) {
 static void mdlOutputs(SimStruct *S, int_T tid) {
 	static SFunction func;
 	real_T  *out0 = ssGetOutputPortRealSignal(S,0);
-	InputRealPtrsType input0 = ssGetInputPortRealSignalPtrs(S,0);
+	// InputRealPtrsType input0 = ssGetInputPortRealSignalPtrs(S,0);
 
-	double res = func.sendPostMessage(*input0[0]);
+    Request req;
+    req.ox_pos   = *ssGetInputPortRealSignalPtrs(S,0)[0];
+    req.ox_speed = *ssGetInputPortRealSignalPtrs(S,1)[0];
+    req.end_pos  = *ssGetInputPortRealSignalPtrs(S,2)[0];
+
+	double res = func.sendPostMessage(req);
 	out0[0] = res;
 }
 
