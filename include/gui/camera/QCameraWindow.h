@@ -23,10 +23,12 @@ class QCameraWindow : public QWidget {
 public:
     explicit QCameraWindow(QWidget *parnet=nullptr);
     ~QCameraWindow() override;
+    void closeEvent(QCloseEvent *event) override;
+signals:
+    void newCamera(std::shared_ptr<QICamera> camera);
 private:
     void initDialog();
     void initImageView();
-    std::shared_ptr<QICamera> camera;
 private slots:
     void comboBoxUpdate(const QString &name);
     void cameraConnection();
@@ -34,11 +36,12 @@ private:
 
     // Окно подключения к камере
     QComboBox *mConnectionsType = new QComboBox(this);
-    QLayout *mDialogLayout = new QHBoxLayout(this);
+    QVBoxLayout *mWindowLayout = new QVBoxLayout(this);
+    QLayout *mDialogLayout = new QHBoxLayout;
     QCameraWindowDialogContentImpl *mContent;
     // Окно получение данных с камерых
     std::unique_ptr<QImageView> mImageView = nullptr;
     //Камера
-    std::unique_ptr<QICamera> mCamera = nullptr;
+    std::shared_ptr<QICamera> mCamera = nullptr;
 };
 #endif //SDDCLIENT_QCAMERA_H

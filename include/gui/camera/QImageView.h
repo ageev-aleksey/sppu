@@ -16,6 +16,7 @@ public:
     QImageView(int width, int height, QWidget *parent = nullptr);
 
     void mouseMoveEvent(QMouseEvent *ev) override;
+    void closeEvent(QCloseEvent *event) override;
 public slots:
     void updateImage(cv::Mat img);
     void setSizeWindow(int width, int height);

@@ -3,6 +3,10 @@ import numpy as np
 
 WINDOW_SIZE = (30, 30)
 
+
+def get_window(image, x, y, windowSize):
+	return image[y:y + windowSize[1], x:x + windowSize[0]]
+
 def sliding_window(image, stepSize, windowSize):
 	# slide a window across the image
 	for y in range(0, image.shape[0], stepSize):
@@ -19,25 +23,35 @@ if __name__ == "__main__":
 	# print(img.shape)
 	# # red = img[:, :, 2]
 	# # POINTS = []
-	cap = cv2.VideoCapture("/media/nrx/ADATA UFD/Диссертация/data/20210302_161444_004.avi")
+	cap = cv2.VideoCapture("rtsp://192.168.1.176:5554/camera")
 	while True:
 		_, original = cap.read()
 		#cv2.imshow("original", original)
 		img = np.copy(original)
-		img = cv2.GaussianBlur(img, (15, 15), 2)
+		gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+		#img = cv2.GaussianBlur(img, (15, 15), 2)
 		#img = cv2.medianBlur(img, 7)
 
 		for x, y, win in sliding_window(img, WINDOW_SIZE[0], WINDOW_SIZE):
 			red = win[:, :, 2];
+			gw = get_window(gray, x ,y, WINDOW_SIZE);
 		# параметрическое определение нормального распределения
 			mu = red.mean()
 			sigma = red.std()
+			mu_g = gw.mean();
+			sigma_g = gw.std();
 
 			rtable = np.zeros(256, np.uint8)
 			identity = np.arange(256, dtype=np.uint8)
 			for i in range(int(np.ceil(mu + 3*sigma)), 256):
 				rtable[i] = i
 			table = np.dstack((identity, identity, rtable))
+			cv2.LUT(win, table, win)
+
+			gtable = np.zeros(256, np.uint8)
+			for i in range(int(np.ceil(mu_g + 3*sigma_g)), 256):
+				gtable[i] = i
+			table = np.dstack((identity, identity, gtable))
 			cv2.LUT(win, table, win)
 	# for win_i in range(win.shape[0]):
 	# 	for win_j in range(win.shape[1]):
@@ -70,8 +84,8 @@ if __name__ == "__main__":
 		else:
 			color = (255, 0, 0)
 		original = cv2.circle(original, centroid, 10, color, cv2.FILLED)
-		cv2.imshow("img", cv2.resize(original, (1280, 720)))
-		cv2.imshow("blur", cv2.resize(img, (1280, 720)))
+		cv2.imshow("img", cv2.resize(original, (640, 480)))
+		cv2.imshow("blur", cv2.resize(bin, (640, 480)))
 		if cv2.waitKey(1) == 27:
 			break
 	#cv2.imwrite("sliding_window_test.bmp", original)

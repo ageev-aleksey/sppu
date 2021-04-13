@@ -8,8 +8,13 @@
 #include "sdd_protocol/connect/QIConnection.h"
 #include <unordered_map>
 
+/**
+ * Информация об состоянии устройства с дополнительными полями
+ */
 struct SavingData {
+    /// Информация об состоянии устройства
     sdd::conn::State state;
+    /// Дополнительные не обязательные поля
     std::unordered_map<std::string, std::string> additional;
 };
 #endif //SDDCLIENT_SAVINGDATA_H

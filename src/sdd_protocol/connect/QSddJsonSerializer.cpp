@@ -28,6 +28,7 @@ QByteArray QSddJsonSerializer::write(const SavingData &object) {
     for (const auto &el : object.additional) {
         additional[el.first.c_str()] = el.second.c_str();
     }
+    json["additional"] = additional;
 
     QJsonDocument doc;
     doc.setObject(json);

@@ -8,6 +8,9 @@
 #include <QWidget>
 
 
+/**
+ * @deprecated
+ */
 class QModelPlots : public QWidget {
     Q_OBJECT
 public:

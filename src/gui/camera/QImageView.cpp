@@ -24,7 +24,7 @@ void QImageView::mouseMoveEvent(QMouseEvent *ev)  {
 
 void QImageView::updateImage(cv::Mat img) {
     //       std::cout << "print" << std::endl;
-    cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
+   // cv::cvtColor(img, img, cv::COLOR_BGR2RGB);
     QImage image((uchar*)img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
     int w = m_imgView->width();
     int h = m_imgView->height();
@@ -34,4 +34,8 @@ void QImageView::updateImage(cv::Mat img) {
 void QImageView::setSizeWindow(int width, int height) {
     m_imgView->setFixedWidth(width);
     m_imgView->setFixedHeight(height);
+}
+
+void QImageView::closeEvent(QCloseEvent *event) {
+    QWidget::closeEvent(event);
 }

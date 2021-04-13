@@ -17,6 +17,7 @@ if(UNIX)
     set(OpenCV_DIR ~/Загрузки/opencv/opencv/build)
     #set(Qt5_DIR /home/nrx/Qt/5.15.0/gcc_64/lib/cmake/Qt5)  
     set(Qt5_DIR ~/Qt/5.15.2/gcc_64/lib/cmake/Qt5)
+    set(libjpeg-turbo_DIR /opt/libjpeg-turbo/lib64/cmake/libjpeg-turbo)
     #set(Qt5_DIR C:/Qt/5.15.2/msvc2019_64/lib/cmake/Qt5)
     #Boost
     #set(BOOST_ROOT C:/libs/boost64-1.61.0-vs2015)
@@ -73,3 +74,4 @@ endif()
 
 add_subdirectory(sub_project/ip_cam)
 add_subdirectory(sub_project/find_in_image)
+add_subdirectory(sub_project/http)

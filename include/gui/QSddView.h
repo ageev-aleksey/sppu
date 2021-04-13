@@ -17,6 +17,10 @@
 #include "gui/QISddStateWidget.h"
 
 //TODO не проинициализированны внутренние виджеты
+
+/**
+ * Виджет отображения текущего состояния устройства
+ */
 class QSddView : public QWidget
 {
     Q_OBJECT
