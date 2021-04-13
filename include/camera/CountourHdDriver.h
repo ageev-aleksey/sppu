@@ -32,7 +32,7 @@
 #define VKVR_ERR_UNKNOWN        (13)
 #define VKVR_ERR_SEND_FAILED    (14)
 #define VKVR_ERR_RECV_FAILED    (15)
-#ifdef win
+#ifdef WIN32
 //-----------------------------------------------------------------------------
 // Copyright © 2012 ОАО Ижевский Радиозавод, http://www.irz.ru
 //-----------------------------------------------------------------------------
