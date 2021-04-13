@@ -1,5 +1,6 @@
 #include "gui/camera/QCameraWindow.h"
 #include "camera/QRtspCamera.h"
+#include "camera/QContourHDCamera.h"
 #include <QLineEdit>
 #include <QPushButton>
 
@@ -62,7 +63,10 @@ void QCameraWindow::comboBoxUpdate(const QString &name) {
 void QCameraWindow::cameraConnection() {
     if (mConnectionsType->currentText() == IMG_SOURCE_CVCAP) {
         // TODO (ageev) заменить в интерфейсе std::string на QString
-        mCamera = std::make_unique<QRtspCamera>(mContent->videoSourceURL->text().toStdString());
+       //mCamera = std::make_unique<QRtspCamera>(mContent->videoSourceURL->text().toStdString());
+        mCamera = std::make_unique<QContourHdCamera>();
+
+        
         QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
         mImageView->show();
     }

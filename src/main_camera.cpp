@@ -1,10 +1,15 @@
-#include "camera/QRtspCamera.h"
+//#include "camera/QRtspCamera.h"
+#include "camera/QContourHDCamera.h"
 #include <QApplication>
 #include <QWidget>
 #include <QLabel>
 #include <QFormLayout>
 #include <QMouseEvent>
-#include <gui/camera/QImageView.h>
+//#include <gui/camera/QImageView.h>
+
+
+
+
 
 
 class QImageView : public QWidget {
@@ -13,9 +18,11 @@ public:
     QImageView(int width, int height, QWidget *parent = nullptr)
         : QWidget(parent)
     {
-        setLayout(new QHBoxLayout);
-        m_imgView->setFixedWidth(width);
-        m_imgView->setFixedHeight(height);
+        layout = new QHBoxLayout;
+        setLayout(layout);
+       // m_imgView->setFixedWidth(width);
+       // m_imgView->setFixedHeight(height);
+        layout->addWidget(m_imgView);
         setMouseTracking(true);
     }
 
@@ -25,13 +32,17 @@ public:
 public slots:
     void updateImage(cv::Mat img) {
         //       std::cout << "print" << std::endl;
+       // processingImage(img);
         QImage image((uchar*)img.data, img.cols, img.rows, img.step, QImage::Format_RGB888);
-        m_imgView->setPixmap(QPixmap::fromImage(image));
+        int w = m_imgView->width();
+        int h = m_imgView->height();
+        m_imgView->setPixmap(QPixmap::fromImage(image).scaled(w, h, Qt::KeepAspectRatio));
     }
 signals:
     void mouseMove(int x, int y);
 private:
     QLabel *m_imgView = new QLabel(this);
+    QLayout* layout = nullptr;
 };
 
 
@@ -74,7 +85,9 @@ private:
 int main(int argc, char **argv) {
     QApplication core(argc, argv);
     auto factory = QCameraMaker::make();
-    auto camera = factory->create("rtsp://192.168.1.176:5554/camera");
+    //auto camera = factory->create("rtsp://192.168.1.176:5554/camera");
+     auto camera = factory->create("D:\\Диссертация\\data\\20210302_161444_004.avi");
+   // auto camera = new QContourHdCamera;
     auto view = new QImageView(640, 480, nullptr);
     QObject::connect(camera.get(), &QICamera::recvImage, view, &QImageView::updateImage);
     App app(view);

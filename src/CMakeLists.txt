@@ -32,6 +32,7 @@ find_package(Qt5 COMPONENTS Core Widgets PrintSupport REQUIRED)
 find_package(Qt5 COMPONENTS SerialPort REQUIRED)
 find_package(Boost REQUIRED COMPONENTS container)
 find_package(OpenCV REQUIRED)
+find_package(libjpeg-turbo REQUIRED)
 
 if(Boost_FOUND) 
     message(STATUS "BOOST: ${Boost_LIBRARY_DIRS} : ${Boost_LIBRARIES}")
@@ -63,7 +64,7 @@ add_library(SDD::QT_MODEL_COMPONENTS ALIAS qt_model_components)
 
 add_library(camera ${SRC_CAMERA} ${QT_MOC_CAMERA})
 target_include_directories(camera PUBLIC ${INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${CMAKE_INCLUDE_CURRENT_DIR})
-target_link_libraries(camera PUBLIC ${OpenCV_LIBS} Qt5::Core Qt5::Widgets)
+target_link_libraries(camera PUBLIC ${OpenCV_LIBS} Qt5::Core Qt5::Widgets libjpeg-turbo::jpeg)
 
 add_executable(app_gui ${SRC_GUI} ${CMAKE_CURRENT_LIST_DIR}/main_SddClient.cpp
         ${LIB_DIR}/qcustomplot/qcustomplot.cpp
