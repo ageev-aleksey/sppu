@@ -80,6 +80,53 @@ class ResNet (Ann):
         return s
 
 
+class ODEBlock(keras.layers.Layer):
+
+    def __init__(self, nunits, nlayers, activation):
+        self._nunits = nunits
+        self._nlayers = nlayers
+        self._weight = []
+        self._bias = []
+        self._activation = activation
+        super(ODEBlock, self).__init__()
+
+    def build(self, input_shape):
+        self._weight.append(self.add_weight(
+            "input_weight", 
+            shape=(input_shape[-1], self._nunits),
+            initializer="random_normal",
+            trainable=True
+            ))
+        # self._bias.append(self.add_weight("input_bias",
+        #                                  shape=(self._nunits,),
+        #                                  initializer="zeros",
+        #                                  trainable=True)
+                    # )
+        for i in range(1, self._nlayers-1):
+            self._weight.append(self.add_weight("hiden_layer" +str(i), 
+                                                shape=(self._nunits, self._nunits),
+                                                initializer="random_normal",
+                                                trainable=True
+                                                ))
+            # self._bias.append(self.add_weight("hiden_bias" + str(i),
+            #                             shape=(self._nunits,),
+            #                             initializer="zeros",
+            #                             trainable=True))
+        super(ODEBlock, self).build(input_shape)
+
+    def call(self, x):
+        t = tf.constant([0, 1], dtype="float32")
+        return tf.contrib.integrate.odeint(self.ode_func, x, t, rtol=1e-3, atol=1e-3)[1]
+
+    def compute_output_shape(self, input_shape):
+        return self._nunits
+
+    def ode_func(self, x, t):
+        y = self._activation(tf.matmul(x, self._weight[0]) ) 
+        for i in range(1, self._nlayers-1):
+            y =  self._activation(tf.matmul(y, self._weight[i])) 
+        return y
+
 class RelativeApproximationError(tf.keras.metrics.Metric):
     """RAE = (1/n) * SUM_{0}^{n}{(y_p - y)/y}"""
     def __init__(self, name='RAE', **kwargs):
