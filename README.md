@@ -13,6 +13,9 @@
 - Qt5.15 (Core, Widgets, SerialPort, PrintSupport)
 (Необходимо указать путь до Qt5Find.cmake в корневом CMakeLists.txt данного проекта)
 - Boost::Containers (Используется Boost.CircularBuffer)
+- OpenCV 4.5.1
+- libjpeg-turbo
+- curl
 ## Создание виртуальной пары последовательных портов в Ubuntu
 
 ```commandline

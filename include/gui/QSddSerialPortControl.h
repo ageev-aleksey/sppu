@@ -10,7 +10,11 @@
 
 #include <memory>
 
-
+/**
+ * Виджет отображения и доступа к настройкам
+ * параметров подключения к устройству через
+ * последовательный порт
+ */
 class QSddSerialPortControl : public QISddStateWidget {
     Q_OBJECT
 public:

@@ -4,6 +4,10 @@ import pandas as pd
 import json
 import tensorflow.keras as keras
 import numbers
+from typing import List, Dict
+import scipy as s
+import scipy.io as sio
+import numpy as np
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
@@ -139,3 +143,116 @@ def load_info_all_models(models_root : str) -> pd.DataFrame:
         if df_info is not None:
             df = pd.concat([df, df_info])
     return df.reset_index()
+
+
+
+
+################################################################################
+######### Загрузка Matlab файла с результатами моделирования модели ############
+################################################################################
+
+
+def modelMat2Dict(mat) -> List[Dict]:
+    """Конвертирование данных загруженных из mat файл в более удобное предстваление"""
+    ret = []
+    d = mat['data']
+    for i in range(d.shape[0]):
+        ret.append({'time': d[i][0][0].reshape(-1),
+                    'ox_pos': np.around(d[i][0][1].reshape(-1), 3),
+                    'ox_speed': np.around(d[i][0][2].reshape(-1), 3),
+                    'duty_cycle': np.around(d[i][0][3].reshape(-1),3),
+                    'begin_pos': d[i][0][4][0, 0],
+                    'end_pos': d[i][0][5][0, 0]})
+    return ret
+
+
+def allMatModelLoad(path: str) -> List[Dict]:
+    """Загрузка данных из mat файла (необходима наличие оперделенной структуры)"""
+    ret = []
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            data = sio.loadmat(os.path.join(root, file))
+            ret = ret + modelMat2Dict(data)
+    return ret
+
+
+def convert2LongRepresent(value: List[Dict]) -> Dict:
+    """Конвертирование данных, из короткого представления в длинное"""
+    ret = {}
+    for el in value:
+        for key in el:
+            v = ret.get(key, [])
+            v.append(el[key])
+            ret[key] = v
+
+    for key in ret:
+        try:
+            ret[key] = np.concatenate(ret[key])
+        except:
+            pass
+    return ret
+
+
+def findEndControll(v):
+    """Поиск поледней точки в данных, выполняющее управление"""
+    index = 0;
+    for el in v['duty_cycle'][::-1]:
+        if el != 0:
+            break
+        else:
+            index = index + 1
+    return len(v['duty_cycle']) - index
+
+
+def cutData(data: List[Dict]) -> List[Dict]:
+    """Обрезка данных по критерию, управление завершено.
+    Если ШИМ отличается от нуля (поиск ведется с конца) то выполняется управление
+    иначе, управление не выполнятся, соответсвенно данные для нейронной сети не несут ни какой информации
+    их необходимо выкинуть"""
+    for el in data:
+        last_index = findEndControll(el)
+        print(last_index)
+        for key in el:
+            if type(el[key]) == np.ndarray:
+                el[key] = el[key][0:last_index]
+
+
+
+
+###############################################################################
+### Функции для приминении нейронной сети в качестве прямого нейроэмулятора ###
+###############################################################################
+
+
+def neural_foo(m, current_state, duty_cycle_set):
+    state = current_state
+    history = []
+    for i in range(duty_cycle_set.shape[0]):
+        print(duty_cycle_set[i])
+        state = np.concatenate([state, np.array([duty_cycle_set[i]])])
+        history.append(state)
+        state = m.predict(state.reshape(1, -1))[0]
+    return np.stack(history)
+    
+
+
+
+# if __name__ == "__main__":
+#     import tensorflow as tf 
+#     from tensorflow import keras
+
+#     import numpy as np
+#     import scipy as s
+#     import scipy.io as sio
+#     import neural
+
+#     matlab_path = "../../../../"
+#     path = "./data"
+#     data = sio.loadmat(matlab_path + "simulation_data2.mat")
+#     data = modelMat2Dict(data)
+#     cutData(data)
+#     #calcErrorControl(data)
+#     long = convert2LongRepresent(data)
+
+#     ann = keras.models.load_model("./ipython/resnet_forward_neural_emulator_test.h5");
+#     neural_foo(ann, np.array([0, 0]), np.array([1, 1 ,1, 1]))

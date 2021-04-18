@@ -18,6 +18,10 @@
 #include <QtWidgets/QLabel>
 #include <memory>
 
+/**
+ * Виджет отображения настроек
+ * имитационной модели устройства
+ */
 class QSddModelControl : public QISddStateWidget {
     Q_OBJECT
 public:
