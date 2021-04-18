@@ -12,10 +12,10 @@ __pycache__/
 models/
 models2/
 lib/VSTermo/
-src/camera/CountorHDDriver.cpp
-src/camera/QContourHDCamera.cpp
-include/camera/CountourHdDriver.h
-include/camera/QContourHDCamera.h
+#src/camera/CountorHDDriver.cpp
+#src/camera/QContourHDCamera.cpp
+#include/camera/CountourHdDriver.h
+#include/camera/QContourHDCamera.h
 lib/VSTermo
 *.h5
 *.pbtxt
