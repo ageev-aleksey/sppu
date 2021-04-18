@@ -1,3 +1,4 @@
+
 cmake_minimum_required(VERSION 3.5)
 project(openCvTest)
 
@@ -20,3 +21,4 @@ target_link_libraries(read_jpg_from_buffer ${OpenCV_LIBS} libjpeg-turbo::jpeg)
 
 add_executable(libjpeg_example lib_jpeg_example.cpp)
 target_link_libraries(read_jpg_from_buffer libjpeg-turbo::jpeg)
+
