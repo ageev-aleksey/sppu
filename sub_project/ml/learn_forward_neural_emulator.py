@@ -25,5 +25,4 @@ if __name__ == "__main__":
     ann = k.Model(inputs=ann.inputs, outputs=ann.outputs)
     ann.compile('adam', 'mse', ['mae'])
     h = ann.fit(x, y, batch_size=32, epochs=100)
-
     print(h)
