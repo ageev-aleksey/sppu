@@ -21,7 +21,7 @@ void sdd::conn::QSerialPortConnection::send(Package &package)  {
 }
 
 sdd::conn::QSerialPortConnection::QSerialPortConnection()
-    : m_buffer(StatePackage::NUM_BYTES*100)
+    : m_buffer(StatePackage::NUM_BYTES*2)
 {
    m_serialPort = nullptr;
    m_file.setFileName("test.bin");

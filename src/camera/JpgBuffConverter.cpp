@@ -84,6 +84,10 @@ JpgBuffConverter::JpgBuffConverter()
     // empty
 }
 
+JpgBuffConverter::~JpgBuffConverter() {
+    delete m_pimpl;
+}
+
 cv::Mat JpgBuffConverter::operator()(const std::vector<unsigned char> &jpg_img) {
     return m_pimpl->operator()(jpg_img);
 }

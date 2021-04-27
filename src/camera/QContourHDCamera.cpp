@@ -2,6 +2,7 @@
 
 #include "camera/QContourHDCamera.h"
 #include "camera/CountourHdDriver.h"
+#include "camera/JpgBuffConverter.h"
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <stdexcept>
@@ -146,10 +147,12 @@ namespace {
 
 char jpg_name[] = "C:\\my_tmp\\tmp.jpg";
 static cv::Mat glob_img;
+JpgBuffConverter jpgConverter;
+
 void contourHd_callback(void* param,
                const void* jpeg_img, unsigned int jpeg_size, int reason)
 {
-#ifdef win
+#ifdef WIN32
    // cv::Mat raw(1, jpeg_size, CV_8UC1, jpeg_img);
 
    // Если callback-функция была вызвана для оповещения об ошибке,
@@ -158,32 +161,37 @@ void contourHd_callback(void* param,
   //_sleep(2000);
   //jpg_name[7] = '0' + (char)jpeg_saved;
   // Создание файла JPEG.
-  HANDLE hf = CreateFile(jpg_name,
-      GENERIC_READ | GENERIC_WRITE,
-      (DWORD)0,
-      NULL,
-      CREATE_ALWAYS,
-      FILE_ATTRIBUTE_NORMAL,
-      (HANDLE)NULL);
-  if (hf == INVALID_HANDLE_VALUE)
-  {
-      fprintf(stderr, "Failed to create file: \"%s\".\n", jpg_name);
-      return;
-  };
+  //HANDLE hf = CreateFile(jpg_name,
+  //    GENERIC_READ | GENERIC_WRITE,
+  //    (DWORD)0,
+  //    NULL,
+  //    CREATE_ALWAYS,
+  //    FILE_ATTRIBUTE_NORMAL,
+  //    (HANDLE)NULL);
+  //if (hf == INVALID_HANDLE_VALUE)
+  //{
+  //    fprintf(stderr, "Failed to create file: \"%s\".\n", jpg_name);
+  //    return;
+  //};
 
-  // Запись данных в файл JPEG.
-   DWORD dwTmp;
-  if (!WriteFile(hf, jpeg_img, jpeg_size, (LPDWORD)&dwTmp, NULL))
-      fprintf(stderr, "Failed to write to file: \"%s\".\n", jpg_name);
-  else
-      fprintf(stdout, "Captured image successfully saved to \"%s\".\n", jpg_name);
+  //// Запись данных в файл JPEG.
+  // DWORD dwTmp;
+  //if (!WriteFile(hf, jpeg_img, jpeg_size, (LPDWORD)&dwTmp, NULL))
+  //    fprintf(stderr, "Failed to write to file: \"%s\".\n", jpg_name);
+  //else
+  //    fprintf(stdout, "Captured image successfully saved to \"%s\".\n", jpg_name);
 
   // Закрытие файла JPEG.
-  CloseHandle(hf);
+ // CloseHandle(hf);
 
-  glob_img = cv::imread(jpg_name);
-
-  processingImage(glob_img);
+  //glob_img = cv::imread(jpg_name);
+  uchar* bptr = (uchar*)jpeg_img;
+  std::vector<uchar> jpgBuff(jpeg_size);
+  for (size_t i = 0; i < jpeg_size; i++) {
+      jpgBuff[i] = bptr[i];
+  }
+  glob_img = jpgConverter(jpgBuff);
+  // processingImage(glob_img);
   cv::imshow("img", glob_img);
   //cv::waitKey(0);
   cv::cvtColor(glob_img, glob_img, cv::COLOR_BGR2RGB);
