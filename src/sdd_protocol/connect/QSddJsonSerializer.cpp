@@ -16,6 +16,7 @@ sdd::conn::QSddJsonSerializer::QSddJsonSerializer()
 
 QByteArray QSddJsonSerializer::write(const SavingData &object) {
     QJsonObject json;
+    json["index"] = object.state.index;
     json["ox"] = object.state.ox;
     json["oy"] = object.state.oy;
     json["pwmX"] = object.state.pwm.ox;

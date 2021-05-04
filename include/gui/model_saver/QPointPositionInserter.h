@@ -39,6 +39,9 @@ private:
 
     std::mutex m_pointMutex;
     cv::Point m_lastPoint;
+    int m_index;
+
+    std::chrono::steady_clock::time_point  m_time;
 
     std::mutex m_dataMutex;
     SavingData m_lastData;

@@ -6,6 +6,7 @@
 QPointPositionInserter::QPointPositionInserter(std::shared_ptr<QModelDataGetter> dataGetter,
                                                std::shared_ptr<QICamera> camera)
 {
+    m_index = 0;
     setGetter(std::move(dataGetter));
     setCamera(std::move(camera));
 }
@@ -51,11 +52,13 @@ std::shared_ptr<QICamera> QPointPositionInserter::getCamera() {
 }
 
 void QPointPositionInserter::addImage(cv::Mat frame) {
+    auto time = std::chrono::steady_clock::now();
     auto point = findRedPointCoordinates(frame);
 
     { // lock
         std::lock_guard<std::mutex> lock(m_pointMutex);
-        m_lastPoint = {0};//point;
+        m_lastPoint = point;
+        m_time = time;
     } // end locks
 
     makeAndSendLastData();
@@ -74,8 +77,10 @@ SavingData QPointPositionInserter::getData() {
 void QPointPositionInserter::makeAndSendLastData() {
     SavingData data  = getData();
     cv::Point  point = getPoint();
-    data.additional["timeAddedPointInformation"] =
-            std::to_string(std::chrono::steady_clock::now().time_since_epoch().count());
+    data.additional["pointPositionIndex"] = std::to_string(m_index);
+    m_index++;
+    data.additional["timeAddedPointInformation"] = std::to_string(
+            std::chrono::duration_cast<std::chrono::microseconds>(m_time.time_since_epoch()).count());
     data.additional["redPointOx"] = std::to_string(point.x);
     data.additional["redPointOy"] = std::to_string(point.y);
     emit newData(data);

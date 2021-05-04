@@ -2,6 +2,7 @@
 #include <opencv2/opencv.hpp>
 //#include "algorithms/algorithms.h"
 #include <map>
+#include <cmath>
 
 // 27.04.21
 //#define GAUSS_KERNEL_SIZE cv::Size{15, 15}
@@ -171,7 +172,22 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
 
     cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
+    std::cout << "Point{" << centroid.x << "; " << centroid.y << "} ";
 
+    double window_width = 0.94;
+    double windows_height = 0.94;
+    double Px = window_width/original.cols;
+    double Py = windows_height / original.rows;
+    cv::Point3d p;
+    p.x  = original.cols/2 - centroid.x;
+    p.y = original.rows/2 - centroid.y;
+    p.z = 1.88;
+
+    cv::Point2d d;
+    d.x = std::atan(p.x/p.z);
+    d.y = std::atan(p.y/p.z);
+
+    std::cout << "Deg{" << d.x << "; " << d.y << "}" << std::endl;
    return centroid;
 }
 

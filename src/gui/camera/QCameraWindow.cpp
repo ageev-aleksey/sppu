@@ -6,6 +6,7 @@
 #include <QCloseEvent>
 
 const QString IMG_SOURCE_CVCAP = "cv::VideoCapture";
+const QString IMG_SOURCE_CONTOUR_HD = "ipcam::ContourHd";
 
 
 
@@ -46,6 +47,7 @@ void QCameraWindow::initDialog() {
     mWindowLayout->addWidget(widgetGroup);
 
     mConnectionsType->addItem(IMG_SOURCE_CVCAP);
+    mConnectionsType->addItem(IMG_SOURCE_CONTOUR_HD);
     mConnectionsType->addItem("");
     mWindowLayout->addWidget(mImageView.get(), 1);
 
@@ -68,21 +70,26 @@ void QCameraWindow::comboBoxUpdate(const QString &name) {
 }
 
 void QCameraWindow::cameraConnection() {
-    if (mConnectionsType->currentText() == IMG_SOURCE_CVCAP) {
-        if (mCamera == nullptr) {
-            // TODO (ageev) заменить в интерфейсе std::string на QString
-            //mCamera = std::make_unique<QContourHdCamera>();
-            mCamera = std::make_unique<QCvVcCamera>(mContent->videoSourceURL->text().toStdString());
-            QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
-        }
-
-
-       // mCamera = std::make_unique<QContourHdCamera>();
-        mCamera->play();
-        mImageView->show();
-        emit newCamera(mCamera);
+    if (mCamera != nullptr) {
+        mCamera->stop();
+        mCamera.reset();
     }
 
+    if (mConnectionsType->currentText() == IMG_SOURCE_CVCAP) {;
+        mCamera = std::make_shared<QCvVcCamera>(mContent->videoSourceURL->text().toStdString());
+        QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
+    } else if (mConnectionsType->currentText() == IMG_SOURCE_CONTOUR_HD) {
+        if (mCamera == nullptr) {
+            mCamera = std::make_shared<QContourHdCamera>();
+            QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
+        }
+    } else {
+        return;
+    }
+
+    mCamera->play();
+    mImageView->show();
+    emit newCamera(mCamera);
 }
 
 void QCameraWindow::initImageView() {

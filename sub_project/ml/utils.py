@@ -8,6 +8,7 @@ from typing import List, Dict
 import scipy as s
 import scipy.io as sio
 import numpy as np
+import json
 
 # Print iterations progress
 def print_progress(iteration, total, prefix='', suffix='', decimals=1, bar_length=100):
@@ -270,3 +271,38 @@ def neural_foo(m, current_state, duty_cycle_set):
 
 #     ann = keras.models.load_model("./ipython/resnet_forward_neural_emulator_test.h5");
 #     neural_foo(ann, np.array([0, 0]), np.array([1, 1 ,1, 1]))
+
+
+
+def load_sdd_client_data(path : str) -> dict:
+    """Чтение списка пакетов, записанных клиентом sdd в формате json, 
+    и конвертирование в более удобный формат
+    @params:
+        path - str, путь до  json файла"""
+    f = open(path)
+    buff = f.read()
+    j = json.loads(buff)
+    ret = []
+    for el in j:
+        ret.append(
+            {
+                'packageIndex': el['index'],
+                'ox': el['ox'],
+                'oy': el['oy'],
+                'pwmX': el['pwmX'],
+                'pwmY': el['pwmY'],
+                'taskX': el['taskX'],
+                'taskY': el['taskY'],
+                'packageTime': el['time'],
+                'pointOx': int(el['additional']['redPointOx']),
+                'pointOy': int(el['additional']['redPointOy']),
+                'cameraTime': int(el['additional']['timeAddedPointInformation']),
+                'cameraIndex': int(el['additional']['pointPositionIndex'])
+            }
+        )
+    return ret
+
+
+if __name__ == "__main__":
+    data = load_sdd_client_data("./data2.json")
+    print(data)
