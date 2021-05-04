@@ -2,10 +2,10 @@
 #include <opencv2/opencv.hpp>
 #include "algorithms/algorithms.h"
 
-#define GAUSS_KERNEL_SIZE cv::Size{15, 15}
+#define GAUSS_KERNEL_SIZE cv::Size{3, 3}
 #define GAUSS_SIGMA 0
-#define WINDOW_SIZE cv::Size{30, 30}
-#define STEP 100
+#define STEP 30
+#define WINDOW_SIZE cv::Size{STEP, STEP}
 #define RED_COLOR {0, 0, 255};
 #define BLUE_COLOR {255, 0, 0};
 #define CIRCLE_RADIUS 10
@@ -31,13 +31,13 @@ cv::Mat identity(size_t n) {
 }
 
 cv::Point findRedPointCoordinates(cv::Mat &original)  {
-    cv::Mat img = original;
+    cv::Mat img = original(cv::Rect(10, 10, original.cols-20, original.rows-20));
     cv::Mat hsv;
     cv::Point centroid;
     cv::Scalar color = BLUE_COLOR;
     //_sleep(2000);
-    // cv::medianBlur(img, img, 5);
-    // cv::GaussianBlur(img, img, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
+     //cv::medianBlur(img, img, 3);
+     //cv::GaussianBlur(img, img, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
 
     for (size_t x = 0; x < img.cols; x += STEP) {
         for (size_t y = 0; y < img.rows; y += STEP) {
@@ -60,7 +60,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
 
             cv::Mat rtable = zeros(256);
             cv::Mat ident = identity(256);
-            for (size_t i = std::ceil(mu.val[0] + 3.0 * sigma.val[0]); i < rtable.rows; i++) {
+            for (size_t i = std::ceil(mu.val[0] + 4.0 * sigma.val[0]); i < rtable.rows; i++) {
                 rtable.at<uchar>(i) = i;
             }
             cv::Mat table;
@@ -79,7 +79,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
             if (h > 20) {
                 v = 0;
             }
-            if (v < 100) {
+            if (v < 200) {
                 v = 0;
             }
             hsv.at<cv::Vec3b>(i, j) = pixel;
@@ -90,7 +90,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     cv::split(hsv, hsv_channels);
     cv::Mat &value_channel = hsv_channels[2];
     cv::Mat binary;
-    cv::threshold(value_channel, binary, 0, 1000, cv::THRESH_BINARY);
+    cv::threshold(value_channel, binary, 0, 256, cv::THRESH_BINARY);
 
     cv::Moments m = cv::moments(binary, true);
     if (m.m00 != 0) {
@@ -104,5 +104,6 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
     cv::imshow("bin", binary);
+    //cv::waitKey();
    return centroid;
 }

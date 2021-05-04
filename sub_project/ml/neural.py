@@ -90,16 +90,21 @@ class RelativeApproximationError(tf.keras.metrics.Metric):
                                    dtype = tf.float32, initializer='ones')
     
     def update_state(self, y_true, y_pred, sample_weight=None):
-            val =tf.math.abs(tf.math.subtract(y_true, y_pred, name="val"))
-            self.value.assign_add(tf.math.reduce_sum(tf.math.divide(val, y_true)), name="value")
-            self.num.assign_add(1, name="num")
+        #tf.print("y_true", tf.shape(y_true))
+        #tf.print("y_pred", y_pred)
+        val = tf.math.subtract(y_true, y_pred, name="val")
+        #tf.print("val", val)
+        self.value.assign_add(tf.math.reduce_sum(tf.math.abs(tf.math.divide(val, y_true))), name="value")
+        self.num.assign_add(tf.cast(tf.shape(y_true)[0], tf.float32), name="num")
+        #tf.print("value", self.value)
+        #tf.print("num", self.num)
         
     def result(self):
         return self.value / self.num
     
     def reset_states(self):
-        self.value = 0
-        self.num = 0
+        self.value.assign(0)
+        self.num.assign(0)
 
 
 class NeuralMaker:

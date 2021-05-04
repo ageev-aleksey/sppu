@@ -166,6 +166,20 @@ def modelMat2Dict(mat) -> List[Dict]:
     return ret
 
 
+def modelMat2DictV2(mat) -> List[Dict]:
+    """Конвертирование данных загруженных из mat файл в более удобное предстваление"""
+    ret = []
+    d = mat['data']
+    for i in range(d.shape[0]):
+        value = {}
+        j = 0;
+        for key in d.dtype.fields:
+            value[key] = d[i][0][j].reshape(-1),
+            j = j + 1
+        ret.append(value)
+    return ret
+
+
 def allMatModelLoad(path: str) -> List[Dict]:
     """Загрузка данных из mat файла (необходима наличие оперделенной структуры)"""
     ret = []

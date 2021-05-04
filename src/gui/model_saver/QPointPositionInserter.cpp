@@ -51,7 +51,9 @@ std::shared_ptr<QICamera> QPointPositionInserter::getCamera() {
 }
 
 void QPointPositionInserter::addImage(cv::Mat frame) {
-    auto point = findRedPointCoordinates(frame);
+    cv::Mat imgResized;
+    cv::resize(frame, imgResized, {330, 240});
+    auto point = findRedPointCoordinates(imgResized);
 
     { // lock
         std::lock_guard<std::mutex> lock(m_pointMutex);
