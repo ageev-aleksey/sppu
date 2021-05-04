@@ -51,13 +51,11 @@ std::shared_ptr<QICamera> QPointPositionInserter::getCamera() {
 }
 
 void QPointPositionInserter::addImage(cv::Mat frame) {
-    cv::Mat imgResized;
-    cv::resize(frame, imgResized, {330, 240});
-    auto point = findRedPointCoordinates(imgResized);
+    auto point = findRedPointCoordinates(frame);
 
     { // lock
         std::lock_guard<std::mutex> lock(m_pointMutex);
-        m_lastPoint = point;
+        m_lastPoint = {0};//point;
     } // end locks
 
     makeAndSendLastData();
@@ -82,5 +80,3 @@ void QPointPositionInserter::makeAndSendLastData() {
     data.additional["redPointOy"] = std::to_string(point.y);
     emit newData(data);
 }
-
-
