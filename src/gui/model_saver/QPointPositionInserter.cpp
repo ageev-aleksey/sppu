@@ -55,7 +55,7 @@ void QPointPositionInserter::addImage(cv::Mat frame) {
 
     { // lock
         std::lock_guard<std::mutex> lock(m_pointMutex);
-        m_lastPoint = point;
+        m_lastPoint = {0};//point;
     } // end locks
 
     makeAndSendLastData();

@@ -14,6 +14,7 @@ class JpgBuffConverterImpl;
 class JpgBuffConverter {
 public:
     JpgBuffConverter();
+    ~JpgBuffConverter();
     /**
      * Декомпрессия jpg изображения
      * @param jpg_img - буффер с jpg изображением
@@ -21,7 +22,7 @@ public:
      */
     cv::Mat operator()(const std::vector<unsigned char> &jpg_img);
 private:
-    std::unique_ptr<JpgBuffConverterImpl> m_pimpl;
+    JpgBuffConverterImpl *m_pimpl;
 };
 
 #endif //SDDCLIENT_JPGBUFFCONVERTER_H
