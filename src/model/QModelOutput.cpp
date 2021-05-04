@@ -29,10 +29,16 @@ static short convertPwm(double value) {
 
 void QModelOutput::writeModelState(SddModel::State state) {
     sdd::StatePackage statePackage;
-    // TODO (?)
-    statePackage.setOX(convertCorner(state.positionOx));
-    statePackage.setOY(convertCorner(state.positionOz));
+    //// For protocol version 1
+    // statePackage.setOX(convertCorner(state.positionOx));
+    // statePackage.setOY(convertCorner(state.positionOz));
     //////////////////////
+    // For protocol version v2
+    statePackage.setS0(0);
+    statePackage.setS1(0);
+    statePackage.setS2(convertCorner(state.positionOx));
+    statePackage.setS3(convertCorner(state.positionOz));
+    //////////////////////////
     statePackage.setPositionX(convertCorner(state.positionOx));
     statePackage.setPositionX(convertCorner(state.positionOz));
     statePackage.setPWMX(convertPwm(state.oxSignal));

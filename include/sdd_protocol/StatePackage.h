@@ -49,6 +49,17 @@ namespace sdd {
         short positionY();
         void setPositionY(short pos);
 
+        short S0();
+        short S1();
+        short S2();
+        short S3();
+
+        void setS0(short v);
+        void setS1(short v);
+        void setS2(short v);
+        void setS3(short v);
+
+
         Package::byte_t  randomValue();
 
         template <typename Iterator>

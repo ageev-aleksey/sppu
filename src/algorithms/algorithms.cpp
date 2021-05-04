@@ -120,7 +120,9 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     cv::split(hsv, hsv_channels);
     cv::Mat &value_channel = hsv_channels[2];*/
     cv::Mat binary;
+    cv::Mat binary_show;
     cv::threshold(img, binary, 150, 1, cv::THRESH_BINARY);
+    cv::threshold(img, binary_show, 150, 255, cv::THRESH_BINARY);
     // binaryPrint(binary);
 
     //cv::Moments m = cv::moments(binary, true);
@@ -128,7 +130,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
 
     //std::cout << binary.type() << std::endl;
 
-    cv::imshow("bin", binary);
+    cv::imshow("bin", binary_show);
 
     std::map<int, int> squares = binarySegmentation(binary);
     int max_key = 0;

@@ -71,8 +71,8 @@ void QCameraWindow::cameraConnection() {
     if (mConnectionsType->currentText() == IMG_SOURCE_CVCAP) {
         if (mCamera == nullptr) {
             // TODO (ageev) заменить в интерфейсе std::string на QString
-            mCamera = std::make_unique<QContourHdCamera>();
-            // mCamera = std::make_unique<QCvVcCamera>(mContent->videoSourceURL->text().toStdString());
+            //mCamera = std::make_unique<QContourHdCamera>();
+            mCamera = std::make_unique<QCvVcCamera>(mContent->videoSourceURL->text().toStdString());
             QObject::connect(mCamera.get(), &QICamera::recvImage, mImageView.get(), &QImageView::updateImage);
         }
 

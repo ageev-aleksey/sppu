@@ -94,6 +94,22 @@ Package::byte_t StatePackage::randomValue() {
 }
 
 
+short StatePackage::S0() {
+    return findField("S0")->to<short>()[0];
+}
+
+short StatePackage::S1() {
+    return findField("S1")->to<short>()[0];
+}
+
+short StatePackage::S2() {
+    return findField("S2")->to<short>()[0];
+}
+
+short StatePackage::S3() {
+    return findField("S3")->to<short>()[0];
+}
+
 
 void StatePackage::create_all_fields() {
     // Корректный разбор пакета для устройсвта посылающая 36 байт
@@ -134,6 +150,22 @@ void StatePackage::create_all_fields() {
     bworker.addField("-1", 7);
     bworker.addField("R", 1);
 
+}
+
+void StatePackage::setS0(short v) {
+    findField("S0")->fill(reinterpret_cast<const char*>(&v), 2);
+}
+
+void StatePackage::setS1(short v) {
+    findField("S1")->fill(reinterpret_cast<const char*>(&v), 2);
+}
+
+void StatePackage::setS2(short v) {
+    findField("S2")->fill(reinterpret_cast<const char*>(&v), 2);
+}
+
+void StatePackage::setS3(short v) {
+    findField("S3")->fill(reinterpret_cast<const char*>(&v), 2);
 }
 
 

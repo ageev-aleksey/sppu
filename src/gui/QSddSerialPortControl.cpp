@@ -29,9 +29,9 @@ void QSddSerialPortControl::guiInit() {
     auto *box = new QGroupBox("Current device state");
     box->setLayout(textDeviceStateLayout);
     textDeviceStateLayout->addWidget(new QLabel("X position:"), 0, 0);
-    textDeviceStateLayout->addWidget(new QLabel("Z position:"), 1, 0);
+    textDeviceStateLayout->addWidget(new QLabel("Y position:"), 1, 0);
     textDeviceStateLayout->addWidget(new QLabel("X speed:"), 2, 0);
-    textDeviceStateLayout->addWidget(new QLabel("Z speed:"), 3, 0);
+    textDeviceStateLayout->addWidget(new QLabel("Y speed:"), 3, 0);
     textDeviceStateLayout->addWidget(new QLabel("Diff time recv packs:"), 4, 0);
     textDeviceStateLayout->addWidget(mXPosition, 0, 1);
     textDeviceStateLayout->addWidget(mYPosition, 1, 1);
