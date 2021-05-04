@@ -16,6 +16,7 @@
 - OpenCV 4.5.1
 - libjpeg-turbo
 - curl
+- jsoncpp
 ## Создание виртуальной пары последовательных портов в Ubuntu
 
 ```commandline
