@@ -17,7 +17,7 @@
 
 #define GAUSS_KERNEL_SIZE cv::Size{3, 3}
 #define GAUSS_SIGMA 0
-#define STEP 40
+#define STEP 30
 #define WINDOW_SIZE cv::Size{STEP, STEP}
 #define RED_COLOR {0, 0, 255}
 #define BLUE_COLOR {255, 0, 0}
@@ -43,8 +43,16 @@ cv::Mat identity(size_t n) {
     return ret;
 }
 
+struct ObjInfo {
+    int id;
+    int perimeter;
+    int square;
+    int m10;
+    int m01;
+    double factor;
+};
 
-std::map<int, int>  binarySegmentation(cv::Mat binary);
+std::pair<std::map<int, int>, std::map<int, int>>   binarySegmentation(cv::Mat binary);
 
 void binaryPrint(cv::Mat binary) {
     for (size_t i = 0; i < binary.rows; i++) {
@@ -56,6 +64,8 @@ void binaryPrint(cv::Mat binary) {
 }
 
 cv::Point findRedPointCoordinates(cv::Mat &original)  {
+    original.rows;
+    original.cols;
     cv::Mat img;
     cv::GaussianBlur(original, original, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
     cv::cvtColor(original, img, cv::COLOR_BGR2GRAY);
@@ -118,12 +128,13 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     }
 
     std::array<cv::Mat, 3> hsv_channels;
-    cv::split(hsv, hsv_channels);
+    cv::split(hsv, hsv_channels);s
     cv::Mat &value_channel = hsv_channels[2];*/
-    cv::Mat binary;
+    cv::Mat binary1;
     cv::Mat binary_show;
-    cv::threshold(img, binary, 150, 1, cv::THRESH_BINARY);
-    cv::threshold(img, binary_show, 150, 255, cv::THRESH_BINARY);
+    cv::threshold(img, binary1, 100, 1, cv::THRESH_BINARY);
+    cv::Mat binary = binary1(cv::Rect(5, 5, binary1.cols - 10, binary1.rows - 10));
+    cv::threshold(img, binary_show, 100, 255, cv::THRESH_BINARY);
     // binaryPrint(binary);
 
     //cv::Moments m = cv::moments(binary, true);
@@ -133,15 +144,32 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
 
     cv::imshow("bin", binary_show);
 
-    std::map<int, int> squares = binarySegmentation(binary);
-    int max_key = 0;
-    int max_value = -500;
-    for (auto &el : squares) {
-        if (el.second > max_value) {
-            max_key = el.first;
-            max_value = el.second;
-        }
+    auto  info_objs = binarySegmentation(binary);
+    auto& squares = info_objs.first;
+    auto& perimeter = info_objs.second;
+
+    std::vector<ObjInfo> objects;
+    for (auto& el : squares) {
+        ObjInfo object;
+        object.id = el.first;
+        object.square = el.second;
+        object.perimeter = perimeter[el.first];
+        objects.push_back(object);
     }
+
+    std::sort(objects.begin(), objects.end(), [](const ObjInfo& x, const ObjInfo& y) {
+        return x.square > y.square;
+    });
+
+    //int max_key = 0;
+    //int max_value = -500;
+    //
+    //for (auto &el : squares) {
+    //    if (el.second > max_value) {
+    //        max_key = el.first;
+    //        max_value = el.second;
+    //    }
+    //}
 
     if (squares.empty()) {
         cv::circle(original, centroid, CIRCLE_RADIUS, BLUE_COLOR, cv::FILLED);
@@ -149,22 +177,34 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
         return {0, 0};
     }
 
-    int m00 = 0;
-    int m10 = 0;
-    int m01 = 0;
-    for (size_t i = 0; i < binary.rows; i++) {
-        for (size_t j = 0; j < binary.cols; j++) {
-            if (binary.at<uchar>(i, j) == max_key) {
-                m00++;
-                m10 += i;
-                m01 += j;
+    for (auto& obj : objects) {
+        obj.m10 = 0;
+        obj.m01 = 0;
+        for (size_t i = 0; i < binary.rows; i++) {
+            for (size_t j = 0; j < binary.cols; j++) {
+                if (binary.at<uchar>(i, j) == obj.id) {
+                    // obj.m00++;
+                   obj.m10 += i;
+                   obj.m01 += j;
+                }
             }
+        }
+        double pi = 3.14;
+        obj.factor = 0;
+       // obj.factor = std::abs( obj.perimeter / (2 * std::sqrt(pi * obj.square)) - 1);
+    }
+    int max_index = 0;
+    int square = 0;
+    for (size_t i = 0; i < objects.size(); i++) {
+        if (objects[i].factor < 0.3 && objects[i].square > square) {
+            max_index = i;
+            square = objects[i].square;
         }
     }
 
-    if (m00 > 5) {
-        centroid.x = m01 / m00;
-        centroid.y = m10 / m00;
+    if (objects[max_index].square > 5) {
+        centroid.x = objects[max_index].m01 / objects[max_index].square;
+        centroid.y = objects[max_index].m10 / objects[max_index].square;
         color = RED_COLOR;
     } else {
         color = BLUE_COLOR;
@@ -173,6 +213,9 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
     std::cout << "Point{" << centroid.x << "; " << centroid.y << "} ";
+    std::cout << "m10 -> " << objects[max_index].m10 << std::endl;
+    std::cout << "m01 -> " << objects[max_index].m01 << std::endl;
+    std::cout << "m10/m01 -> " << objects[max_index].factor << std::endl;
 
     double window_width = 0.94;
     double windows_height = 0.94;
@@ -199,8 +242,8 @@ int& at(std::map<int, int> &m, int key) {
     return m[key];
 }
 
-
-std::map<int, int>  binarySegmentation(cv::Mat binary) {
+// @return pair{Площадь объектов, Перимитер объектов}
+std::pair<std::map<int, int>, std::map<int, int>>  binarySegmentation(cv::Mat binary) {
     int km = 0;
     int kn = 0;
     int A = 0;
@@ -208,6 +251,7 @@ std::map<int, int>  binarySegmentation(cv::Mat binary) {
     int C = 0;
     int cur = 0;
     std::map<int, int> square;
+    std::map<int, int> perimeter;
     for(size_t i = 0; i < binary.rows; i++) {
         for (size_t j = 0; j < binary.cols; j++) {
             kn = j-1;
@@ -230,12 +274,15 @@ std::map<int, int>  binarySegmentation(cv::Mat binary) {
                 cur++;
                 binary.at<uchar>(i, j) = cur;
                 at(square, cur)++;
+             //   at(perimeter, cur)++;
             } else if (B != 0 && C == 0) {
                 binary.at<uchar>(i, j) = B;
                 at(square, B)++;
+               // at(perimeter, A)++;
             } else if (B == 0 && C != 0) {
                 binary.at<uchar>(i, j) = C;
                 at(square, C)++;
+               // at(perimeter, A)++;
             } else if (B != 0 && C != 0) {
                 at(square, B)++;
                 if (B == C) {
@@ -247,9 +294,73 @@ std::map<int, int>  binarySegmentation(cv::Mat binary) {
 //                    at(square, C) = 0;
                 }
             }
+
+    /*        if (B == 0 & C == 0) {
+                at(perimeter, A)++;
+            } else if (B != 0 && C == 0) {
+                at(perimeter, A)++;
+            } else if (B == 0 && C != 0) {
+                at(perimeter, A)++;
+            }*/
+
+            /*
+                        A = Im(i,j);
+        kn = j + 1;
+        if kn > n then
+          kn = n;
+          B = 0;
+        else
+          B = Im(i,kn);
+        end
+    
+        km = i + 1;
+        if km > m then
+          km = m;
+          C = 0;
+        else
+          C = Im(km,j);
+        end
+        
+        if B == 0 & C == 0 then
+          Perimetrs(A) = Perimetrs(A) + 1;
+        elseif B ~= 0 & C == 0 then
+          Perimetrs(A) = Perimetrs(A) + 1;
+        elseif B == 0 & C ~= 0 then
+          Perimetrs(A) = Perimetrs(A) + 1;
+        end
+            */
+
+            A = binary.at<uchar>(i, j);
+            kn = j + 1;
+            if (kn >= binary.cols) {
+                kn = binary.cols-1;
+                B = 0;
+            }
+            else {
+                B = binary.at<uchar>(i, kn);
+            }
+
+            km = i + 1;
+            if (km >= binary.rows) {
+                km = binary.rows-1;
+                C = 0;
+            }
+            else {
+                C = binary.at<uchar>(km, j);
+            }
+
+            if (B == 0 & C == 0) {
+                at(perimeter, A)++;
+            }
+            else if (B != 0 && C == 0) {
+                at(perimeter, A)++;
+            }
+            else if (B == 0 && C != 0) {
+                at(perimeter, A)++;
+            }
         }
     }
-    return std::move(square);
+    return { std::move(square), std::move(perimeter) };
 }
 
 
