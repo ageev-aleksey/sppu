@@ -18,7 +18,7 @@
 
 void sdd::conn::QSerialPortConnection::send(Package &package)  {
     m_serialPort->write(&package.toBinary()[0]);
-    m_currentIndex = 0;
+   // m_currentIndex = 0;
 }
 
 sdd::conn::QSerialPortConnection::QSerialPortConnection()
@@ -27,6 +27,7 @@ sdd::conn::QSerialPortConnection::QSerialPortConnection()
    m_serialPort = nullptr;
    m_file.setFileName("test.bin");
    m_file.open(QIODevice::WriteOnly);
+   m_currentIndex = 0;
 }
 
 sdd::conn::State sdd::conn::QSerialPortConnection::statePackageToStruct(sdd::StatePackage &pack) {

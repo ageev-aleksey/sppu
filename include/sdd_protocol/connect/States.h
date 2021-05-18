@@ -25,7 +25,7 @@ namespace sdd::conn {
         int oy;
     };
     struct State {
-        int index;
+        int64_t index;
         int ox;
         int oy;
         Pwm pwm;

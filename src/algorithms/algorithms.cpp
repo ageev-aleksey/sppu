@@ -209,7 +209,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     } else {
         color = BLUE_COLOR;
     }
-
+    cv::cvtColor(original, original, cv::COLOR_RGB2BGR);
     cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
     std::cout << "Point{" << centroid.x << "; " << centroid.y << "} ";

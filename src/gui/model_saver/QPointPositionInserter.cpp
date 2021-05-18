@@ -80,7 +80,7 @@ void QPointPositionInserter::makeAndSendLastData() {
     data.additional["pointPositionIndex"] = std::to_string(m_index);
     m_index++;
     data.additional["timeAddedPointInformation"] = std::to_string(
-            std::chrono::duration_cast<std::chrono::microseconds>(m_time.time_since_epoch()).count());
+            std::chrono::duration_cast<std::chrono::milliseconds>(m_time.time_since_epoch()).count());
     data.additional["redPointOx"] = std::to_string(point.x);
     data.additional["redPointOy"] = std::to_string(point.y);
     emit newData(data);
