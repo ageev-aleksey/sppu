@@ -137,8 +137,8 @@ class S(BaseHTTPRequestHandler):
 
         req = json.loads(post_data.decode('utf-8'))
         # resp = ann.predict(np.array([[req['error']]])) # controll by error
-        #resp = inverse_neuro_controller(req['ox_pos'], req['ox_speed'], req['end_pos']) #controll by state
-        resp = forward_neuro_controller(req['ox_pos'], req['ox_speed'], req['end_pos'])
+        resp = inverse_neuro_controller(req['ox_pos'], req['ox_speed'], req['end_pos']) #controll by state
+        #resp = forward_neuro_controller(req['ox_pos'], req['ox_speed'], req['end_pos'])
         self._set_response()
         ret = {
             "duty_cycle": resp
@@ -163,9 +163,9 @@ if __name__ == '__main__':
     print("Loading model...")
     #ann = keras.models.load_model('resnet_model_controll_by_state.h5')
     #ann = keras.models.load_model('resnet_forward_neural_emulator_test.h5')
-    #ann = keras.models.load_model('backword_model.432.h5')
+    ann = keras.models.load_model('backword_model.432.h5')
     #ann = keras.models.load_model('resnet_forward_neural_emulator_test1.h5')
-    ann = keras.models.load_model('resnet_forward_neural_emulator_test3.h5')
+    #ann = keras.models.load_model('resnet_forward_neural_emulator_test3.h5')
     print("...Model loaded")
     if len(argv) == 2:
         run(port=int(argv[1]))

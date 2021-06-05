@@ -19,3 +19,4 @@ include/camera/QContourHDCamera.h
 lib/VSTermo
 *.h5
 sub_project/data
+BUILD2/

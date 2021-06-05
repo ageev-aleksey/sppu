@@ -43,6 +43,9 @@ public:
     QRtspCameraWorker(std::string url)
     : capture(url)
     {}
+    QRtspCameraWorker(int deviceIndex)
+        : capture(deviceIndex)
+    {}
 public slots:
     void capturingInit() {
         timer = new QTimer(this);
@@ -83,7 +86,13 @@ public:
 QCvVcCamera::QCvVcCamera(const std::string uri) {
     m_uri = std::move(uri);
     qRegisterMetaType<cv::Mat>("cv::Mat");
-    m_worker = new QRtspCameraWorker(m_uri);
+    if (m_uri == ":webcam") {
+        m_worker = new QRtspCameraWorker(0);
+    }
+    else {
+        m_worker = new QRtspCameraWorker(m_uri);
+    }
+    
     if (!m_worker->capture.isOpened()) {
         throw std::runtime_error("Error connection source");
     }

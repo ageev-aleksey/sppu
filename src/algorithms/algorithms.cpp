@@ -148,18 +148,21 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     auto& squares = info_objs.first;
     auto& perimeter = info_objs.second;
 
-    std::vector<ObjInfo> objects;
+    std::unordered_map<int, ObjInfo> objects;
     for (auto& el : squares) {
         ObjInfo object;
+        object.m01 = 0;
+        object.m10 = 0;
+        object.factor = 0;
         object.id = el.first;
         object.square = el.second;
         object.perimeter = perimeter[el.first];
-        objects.push_back(object);
+        objects.insert({ object.id, object });
     }
 
-    std::sort(objects.begin(), objects.end(), [](const ObjInfo& x, const ObjInfo& y) {
+   /* std::sort(objects.begin(), objects.end(), [](const ObjInfo& x, const ObjInfo& y) {
         return x.square > y.square;
-    });
+    });*/
 
     //int max_key = 0;
     //int max_value = -500;
@@ -177,7 +180,17 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
         return {0, 0};
     }
 
-    for (auto& obj : objects) {
+
+    for (size_t i = 0; i < binary.rows; i++) {
+        for (size_t j = 0; j < binary.cols; j++) {
+            int id = binary.at<uchar>(i, j);
+            auto& obj = objects[id];
+            obj.m01 += i;
+            obj.m10 += j;
+        }
+    }
+
+/*    for (auto& obj : objects) {
         obj.m10 = 0;
         obj.m01 = 0;
         for (size_t i = 0; i < binary.rows; i++) {
@@ -192,7 +205,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
         double pi = 3.14;
         obj.factor = 0;
        // obj.factor = std::abs( obj.perimeter / (2 * std::sqrt(pi * obj.square)) - 1);
-    }
+    }*/
     int max_index = 0;
     int square = 0;
     for (size_t i = 0; i < objects.size(); i++) {
@@ -212,10 +225,10 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     cv::cvtColor(original, original, cv::COLOR_RGB2BGR);
     cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
-    std::cout << "Point{" << centroid.x << "; " << centroid.y << "} ";
-    std::cout << "m10 -> " << objects[max_index].m10 << std::endl;
-    std::cout << "m01 -> " << objects[max_index].m01 << std::endl;
-    std::cout << "m10/m01 -> " << objects[max_index].factor << std::endl;
+    // std::cout << "Point{" << centroid.x << "; " << centroid.y << "} ";
+    // std::cout << "m10 -> " << objects[max_index].m10 << std::endl;
+    // std::cout << "m01 -> " << objects[max_index].m01 << std::endl;
+    // std::cout << "m10/m01 -> " << objects[max_index].factor << std::endl;
 
     double window_width = 0.94;
     double windows_height = 0.94;
@@ -230,7 +243,7 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     d.x = std::atan(p.x/p.z);
     d.y = std::atan(p.y/p.z);
 
-    std::cout << "Deg{" << d.x << "; " << d.y << "}" << std::endl;
+  //  std::cout << "Deg{" << d.x << "; " << d.y << "}" << std::endl;
    return centroid;
 }
 
