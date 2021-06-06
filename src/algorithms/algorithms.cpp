@@ -216,14 +216,14 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     }
 
     if (objects[max_index].square > 5) {
-        centroid.x = objects[max_index].m01 / objects[max_index].square;
-        centroid.y = objects[max_index].m10 / objects[max_index].square;
+        centroid.x = objects[max_index].m10 / objects[max_index].square;
+        centroid.y = objects[max_index].m01 / objects[max_index].square;
         color = RED_COLOR;
     } else {
         color = BLUE_COLOR;
     }
    // cv::cvtColor(original, original, cv::COLOR_RGB2BGR);
-    cv::circle(original, {centroid.y, centroid.x}, CIRCLE_RADIUS, color, cv::FILLED);
+    cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
    // cv::waitKey();
    std::cout << "Original{" << original.rows << "; " << original.cols << "} " << std::endl;
