@@ -9,7 +9,9 @@
 #include <sstream>
 #include <QtSerialPort/QSerialPort>
 
+#include <experimental/filesystem>
 
+namespace fs = std::experimental::filesystem;
 /**
  * Создание модели работаюющая в отдельном потоке, которая отправлет данные в устройство
  * @param file_path - путь до файла с параметрами модели и настройками устройства в json формате
@@ -30,6 +32,7 @@ SddModel::Parameters modelParametersParse(const QJsonObject &obj);
 QString deviceParse(const QJsonObject &obj);
 
 int main(int argc, char **argv) {
+    std::cout << fs::current_path() << std::endl;
     QCoreApplication appCore(argc, argv);
     qSetMessagePattern("[%{time yyyyMMdd h:mm:ss.zzz t} "
                       "%{if-debug}D%{endif}"
@@ -46,6 +49,7 @@ int main(int argc, char **argv) {
 
 
 std::unique_ptr<QModelOutput> make(const QString &file_path) {
+    std::cout << file_path.toStdString() << std::endl;
     QFile property(file_path);
     if (!property.open(QIODevice::ReadOnly)) {
         QString msg;

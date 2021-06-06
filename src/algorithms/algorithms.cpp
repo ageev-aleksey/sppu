@@ -175,8 +175,8 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     //}
 
     if (squares.empty()) {
-        cv::circle(original, centroid, CIRCLE_RADIUS, BLUE_COLOR, cv::FILLED);
-        cv::imshow("original", original);
+        //cv::circle(original, centroid, CIRCLE_RADIUS, BLUE_COLOR, cv::FILLED);
+        //cv::imshow("original", original);
         return {0, 0};
     }
 
@@ -222,10 +222,12 @@ cv::Point findRedPointCoordinates(cv::Mat &original)  {
     } else {
         color = BLUE_COLOR;
     }
-    cv::cvtColor(original, original, cv::COLOR_RGB2BGR);
-    cv::circle(original, centroid, CIRCLE_RADIUS, color, cv::FILLED);
+   // cv::cvtColor(original, original, cv::COLOR_RGB2BGR);
+    cv::circle(original, {centroid.y, centroid.x}, CIRCLE_RADIUS, color, cv::FILLED);
     cv::imshow("original", original);
-    // std::cout << "Point{" << centroid.x << "; " << centroid.y << "} ";
+   // cv::waitKey();
+   std::cout << "Original{" << original.rows << "; " << original.cols << "} " << std::endl;
+    std::cout << "Point{" << centroid.x << "; " << centroid.y << "} " << std::endl;
     // std::cout << "m10 -> " << objects[max_index].m10 << std::endl;
     // std::cout << "m01 -> " << objects[max_index].m01 << std::endl;
     // std::cout << "m10/m01 -> " << objects[max_index].factor << std::endl;
