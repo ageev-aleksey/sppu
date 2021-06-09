@@ -12,7 +12,7 @@ namespace sdd {
     class StatePackage : public Package {
     public:
         inline const static int ID = 20;
-        inline const static int NUM_BYTES = 36;
+        inline const static int NUM_BYTES = 31/*36*/;
         StatePackage();
         explicit StatePackage(const std::vector<Package::byte_t> &bin_buff);
         //void fromBinary(std::vector<Package::byte_t> bin_buff);
@@ -49,6 +49,17 @@ namespace sdd {
         short positionY();
         void setPositionY(short pos);
 
+        short S0();
+        short S1();
+        short S2();
+        short S3();
+
+        void setS0(short v);
+        void setS1(short v);
+        void setS2(short v);
+        void setS3(short v);
+
+
         Package::byte_t  randomValue();
 
         template <typename Iterator>
@@ -56,6 +67,8 @@ namespace sdd {
             if (std::distance(begin, end) == NUM_BYTES && *begin == ID) {
                 auto last = end - 1;
                 //auto payloadEnd = last - 2;
+               /* std::cout << "Pack hash: " << (int)*last << std::endl;
+                std::cout << "Hash: " << (int)hash(begin, last) << std::endl;*/
                 return *last == hash(begin, last);
             }
             return false;

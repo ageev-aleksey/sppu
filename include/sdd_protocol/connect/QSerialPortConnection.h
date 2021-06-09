@@ -38,7 +38,9 @@ namespace sdd::conn {
         void packageWrite(Package *pack);
         bool read(StatePackage &package, size_t readSize);
         bool callbackIsContain(const std::function<Handle> &handler);
+        State statePackageToStruct(sdd::StatePackage &pack);
 
+        int64_t m_currentIndex;
         std::shared_ptr<QSerialPort> m_serialPort;
         QMetaObject::Connection m_qtEventConnection;
         std::vector<std::function<Handle>> m_callBacks;

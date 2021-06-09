@@ -6,6 +6,7 @@
 #define TESTSIMULINKMODEL_STATE_H
 
 #include <chrono>
+#include <QtGlobal>
 
 namespace sdd::conn {
     struct Light {
@@ -25,6 +26,7 @@ namespace sdd::conn {
         int oy;
     };
     struct State {
+        qint64 index;
         int ox;
         int oy;
         Pwm pwm;

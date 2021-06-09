@@ -3,11 +3,6 @@
 #include <QPushButton>
 
 
-// TODO(ageev) выделить панель управления в отдельный интерфейс
-//  и реализовать интерфейс для компьютерной модели и устройства через ком порт
-//
-
-
 // TODO(ageev) SddController
 QSddView::QSddView(QISddStateWidget *sddConnector, QWidget *parent)
 : QWidget(parent), mSddConnect(sddConnector) {
@@ -43,11 +38,11 @@ void QSddView::guiInit() {
     plot = mPlots->addPlot(1, 0, &p);
     plot->plotLayout()->insertRow(0);
     plot->plotLayout()->addElement(0, 0,
-                                   new QCPTextElement(plot, "Oz position", QFont("sans", 12, QFont::Weight::Bold)));
+                                   new QCPTextElement(plot, "Oy position", QFont("sans", 12, QFont::Weight::Bold)));
     plot = mPlots->addPlot(1, 1, &p);
     plot->plotLayout()->insertRow(0);
     plot->plotLayout()->addElement(0, 0,
-                                   new QCPTextElement(plot, "Oz speed", QFont("sans", 12, QFont::Weight::Bold)));
+                                   new QCPTextElement(plot, "Oy speed", QFont("sans", 12, QFont::Weight::Bold)));
 
     plot = mPlots->addPlot(0, 2, &p);
     plot->plotLayout()->insertRow(0);
@@ -57,7 +52,7 @@ void QSddView::guiInit() {
     plot = mPlots->addPlot(1, 2, &p);
     plot->plotLayout()->insertRow(0);
     plot->plotLayout()->addElement(0, 0,
-                                   new QCPTextElement(plot, "Oz input", QFont("sans", 12, QFont::Weight::Bold)));
+                                   new QCPTextElement(plot, "Oy input", QFont("sans", 12, QFont::Weight::Bold)));
     mLayout->addWidget(mPlots, 1);
 
     mLayout->addWidget(mSddConnect);

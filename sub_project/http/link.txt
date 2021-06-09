@@ -1,0 +1,206 @@
+-L/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.9.5
+-L/usr/lib/x86_64-linux-gnu/libcurl.so
+
+-I/usr/include/x86_64-linux-gnu/qt5/QtCore
+
+
+>> mex hello.cpp
+Building with 'g++'.
+MEX completed successfully.
+>> hello()
+must be 1 double argument
+ 
+>> hello(1)
+>> hello()
+must be 1 double argument
+ 
+>> hello
+must be 1 double argument
+ 
+>> hello
+must be 1 double argument
+ 
+>> hello()
+must be 1 double argument
+ 
+>> mex hello.cpp
+Building with 'g++'.
+Error using mex
+/home/nrx/app/matlab_mex/test/hello.cpp: In member function ‘virtual void
+MexFunction::operator()(matlab::mex::ArgumentList, matlab::mex::ArgumentList)’:
+/home/nrx/app/matlab_mex/test/hello.cpp:9:58: error: ‘DOUBLE’ was not declared in this scope
+         if (inputs.size() == 1 && inputs[0].getType() == DOUBLE) {
+                                                          ^~~~~~
+ 
+>> mex hello.cpp
+Building with 'g++'.
+MEX completed successfully.
+>> hello()
+must be 1 double argument
+ 
+>> 
+>> hello(1)
+>> hello('a')
+must be 1 double argument
+ 
+>> hello(1)
+>> hello(1.0)
+>> mex hello.cpp
+Building with 'g++'.
+MEX completed successfully.
+>> hello(1)
+value: 1
+>> hello(1.0)
+value: 1
+>> hello(1.02)
+value: 1.02
+Exception "java.lang.ClassNotFoundException: com/intellij/codeInsight/editorActions/FoldingData"while constructing DataFlavor for: application/x-java-jvm-local-objectref; class=com.intellij.codeInsight.editorActions.FoldingData
+Exception "java.lang.ClassNotFoundException: com/intellij/codeInsight/editorActions/FoldingData"while constructing DataFlavor for: application/x-java-jvm-local-objectref; class=com.intellij.codeInsight.editorActions.FoldingData
+Exception "java.lang.ClassNotFoundException: com/intellij/openapi/editor/RawText"while constructing DataFlavor for: application/x-java-jvm-local-objectref; class=com.intellij.openapi.editor.RawText
+Exception "java.lang.ClassNotFoundException: com/intellij/openapi/editor/RawText"while constructing DataFlavor for: application/x-java-jvm-local-objectref; class=com.intellij.openapi.editor.RawText
+>> mex neurla_http_client_mex.cpp
+Building with 'g++'.
+Error using mex
+/home/nrx/app/sppu/CPP/sppu -
+develop/sub_project/http/neurla_http_client_mex.cpp:2:10: fatal error: mexAdapter.h:
+Нет такого файла или каталога
+ #include <mexAdapter.h>
+          ^~~~~~~~~~~~~~
+compilation terminated.
+ 
+>> mex neurla_http_client_mex.cpp
+Building with 'g++'.
+Error using mex
+/home/nrx/app/sppu/CPP/sppu -
+develop/sub_project/http/neurla_http_client_mex.cpp:6:10: fatal error:
+QJsonDocument: Нет такого файла или каталога
+ #include <QJsonDocument>
+          ^~~~~~~~~~~~~~~
+compilation terminated.
+ 
+>> mex neurla_http_client_mex.cpp -I/usr/include/x86_64-linux-gnu/qt5/QtCore -L/usr/lib/x86_64-linux-gnu/libcurl.so -L/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.9.5 
+Building with 'g++'.
+Error using mex
+In file included from /usr/include/x86_64-linux-gnu/qt5/QtCore/QJsonDocument:1:0,
+                 from /home/nrx/app/sppu/CPP/sppu -
+                 develop/sub_project/http/neurla_http_client_mex.cpp:6:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qjsondocument.h:43:10: fatal error:
+QtCore/qjsonvalue.h: Нет такого файла или каталога
+ #include <QtCore/qjsonvalue.h>
+          ^~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+ 
+>> mex neurla_http_client_mex.cpp -I/usr/include/x86_64-linux-gnu/qt5/QtCore -L/usr/lib/x86_64-linux-gnu/libcurl.so -L/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.9.5 -I/usr/include/x86_64-linux-gnu/qt5
+Building with 'g++'.
+Error using mex
+/home/nrx/app/sppu/CPP/sppu - develop/sub_project/http/neurla_http_client_mex.cpp:
+In function ‘size_t write_callback(char*, size_t, size_t, void*)’:
+/home/nrx/app/sppu/CPP/sppu -
+develop/sub_project/http/neurla_http_client_mex.cpp:12:30: error: invalid use of
+incomplete type ‘class QJsonObject’
+     auto object = doc.object();
+                              ^
+In file included from /usr/include/x86_64-linux-gnu/qt5/QtCore/qjsondocument.h:43:0,
+                 from /usr/include/x86_64-linux-gnu/qt5/QtCore/QJsonDocument:1,
+                 from /home/nrx/app/sppu/CPP/sppu -
+                 develop/sub_project/http/neurla_http_client_mex.cpp:6:
+/usr/include/x86_64-linux-gnu/qt5/QtCore/qjsonvalue.h:51:7: note: forward
+declaration of ‘class QJsonObject’
+ class QJsonObject;
+       ^~~~~~~~~~~
+In file included from /usr/include/c++/7/bits/move.h:54:0,
+                 from /usr/include/c++/7/bits/stl_pair.h:59,
+                 from /usr/include/c++/7/bits/stl_algobase.h:64,
+                 from /usr/include/c++/7/vector:60,
+                 from
+                 /home/nrx/app/matlab2020b2/extern/include/cppmex/mexMatlabEngine.hpp:10,
+                                  from
+                 /home/nrx/app/matlab2020b2/extern/include/mex.hpp:80,
+                 from /home/nrx/app/sppu/CPP/sppu -
+                 develop/sub_project/http/neurla_http_client_mex.cpp:1:
+/usr/include/c++/7/type_traits: In instantiation of ‘struct
+std::is_base_of<matlab::mex::Function, MexFunction>’:
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:39:23:
+required from ‘matlab::mex::Function* mexCreatorUtil() [with T = MexFunction]’
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:70:70:
+required from here
+/usr/include/c++/7/type_traits:1512:12: error: invalid use of incomplete type ‘class
+MexFunction’
+     struct is_base_of
+            ^~~~~~~~~~
+In file included from /home/nrx/app/matlab2020b2/extern/include/mexAdapter.hpp:17:0,
+                 from /home/nrx/app/sppu/CPP/sppu -
+                 develop/sub_project/http/neurla_http_client_mex.cpp:2:
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:62:7:
+note: forward declaration of ‘class MexFunction’
+ class MexFunction;
+       ^~~~~~~~~~~
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:
+In instantiation of ‘matlab::mex::Function* mexCreatorUtil() [with T =
+MexFunction]’:
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:70:70:
+required from here
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:39:23:
+error: ‘value’ is not a member of ‘std::is_base_of<matlab::mex::Function,
+MexFunction>’
+     return mexFunction;
+                       ^
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:38:42:
+error: invalid use of incomplete type ‘class MexFunction’
+     matlab::mex::Function* mexFunction = new T();
+                                          ^~~~~~~
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:62:7:
+note: forward declaration of ‘class MexFunction’
+ class MexFunction;
+       ^~~~~~~~~~~
+ 
+>> mex neurla_http_client_mex.cpp -I/usr/include/x86_64-linux-gnu/qt5/QtCore -L/usr/lib/x86_64-linux-gnu/libcurl.so -L/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.9.5 -I/usr/include/x86_64-linux-gnu/qt5
+Building with 'g++'.
+Error using mex
+In file included from /usr/include/c++/7/bits/move.h:54:0,
+                 from /usr/include/c++/7/bits/stl_pair.h:59,
+                 from /usr/include/c++/7/bits/stl_algobase.h:64,
+                 from /usr/include/c++/7/vector:60,
+                 from
+                 /home/nrx/app/matlab2020b2/extern/include/cppmex/mexMatlabEngine.hpp:10,
+                                  from
+                 /home/nrx/app/matlab2020b2/extern/include/mex.hpp:80,
+                 from /home/nrx/app/sppu/CPP/sppu -
+                 develop/sub_project/http/neurla_http_client_mex.cpp:1:
+/usr/include/c++/7/type_traits: In instantiation of ‘struct
+std::is_base_of<matlab::mex::Function, MexFunction>’:
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:39:23:
+required from ‘matlab::mex::Function* mexCreatorUtil() [with T = MexFunction]’
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:70:70:
+required from here
+/usr/include/c++/7/type_traits:1512:12: error: invalid use of incomplete type ‘class
+MexFunction’
+     struct is_base_of
+            ^~~~~~~~~~
+In file included from /home/nrx/app/matlab2020b2/extern/include/mexAdapter.hpp:17:0,
+                 from /home/nrx/app/sppu/CPP/sppu -
+                 develop/sub_project/http/neurla_http_client_mex.cpp:2:
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:62:7:
+note: forward declaration of ‘class MexFunction’
+ class MexFunction;
+       ^~~~~~~~~~~
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:
+In instantiation of ‘matlab::mex::Function* mexCreatorUtil() [with T =
+MexFunction]’:
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:70:70:
+required from here
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:39:23:
+error: ‘value’ is not a member of ‘std::is_base_of<matlab::mex::Function,
+MexFunction>’
+     return mexFunction;
+                       ^
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:38:42:
+error: invalid use of incomplete type ‘class MexFunction’
+     matlab::mex::Function* mexFunction = new T();
+                                          ^~~~~~~
+/home/nrx/app/matlab2020b2/extern/include/cppmex/detail/mexFunctionAdapterImpl.hpp:62:7:
+note: forward declaration of ‘class MexFunction’
+ class MexFunction;
+       ^~~~~~~~~~~
+ 
+>> mex neurla_http_client_mex.cpp -I/usr/include/x86_64-linux-gnu/qt5/QtCore -L/usr/lib/x86_64-linux-gnu/libcurl.so -L/usr/lib/x86_64-linux-gnu/libQt5Core.so.5.9.5 -I/usr/include/x86_64-linux-gnu/qt5

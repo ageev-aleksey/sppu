@@ -9,6 +9,7 @@
 #include "sdd_protocol/Package.h"
 #include <QtCore>
 #include <functional>
+#include <mutex>
 
 namespace sdd::conn {
     class QIConnection : public QObject {

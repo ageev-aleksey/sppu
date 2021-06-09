@@ -6,9 +6,17 @@ CMakeLists.txt.user
 build/
 out/
 *.pdb
-<<<<<<< HEAD
 bin/
 __pycache__/
 .ipynb_checkpoints/
 models/
 models2/
+lib/VSTermo/
+src/camera/CountorHDDriver.cpp
+src/camera/QContourHDCamera.cpp
+include/camera/CountourHdDriver.h
+include/camera/QContourHDCamera.h
+lib/VSTermo
+*.h5
+sub_project/data
+BUILD2/

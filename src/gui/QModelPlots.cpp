@@ -1,6 +1,7 @@
 #include "gui/QModelPlots.h"
 #include <utility>
 #include <algorithm>
+#include <assert.h>
 
 QModelPlots::~QModelPlots() noexcept {}
 

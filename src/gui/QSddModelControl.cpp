@@ -28,9 +28,9 @@ void QSddModelControl::guiInit() {
     box->setLayout(layout);
     // layout->setAlignment(Qt::Alignment(Qt::AlignmentFlag::AlignRight));
     layout->addWidget(new QLabel("X position:"), 0, 0);
-    layout->addWidget(new QLabel("Z position:"), 1, 0);
+    layout->addWidget(new QLabel("Y position:"), 1, 0);
     layout->addWidget(new QLabel("X speed:"), 2, 0);
-    layout->addWidget(new QLabel("Z speed:"), 3, 0);
+    layout->addWidget(new QLabel("Y speed:"), 3, 0);
 
 
 
@@ -63,14 +63,14 @@ void QSddModelControl::guiInit() {
     textAndSpin->addRow(new QLabel("Ox0:"), Ox0Parameter);
     ParametersLayout->addLayout(textAndSpin, 0, 0);
     textAndSpin = new QFormLayout;
-    textAndSpin->addRow(new QLabel("Oz0:"), Oz0Parameter);
+    textAndSpin->addRow(new QLabel("Oy0:"), Oz0Parameter);
     ParametersLayout->addLayout(textAndSpin, 0, 1);
     // 2. начальная скорость
     textAndSpin = new QFormLayout;
     textAndSpin->addRow(new QLabel("Vx0:"), Vx0Parameter);
     ParametersLayout->addLayout(textAndSpin, 0, 2);
     textAndSpin = new QFormLayout;
-    textAndSpin->addRow(new QLabel("Vz0:"), Vz0Parameter);
+    textAndSpin->addRow(new QLabel("Vy0:"), Vz0Parameter);
     ParametersLayout->addLayout(textAndSpin, 0, 3);
     // 3. Структурная константа
     textAndSpin = new QFormLayout;

@@ -8,8 +8,8 @@
 
 #define GAUSS_KERNEL_SIZE cv::Size{15, 15}
 #define GAUSS_SIGMA 0
-#define WINDOW_SIZE cv::Size{100, 100}
-#define STEP 100
+#define WINDOW_SIZE cv::Size{50, 50}
+#define STEP 50
 #define RED_COLOR {0, 0, 255};
 #define BLUE_COLOR {255, 0, 0};
 #define CIRCLE_RADIUS 10
@@ -38,7 +38,7 @@ namespace util {
 
 
 int main(int argc, char **argv) {
-    std::string path = "/media/nrx/ADATA UFD/Диссертация/data/20210302_161444_004.avi";
+    std::string path = "C:\\Users\\user\\Desktop\\Пятно фрагмент Темная комната 640х480.avi";//"D:\\Диссертация\\data\\20210302_161444_004.avi";
     cv::VideoCapture cap(path);
 
     if (!cap.isOpened()) {
@@ -55,8 +55,8 @@ int main(int argc, char **argv) {
             break;
         }
         img = original.clone();
-        cv::medianBlur(img, img, 5);
-        cv::GaussianBlur(img, img, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
+       // cv::medianBlur(img, img, 5);
+        // cv::GaussianBlur(img, img, GAUSS_KERNEL_SIZE, GAUSS_SIGMA);
 
         for (size_t x = 0; x < img.cols; x += STEP) {
             for (size_t y = 0; y < img.rows; y += STEP) {

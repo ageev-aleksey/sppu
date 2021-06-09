@@ -18,18 +18,22 @@
 
 void sdd::conn::QSerialPortConnection::send(Package &package)  {
     m_serialPort->write(&package.toBinary()[0]);
+   // m_currentIndex = 0;
 }
 
 sdd::conn::QSerialPortConnection::QSerialPortConnection()
-    : m_buffer(StatePackage::NUM_BYTES*100)
+    : m_buffer(StatePackage::NUM_BYTES*2)
 {
    m_serialPort = nullptr;
    m_file.setFileName("test.bin");
    m_file.open(QIODevice::WriteOnly);
+   m_currentIndex = 0;
 }
 
-sdd::conn::State statePackageToStruct(sdd::StatePackage &pack) {
+sdd::conn::State sdd::conn::QSerialPortConnection::statePackageToStruct(sdd::StatePackage &pack) {
     sdd::conn::State state{};
+    state.index = m_currentIndex;
+    m_currentIndex++;
     state.time = std::chrono::steady_clock::now();
     state.ox = pack.OX();
     state.oy = pack.OY();

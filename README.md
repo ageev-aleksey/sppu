@@ -14,6 +14,15 @@
 (Необходимо указать путь до Qt5Find.cmake в корневом CMakeLists.txt данного проекта)
 - Boost::Containers (Используется Boost.CircularBuffer)
 - OpenCV 4.5.1
+- libjpeg-turbo
+- curl (libcul3-nss)
+- jsoncpp 1.9.4
+- matlab r2021b
+
+Перед запуском matlab необходимо указать путь к библиотеки jsoncpp:
+```shell script
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib/
+```
 ## Создание виртуальной пары последовательных портов в Ubuntu
 
 ```commandline
