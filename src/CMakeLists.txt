@@ -102,7 +102,7 @@ target_include_directories(model_to_com_port PUBLIC ${INCLUDE_DIR} ${Qt5Core_INC
 target_link_libraries(model_to_com_port ${Qt5Core_LIBRARIES} ${Qt5SerialPort_LIBRARIES}
                                         qt_model_components sdd_model sdd_protocol)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    target_link_libraries(model_to_com_port pthread atomic)
+    target_link_libraries(model_to_com_port pthread atomic stdc++fs)
 endif()
 
 add_library(algorithms ${SRC_ALGORITHMS})

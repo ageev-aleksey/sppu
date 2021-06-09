@@ -23,7 +23,7 @@ QByteArray QSddJsonSerializer::write(const SavingData &object) {
     json["pwmY"] = object.state.pwm.oy;
     json["taskX"] = object.state.task.ox;
     json["taskY"] = object.state.task.oy;
-    json["time"] = duration_cast<milliseconds>(object.state.time.time_since_epoch()).count();
+    json["time"] = static_cast<qint64>(duration_cast<milliseconds>(object.state.time.time_since_epoch()).count());
 
     QJsonObject additional;
     for (const auto &el : object.additional) {
